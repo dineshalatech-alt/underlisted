@@ -1,0 +1,17 @@
+# NorCal Deal Finder — Python packages the app needs.
+# Installed with:  pip install -r requirements.txt
+
+streamlit>=1.40        # the web app framework (the screens)
+requests>=2.32         # talks to RentCast / Street View / Gemini over the web
+python-dotenv>=1.0     # reads your private .env keys
+PyYAML>=6.0            # reads the editable config/*.yaml files
+pandas>=2.2            # tables & data wrangling
+Pillow>=10.4          # handling photos / images
+pydeck>=0.9           # the map view with score-colored pins
+
+# Cloud database driver — only needed if you set DATABASE_URL to a PostgreSQL
+# server. Harmless to install now; not used while running on local SQLite.
+psycopg[binary]>=3.1
+
+# Added in a later phase, when we build the AI image feature:
+# google-genai>=1.0    # Gemini / "Nano Banana" image generation

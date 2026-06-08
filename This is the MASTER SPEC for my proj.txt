@@ -1,0 +1,167 @@
+This is the MASTER SPEC for my project. Build it in PHASES, in the order below.
+After each phase, STOP: tell me what you did, how to test it, what works live vs.
+faked, and wait for my OK before the next phase. Never build features on top of an
+unproven data layer. I'm NOT a developer — explain steps simply.
+
+=====================================================================
+THE PRODUCT
+=====================================================================
+A real-estate DEAL-FINDER, CALIFORNIA ONLY for now (built so adding more states
+later = new config + risk source, not a rewrite). Goal: so simple that a Gen Z
+first-timer AND a 75-year-old can open it, scroll a feed, and instantly spot a good
+deal. Mobile-first. It's intended to become a paid product. Keep data, scoring,
+financing, and UI as separate modules.
+
+CURRENT STATE: scaffold, listings, cost architecture, background worker, cloud-DB
+switch, location/photos, and rent/value estimates are CODED but UNTESTED against
+live APIs. Deal Score, cash-needed module, risk flags, map, AI renders, branding,
+accounts, and payments are NOT built.
+
+DATA SOURCES (keys in .env; never print keys; do NOT scrape Redfin/Zillow):
+- RentCast (RENTCAST_API_KEY): sale listings, value estimate (AVM), rent estimate.
+- Google Street View Static (STREETVIEW_API_KEY): real curb photo.
+- Google Maps Static (same Google key, "Maps Static API" enabled): satellite/aerial.
+- Google Maps link: free clickable address link (no API).
+- Google Gemini / Nano Banana (GEMINI_API_KEY): AI "imagine remodeled" renders +
+  one-time branding assets ONLY. NEVER use AI to depict the real current property.
+- Cal Fire (CA fire zones) + FEMA (flood): free public risk data.
+
+COST ARCHITECTURE (applies to everything):
+- Shared cache keyed by PROPERTY, not per user (500 users viewing one home = one
+  lookup + one image fetch total).
+- TTLs (listings ~24h, value/rent ~7d, images ~never), all config.
+- No fetch on page load — users read cache; refreshes come from the scheduled
+  worker. Incremental sync only. Lazy-load images (on open). Per-user monthly cap.
+- Smallest-good image size. Expensive calls behind explicit buttons.
+- Admin/Usage view: billable calls by source, image fetches, cache hit-rate, est. $.
+
+VISUAL / BRANDING (clean-green theme): primary #1D9E75, light fill #E1F5EE, deep
+#0F6E56, neutral grays; reserve amber/red for caution/bad signals. Big readable
+text, big tap targets, plain language, one clear action per screen, jargon gets a
+one-tap "what's this?" tooltip. Show "why it's a deal" visually (score gauge,
+simple bars) so it's understood WITHOUT reading.
+
+DISCLAIMERS in-app: values/rents/cash are ESTIMATES, not financial advice; verify
+with a licensed lender/agent. Fair Housing: scoring/filtering must NOT use signals
+that proxy for protected classes (no demographic or "neighborhood quality" inputs).
+
+=====================================================================
+PHASE 0 — PROVE THE DATA WORKS (do first)
+=====================================================================
+- Live smoke test with my real keys: ONE small call each for listings, value est,
+  rent est, Street View, aerial. Show raw responses.
+- Compare RentCast value/rent FIELD NAMES to what the code assumes; FIX the mapping
+  in the data source if they differ.
+- Confirm caching (second view is free) and report billable calls used.
+- Keep it tiny/cheap. Don't build new features until this passes.
+
+=====================================================================
+PHASE 1 — FINISH THE CORE PRODUCT (California)
+=====================================================================
+- DEAL SCORE (0-100), weights in config: mainly how far BELOW estimated value it's
+  listed, plus rent yield, with days-on-market and risk as secondary. Flag "good
+  deals" above a threshold. Show a "why it scored X" breakdown (segmented bar) and
+  the comps + a value RANGE so the score is trustworthy.
+- BACKTEST the score against recently-sold homes; report whether it would have
+  flagged the genuinely good ones.
+- "HOW MUCH CASH YOU REALLY NEED" (beginner-first): lead with ONE big number ("you
+  need about $X available"). Break into money that LEAVES your account (down
+  payment + closing = cash to close) vs. money you KEEP (reserves). Toggle "live in
+  it" (3-3.5% down) vs "rent it out" (20-25% down) recomputes everything. Credit
+  band + typical qualifying score. Rate is a config value. Tooltips on every term.
+  Advanced collapsible section (PITI, cap rate, yield, DTI). Optional affordability
+  filter. All labeled estimates.
+- RISK FLAGS: FEMA flood + Cal Fire fire-zone badges, plus a "check insurance cost"
+  note for fire zones. Optional/bonus — app must not depend on them.
+- SIMPLE FEED UX: mobile-first scrolling feed of listings; each card = photo, price,
+  address, beds/baths/sqft, and a clear good-deal signal (green score / below-market
+  badge). Tap → plain-language detail (Street View + aerial toggle, Google Maps
+  link, rent + value-vs-price, risk, tooltips). No setup before results appear.
+- MAP VIEW: score-colored pins (optional).
+EXIT TEST: I show it to 3-5 real people; they find a deal without help.
+
+=====================================================================
+PHASE 2 — MAKE IT SECURE, REAL SOFTWARE
+=====================================================================
+- Hosting that runs app + database + worker 24/7 (suggest a beginner-friendly host).
+- Switch SQLite -> managed PostgreSQL (DATABASE_URL already supported).
+- Accounts/login: use a MANAGED provider (Clerk / Auth0 / Supabase Auth) — do NOT
+  build your own auth. Replace the hardcoded "local" user with real accounts.
+- HTTPS everywhere. Secrets only in host env vars, never in code or Git.
+- Restrict Google keys to my domain; set RentCast usage alerts.
+- Rate limiting + Cloudflare (free) in front. Automated daily DB backups.
+- Error tracking (Sentry) + uptime alerts. Confirm the project is in Git.
+
+=====================================================================
+PHASE 3 — BILLING & SUBSCRIPTIONS
+=====================================================================
+- NEVER handle raw card numbers — use the processor's hosted checkout.
+- Use a Merchant of Record (Lemon Squeezy or Paddle) so sales tax/VAT is handled
+  for me; add PayPal as a second checkout option for trust/conversion.
+- 3-day free trial, card required, cancel anytime, auto-renew.
+- FOUNDING PRICING: $12.99/month for the first 12 MONTHS, then $24.99/month.
+  New customers later start at $24.99. Schedule the month-12 step-up automatically.
+  - Disclose clearly at signup: "$12.99/mo for your first 12 months, then $24.99/mo
+    — cancel anytime." Send a reminder email before month 12 (no surprise charges).
+  - Marketing hook: "Lock in $12.99/mo for a full year — goes up to $24.99 soon."
+- Customer billing portal (update card / cancel). Failed-payment retries + dunning.
+- Gate app features until trial/subscription is active.
+
+=====================================================================
+PHASE 4 — LEGAL, TAX & COMPLIANCE
+=====================================================================
+- Terms of Service + Privacy Policy (generator or lawyer). Refund/cancellation
+  policy. Keep in-app estimate/not-advice disclaimers.
+- Sales tax handled by the Merchant of Record. CCPA applies (California); GDPR if EU
+  users; cookie/consent banner if tracking. Consider an LLC. Keep RentCast's
+  commercial-use terms on file.
+
+ I have a detailed MASTER SPEC for this project (all 8 phases, the product
+
+definition, data sources, cost architecture, visual/branding rules, disclaimers,
+
+and Fair-Housing rules). Save it as the canonical plan in the project so you always
+
+follow it. Either make it the full content of ROADMAP_TO_LAUNCH.md, or save it as
+
+MASTER_SPEC.md and have ROADMAP_TO_LAUNCH.md point to it — your call, just don't
+
+duplicate. Then paste it in:
+
+=====================================================================
+PHASE 5 — PRE-LAUNCH
+=====================================================================
+- Landing page: bold Nano Banana hero BACKGROUND generated ONCE and saved as static
+  files (never call the image API on page load), dark-green scrim over it for
+  legible white text, clear value prop + the trial CTA. Keep the working app clean
+  (no busy background behind data).
+- Analytics (Plausible/GA) with events for signup -> trial -> paid.
+- Support email + FAQ page. Onboarding email sequence (welcome, how-to, trial-end).
+- Beta group (10-30 people free for a week); fix the top complaints.
+- Claim social accounts (Instagram, TikTok, YouTube, Facebook).
+
+=====================================================================
+PHASE 6 — MARKETING & ADS
+=====================================================================
+- ORGANIC FIRST: short demo videos (TikTok / IG Reels / YouTube Shorts) showing a
+  real good deal found in seconds; post consistently; basic SEO content.
+- PAID SECOND (only after billing works AND organic shows people convert):
+  start with ONE platform (Meta), $10-20/day just to LEARN the numbers, test 3-5
+  creatives, kill losers, scale winners. Track the FULL funnel: ad -> click ->
+  signup -> trial -> PAID (measure cost per paying customer, not per click).
+  Add Google Search ads later. Install Meta Pixel + Google tag.
+- Ad creative: reuse Nano Banana backgrounds + real deal-card screenshots; 3-5
+  headline/copy variations.
+
+=====================================================================
+PHASE 7 — GROW
+=====================================================================
+- Add states one at a time (each with its own risk-data source).
+- Retention: deal alerts + daily digest email (retention matters most at this price).
+- Referral/affiliate program. Iterate the score with real usage data.
+- Watch monthly: trial->paid %, churn, MRR, CAC, LTV, LTV:CAC (aim 3:1+), API cost
+  per active user, cache hit-rate.
+
+=====================================================================
+Start with PHASE 0. Stop and check with me after each phase.
+=====================================================================

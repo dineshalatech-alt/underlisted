@@ -1,0 +1,56 @@
+# ------------------------------------------------------------------
+# COST & CACHE settings — these keep your per-customer cost LOW.
+# ------------------------------------------------------------------
+# The whole app reads from a SHARED cache keyed by property/address,
+# never per-user. If 500 customers view the same listing it costs ONE
+# lookup + ONE image fetch total; everyone else is served from cache.
+#
+# All of these are yours to tune.
+# ------------------------------------------------------------------
+
+# How long cached data stays "fresh" before we'd re-fetch it.
+ttl:
+  listings_hours:       24     # listings refresh about once a day (scheduled)
+  value_estimate_days:   7     # AVM changes slowly -> weekly
+  rent_estimate_days:    7     # rent estimate -> weekly
+  market_stats_days:     7     # zip market stats -> weekly
+  images_days:        3650     # ~never: a building's exterior/aerial doesn't change
+
+# Scheduled sync. The APP NEVER fetches on page load — a schedule does.
+# (See README "Schedule a daily sync".)
+sync:
+  default_incremental:        true   # only pull recently-listed homes day-to-day
+  incremental_lookback_days:     7   # safety overlap so nothing slips through
+  full_refresh_reminder_days:    7   # do a full refresh ~weekly to catch changes
+
+# Background WORKER — the automated job that refreshes the shared cache on a
+# schedule so users only ever READ from cache. No user/page-load triggers it.
+worker:
+  schedule_hours:           24       # how often the looping worker refreshes
+  max_listings_per_city:   200       # per-run cap per city/zip (cost guard)
+  update_value_rent:      true       # also refresh stale value/rent estimates
+  max_estimates_per_run:    50       # cap value+rent calls per run (cost guard)
+  prewarm_photos:        false       # keep images lazy by default…
+  prewarm_top_n:             0       # …unless >0: pre-fetch photos for N newest homes
+
+# Image sizes — smallest that still looks good. Don't pull 4K for a card.
+images:
+  streetview_size: "640x360"   # used on cards AND the detail page
+  aerial_size:     "640x360"
+  aerial_zoom:     19          # 19 ≈ rooftop level
+
+# Per-user soft monthly cap on billable lookups, so one heavy user can't
+# run up the bill. (Becomes truly per-user once accounts are added; for now
+# it tracks the single local user.)
+limits:
+  monthly_lookups_per_user: 300
+  warn_at_pct: 80              # warn the user once they cross this % of the cap
+
+# Rough $ per billable call, ONLY for the cost readout in the admin view.
+# Edit these to match your actual RentCast plan + Google pricing.
+cost_estimates_usd:
+  rentcast_listings: 0.0       # RentCast is usually quota-based, not per-call
+  rentcast_value:    0.0
+  rentcast_rent:     0.0
+  streetview:        0.007     # ~$7 per 1,000 Street View images
+  aerial:            0.002     # ~$2 per 1,000 Static Map images

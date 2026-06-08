@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>California Deal Finder — Preview</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.1.0/dist/tabler-icons.min.css">
+<style>
+  :root{
+    --green:#1D9E75; --deep:#0F6E56; --fill:#E1F5EE; --ink:#1F2933;
+    --muted:#667085; --border:#E4E7EC; --amber:#E08A00; --red:#C0392B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#F2F4F5;color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .phone{max-width:430px;margin:24px auto;background:#fff;border-radius:24px;
+    overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.15);}
+  .pad{padding:18px}
+  .label{text-align:center;color:var(--muted);font-size:.8rem;letter-spacing:.12em;
+    text-transform:uppercase;margin:30px 0 6px}
+  i.ti{vertical-align:-2px}
+
+  /* hero */
+  .hero{background:linear-gradient(135deg,var(--deep) 0%,var(--green) 100%);
+    color:#fff;text-align:center;padding:34px 22px;}
+  .logo{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.16);
+    display:inline-flex;align-items:center;justify-content:center;font-size:34px;}
+  .hero h1{font-size:1.7rem;font-weight:850;margin:.5rem 0 .3rem;line-height:1.15}
+  .hero p{color:#EAFBF4;font-size:1rem;margin:.2rem auto;max-width:30rem}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);padding:8px 14px;border-radius:999px;
+    font-weight:700;margin-top:12px;font-size:.92rem}
+  .btn{display:block;width:100%;border:none;border-radius:12px;padding:.8rem;
+    font-weight:700;font-size:1rem;cursor:pointer;margin-top:10px}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-ghost{background:#fff;color:var(--deep);border:1.5px solid var(--green)}
+  .feat{border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:10px}
+  .feat h3{margin:.2rem 0;font-size:1rem}
+  .muted{color:var(--muted);font-size:.9rem}
+  .pricecard{background:var(--fill);border:2px solid var(--green);border-radius:18px;
+    padding:20px;text-align:center;margin-top:14px}
+  .big{font-size:2.1rem;font-weight:850;color:var(--deep)}
+  .hook{color:var(--amber);font-weight:700;margin-top:6px;font-size:.9rem}
+
+  /* feed card */
+  .card{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
+  .photo{height:150px;background:#ECEFF1;display:flex;align-items:center;justify-content:center;
+    color:#B0B8BE;font-size:46px;position:relative}
+  .badge{position:absolute;top:10px;left:10px;background:#fff;border-radius:999px;
+    padding:3px 10px;font-size:.78rem;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .badge.green{color:var(--green)} .badge.amber{color:var(--amber)}
+  .gauge{position:absolute;top:10px;right:10px;width:46px;height:46px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.05rem}
+  .row{display:flex;justify-content:space-between;align-items:center}
+  .price{font-size:1.35rem;font-weight:850}
+  .facts{color:var(--muted);font-size:.9rem;margin-top:4px}
+  .facts i{margin-right:2px}
+  .tag{display:inline-block;background:#FBE9C7;color:var(--amber);border-radius:6px;
+    padding:1px 6px;font-size:.72rem;font-weight:700;margin-left:6px}
+  .sep{height:1px;background:var(--border);margin:10px 0}
+
+  /* detail cash box */
+  .cashbox{background:var(--fill);border-radius:14px;padding:16px;margin-top:6px}
+  .cashbig{font-size:1.8rem;font-weight:850;color:var(--deep)}
+  .cashline{display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #C7E3D8}
+  .whybar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin:8px 0}
+  .whybar span{display:block}
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING ============ -->
+<div class="label">1 · Landing page</div>
+<div class="phone">
+  <div class="hero">
+    <div class="logo"><i class="ti ti-home"></i></div>
+    <h1>Find under-priced California homes in seconds</h1>
+    <p>A clear 0–100 deal score, the real rent and value, and exactly how much cash you'd need — in plain English.</p>
+    <div class="pill">$12.99/mo for your first 12 months, then $29.99 · cancel anytime</div>
+  </div>
+  <div class="pad">
+    <button class="btn btn-primary">Start 3-day free trial</button>
+    <button class="btn btn-ghost">Browse deals</button>
+    <p class="muted" style="text-align:center;margin-top:10px">No charge today — this is a preview.</p>
+
+    <div class="feat"><i class="ti ti-gauge" style="color:var(--green);font-size:24px"></i>
+      <h3>Instant deal score</h3><div class="muted">Every home gets a 0–100 score — green means a great deal.</div></div>
+    <div class="feat"><i class="ti ti-building-estate" style="color:var(--green);font-size:24px"></i>
+      <h3>Real rent &amp; value</h3><div class="muted">See value and rent, and whether a home is listed below what it's worth.</div></div>
+    <div class="feat"><i class="ti ti-wallet" style="color:var(--green);font-size:24px"></i>
+      <h3>Know your cash</h3><div class="muted">One plain number for the cash you'd really need — explained.</div></div>
+
+    <div class="pricecard">
+      <div style="font-weight:700">Simple pricing</div>
+      <div class="big">$12.99<span style="font-size:1rem;font-weight:600">/mo</span></div>
+      <div class="muted">for your first 12 months, then $29.99/mo</div>
+      <div class="hook">Lock in $12.99/mo for a year — goes up to $29.99 soon.</div>
+      <div class="muted" style="margin-top:8px">
+        <i class="ti ti-circle-check" style="color:var(--green)"></i> 3-day free trial &nbsp;
+        <i class="ti ti-circle-check" style="color:var(--green)"></i> cancel anytime</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FEED ============ -->
+<div class="label">2 · Deal feed (mobile)</div>
+<div class="phone"><div class="pad">
+  <div class="facts" style="margin-bottom:10px"><i class="ti ti-search"></i> 3 California homes · best deal first</div>
+
+  <!-- card 1 -->
+  <div class="card">
+    <div class="photo"><i class="ti ti-home"></i>
+      <div class="badge green"><i class="ti ti-flame"></i> Great deal</div>
+      <div class="gauge" style="background:#1D9E75">92</div>
+    </div>
+    <div class="pad">
+      <div class="row"><div class="price">$415,000</div><div class="muted">10% below value</div></div>
+      <div class="muted">2118 Larkspur Ln, Sacramento</div>
+      <div class="facts"><i class="ti ti-bed"></i>3 &nbsp; <i class="ti ti-bath"></i>2 &nbsp;
+        <i class="ti ti-ruler-2"></i>1,420 sqft &nbsp; <i class="ti ti-calendar"></i>1998</div>
+      <div class="facts"><i class="ti ti-cash"></i> ~$2,500/mo rent <span class="tag">sample</span></div>
+      <button class="btn btn-primary" style="margin-top:10px">See details</button>
+    </div>
+  </div>
+
+  <!-- card 2 -->
+  <div class="card">
+    <div class="photo"><i class="ti ti-home"></i>
+      <div class="badge amber"><i class="ti ti-tag"></i> Price cut</div>
+      <div class="gauge" style="background:#1D9E75">78</div>
+    </div>
+    <div class="pad">
+      <div class="row"><div class="price">$329,900</div><div class="muted">4% below value</div></div>
+      <div class="muted">540 Commerce Way, Stockton</div>
+      <div class="facts"><i class="ti ti-bed"></i>3 &nbsp; <i class="ti ti-bath"></i>2 &nbsp;
+        <i class="ti ti-ruler-2"></i>1,180 sqft &nbsp; <i class="ti ti-calendar"></i>1985</div>
+      <div class="facts"><i class="ti ti-cash"></i> ~$2,050/mo rent <span class="tag">sample</span></div>
+      <button class="btn btn-primary" style="margin-top:10px">See details</button>
+    </div>
+  </div>
+
+  <!-- card 3 -->
+  <div class="card">
+    <div class="photo"><i class="ti ti-home"></i>
+      <div class="badge"><i class="ti ti-clock-hour-4"></i> New</div>
+      <div class="gauge" style="background:#E08A00">52</div>
+    </div>
+    <div class="pad">
+      <div class="row"><div class="price">$689,000</div><div class="muted">at market value</div></div>
+      <div class="muted">77 Vista Del Sol, Modesto</div>
+      <div class="facts"><i class="ti ti-bed"></i>4 &nbsp; <i class="ti ti-bath"></i>3 &nbsp;
+        <i class="ti ti-ruler-2"></i>2,240 sqft &nbsp; <i class="ti ti-calendar"></i>2015</div>
+      <div class="facts"><i class="ti ti-cash"></i> ~$3,100/mo rent <span class="tag">sample</span></div>
+      <button class="btn btn-primary" style="margin-top:10px">See details</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ============ DETAIL ============ -->
+<div class="label">3 · Home detail</div>
+<div class="phone">
+  <div class="photo" style="height:180px"><i class="ti ti-home"></i>
+    <div class="badge green"><i class="ti ti-flame"></i> Great deal</div></div>
+  <div class="pad">
+    <div class="row"><div class="price">$415,000</div>
+      <div class="gauge" style="position:static;background:#1D9E75;width:54px;height:54px;font-size:1.2rem">92</div></div>
+    <div class="muted">2118 Larkspur Ln, Sacramento &nbsp; <i class="ti ti-map-pin"></i> Open in Google Maps</div>
+    <div class="facts"><i class="ti ti-bed"></i>3 &nbsp; <i class="ti ti-bath"></i>2 &nbsp;
+      <i class="ti ti-ruler-2"></i>1,420 sqft &nbsp; <i class="ti ti-calendar"></i>1998</div>
+
+    <div class="sep"></div>
+    <strong>Why it scored 92</strong>
+    <div class="whybar">
+      <span style="background:#1D9E75;width:60%"></span>
+      <span style="background:#7C5CFC;width:28%"></span>
+      <span style="background:#E08A00;width:12%"></span>
+    </div>
+    <div class="muted"><i class="ti ti-building-estate"></i> Priced 10% below estimated value &nbsp;·&nbsp;
+      <i class="ti ti-cash"></i> ~7.2% gross yield &nbsp;·&nbsp; <i class="ti ti-clock-hour-4"></i> fresh listing</div>
+
+    <div class="sep"></div>
+    <strong><i class="ti ti-wallet"></i> How much cash you really need</strong>
+    <div class="cashbox">
+      <div class="cashbig">$28,200</div>
+      <div class="muted">to buy this home (FHA, live-in)</div>
+      <div class="cashline"><span><i class="ti ti-coins"></i> Down payment (3.5%)</span><strong>$14,525</strong></div>
+      <div class="cashline"><span><i class="ti ti-receipt"></i> Closing costs</span><strong>$8,300</strong></div>
+      <div class="cashline"><span><i class="ti ti-pig-money"></i> Reserves</span><strong>$5,375</strong></div>
+    </div>
+    <p class="muted" style="margin-top:10px">Estimates only — a screening tool, not advice. Fair Housing: scoring never uses
+      demographic or "neighborhood quality" signals.</p>
+  </div>
+</div>
+
+<p style="text-align:center;color:#9AA4AC;font-size:.8rem;margin:24px">
+  Static preview · sample data · grey placeholders (no live photos, no API calls)</p>
+
+</body>
+</html>

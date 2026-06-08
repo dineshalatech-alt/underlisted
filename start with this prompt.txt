@@ -1,0 +1,9 @@
+Read PROJECT_MEMORY.md first, then MASTER_SPEC.md, ROADMAP_TO_LAUNCH.md,
+MILESTONES.md, and TOOLS_AND_SETUP.md. Then tell me, in plain language:
+1. Where we are right now
+2. What's DONE, what's PARKED, and what's next
+3. The exact next step you recommend
+
+Don't change any code or make any API calls yet — just read the files and catch
+yourself up. I'm not a developer, so explain simply. Wait for my OK before doing
+anything.

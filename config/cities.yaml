@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------
+# TARGET CITIES / ZIPS  (Northern California)
+# ------------------------------------------------------------------
+# This is YOURS to edit — no coding needed.
+#
+# To ADD a city: copy one "- name:" block, change the name and state,
+#   and list the zip codes you care about (find them on usps.com).
+# To REMOVE a city: delete its whole "- name:" block.
+# Leave "zips: []" empty to search the whole city.
+#
+# Keep the dashes and indentation exactly as shown.
+# ------------------------------------------------------------------
+
+state: CA
+
+targets:
+  - name: Sacramento
+    zips: ["95820", "95823", "95838", "95824"]
+
+  - name: Stockton
+    zips: ["95205", "95206", "95210"]
+
+  - name: Modesto
+    zips: ["95351", "95354", "95350"]
+
+  - name: Vallejo
+    zips: ["94590", "94591", "94589"]
+
+  - name: Antioch
+    zips: ["94509", "94531"]
+
+  - name: Oakland
+    zips: ["94601", "94603", "94621"]

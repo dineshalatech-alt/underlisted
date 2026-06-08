@@ -1,0 +1,50 @@
+# ------------------------------------------------------------------
+# DEAL SCORE settings  (0–100)
+# ------------------------------------------------------------------
+# The score is built mostly from how far BELOW its estimated value a
+# home is listed, plus how well rent covers the price. Days-on-market
+# and risk are smaller, secondary signals.
+#
+# The four "weights" below must add up to 100. They decide how much
+# each factor pushes the score. Edit them to taste.
+# ------------------------------------------------------------------
+
+weights:
+  value_discount: 50   # listed below its estimated value  (the big one)
+  rent_yield:     30   # how much annual rent vs. price
+  days_on_market: 12   # sitting longer = more negotiating room
+  risk:            8   # fire/flood lowers the score a little
+
+# "Good deal" banner appears at/above this score.
+good_deal_threshold: 70
+
+# --- How each factor turns into points (the scale) ---
+# These set what counts as "great" vs "poor" for each factor.
+scales:
+  # Value discount: listed this % below estimated value = full points.
+  value_discount_full_points_at_pct: 12   # 12% under value = max
+  value_discount_zero_points_at_pct: 0    # at/above value   = 0
+
+  # Gross yield (annual rent / price): this % = full points.
+  rent_yield_full_points_at_pct: 9        # 9% gross yield = max
+  rent_yield_zero_points_at_pct: 4        # 4% or below    = 0
+
+  # Days on market: this many days = full points (more room to negotiate).
+  days_on_market_full_points_at: 90
+  days_on_market_zero_points_at: 0
+
+# --- Risk penalty (subtracted inside the risk factor) ---
+risk_penalty:
+  high_fire:   1.0   # fraction of the risk points removed
+  high_flood:  1.0
+  moderate_fire: 0.5
+  moderate_flood: 0.5
+
+# --- Simple "good deal" badge (used by the FEED today) ---
+# A plain, beginner-friendly signal based only on how far BELOW its estimated
+# value a home is listed. This is the lightweight stand-in until the full 0-100
+# Deal Score (Phase 4) is built; both use the same idea.
+simple_deal_signal:
+  great_below_pct: 8   # listed >= 8% below estimated value -> "Great deal"
+  good_below_pct:  3   # listed 3-8% below -> "Good deal"
+  # within +/- 3% of value -> "Around market"; above value -> "Above market"

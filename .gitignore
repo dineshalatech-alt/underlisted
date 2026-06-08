@@ -1,0 +1,29 @@
+# --- Secrets: NEVER share these ---
+.env
+
+# --- The app's private box of helpers ---
+.venv/
+venv/
+
+# --- Auto-generated cache database & generated images ---
+data/*.db
+data/*.sqlite
+app/assets/generated/
+
+# --- Disposable scratch scripts ---
+.tmp/
+
+# --- Python junk ---
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# --- Editor / OS junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Streamlit ---
+.streamlit/secrets.toml

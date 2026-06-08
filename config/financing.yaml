@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------
+# FINANCING assumptions — powers "How much cash you really need"
+# ------------------------------------------------------------------
+# All figures are ESTIMATES, not a loan offer. Update the rates
+# whenever you like; they change with the market.
+# ------------------------------------------------------------------
+
+# Yearly interest rates (as percents). The app nudges these UP for
+# lower credit-score bands using "rate_bumps" below.
+interest_rates:
+  primary_residence: 6.6     # you'll live in it
+  investment:        7.3     # you'll rent it out
+
+# Extra interest added (in percentage points) for weaker credit.
+# Applied on top of the base rate above. 740+ is the baseline (0).
+rate_bumps_by_credit:
+  "740+":     0.00
+  "680-739":  0.25
+  "620-679":  0.75
+  "580-619":  1.50
+  "<580":     2.50
+
+# Down payment, as a % of price.
+down_payment_pct:
+  live_in:
+    conventional: 3      # as low as 3%
+    fha:          3.5    # 3.5% if credit >= 580, else 10%
+    fha_low_credit: 10   # used when credit band is "<580"
+    va:           0      # 0% down for eligible veterans
+  investment:
+    default: 20          # 20–25% typical; we use 20 by default
+    high:    25
+
+# One-time closing costs, as a % of price (escrow, title, appraisal,
+# lender fees). The app shows a range using low/high.
+closing_costs_pct:
+  low:  2
+  high: 5
+
+# Reserves = months of full payment the lender wants you to keep in
+# the bank AFTER buying (you don't spend it). Mainly for investments.
+reserves_months:
+  live_in:    0
+  investment: 6
+
+# Typical qualifying MINIMUM credit score per loan (shown as guidance).
+qualifying_minimums:
+  fha:          580   # 3.5% down; 500–579 needs 10% down
+  conventional: 620
+  va:           620   # lender-dependent, no official VA minimum
+  investment:   620   # but 700+ usually needed for good rates
+
+# Loan length in years (for the monthly payment math).
+loan_term_years: 30
+
+# Rough monthly operating-expense assumption for the cap-rate estimate,
+# as a % of the rent (taxes, insurance, vacancy, maintenance, mgmt).
+operating_expense_pct_of_rent: 40
