@@ -1,0 +1,52 @@
+# Auto-refresh worker — keeps the shared cache fresh.
+#
+# This is the scheduled robot that fills your Supabase database with real homes,
+# so customers always READ from cache (cheap) and never trigger live API calls.
+#
+# It runs:
+#   * once a day automatically (the cron line below), and
+#   * any time you click "Run workflow" on the Actions tab (manual).
+#
+# It needs these repo SECRETS (Settings -> Secrets and variables -> Actions):
+#   DATABASE_URL        (required) the SAME Supabase string the app uses
+#   RENTCAST_API_KEY    (required) the billable listings/value/rent source
+#   RESEND_API_KEY      (optional) to email saved-search alert digests
+#   ALERT_FROM_EMAIL    (optional) the "from" address for those emails
+#   STREETVIEW_API_KEY  (optional) only used if photo pre-warm is enabled
+name: Refresh listings cache
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # every day at 09:00 UTC (~1-2am US Pacific)
+  workflow_dispatch: {}    # adds a manual "Run workflow" button
+
+# Never let two refreshes run at once (avoids double work / double billing).
+concurrency:
+  group: refresh-worker
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the refresh worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RENTCAST_API_KEY: ${{ secrets.RENTCAST_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_FROM_EMAIL: ${{ secrets.ALERT_FROM_EMAIL }}
+          STREETVIEW_API_KEY: ${{ secrets.STREETVIEW_API_KEY }}
+        run: python -m worker.refresh_worker
