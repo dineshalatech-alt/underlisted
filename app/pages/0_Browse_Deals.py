@@ -25,7 +25,7 @@ from app.assets.theme import (APP_CSS, DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL,  #
                               MUTED, AMBER, RED, score_color)
 from app.icons import TABLER_CSS, ic  # noqa: E402
 from app.helpers import (money, number, dom_label, gmaps_link, pct,  # noqa: E402
-                         favicon_path)
+                         favicon_path, wait_message, random_tip)
 from app import sample_data  # noqa: E402
 
 st.set_page_config(page_title="Browse Deals", page_icon=favicon_path(),
@@ -162,8 +162,11 @@ def _offer_area_load(q: str) -> None:
     city, state, zipc = _parse_area(q)
     if st.button(f"Load listings for {q}  (uses 1 RentCast lookup)",
                  type="primary", key="loadarea"):
-        with st.spinner(f"Fetching {q} from RentCast…"):
+        tip = st.empty()
+        tip.caption(random_tip())
+        with st.spinner(wait_message(q)):
             summary = rentcast.sync_area(city=city, state=state, zip_code=zipc)
+        tip.empty()
         if summary.get("errors"):
             st.error("Couldn't load: " + "; ".join(summary["errors"]))
         elif summary.get("total_seen", 0) == 0:
