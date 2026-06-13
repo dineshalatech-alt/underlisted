@@ -98,7 +98,7 @@ once to create the tables.
 
 ## Key decisions (locked)
 
-- **California-only** for now (more states later).
+- **Nationwide (whole U.S.)** as of 2026-06-12 (was a California-only pilot).
 - **Pricing:** $12.99/mo for the first 12 months, then **$29.99/mo**; 3-day trial,
   cancel anytime. (Full detail in [MASTER_SPEC.md](MASTER_SPEC.md).)
 - **Deal alerts + saved searches = flagship premium / retention feature** (the

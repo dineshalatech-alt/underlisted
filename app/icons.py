@@ -53,6 +53,9 @@ ICONS = {
     "trending": "ti-trending-up",
     "clock": "ti-clock-hour-4",     # days on market
     "calc": "ti-calculator",
+    "bank": "ti-building-bank",     # bank-owned / foreclosure
+    "gavel": "ti-gavel",            # auction / sold as-is
+    "link": "ti-external-link",     # outbound links (HUD/HomePath/HomeSteps)
 }
 
 

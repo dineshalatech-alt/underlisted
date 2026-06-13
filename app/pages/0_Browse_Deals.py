@@ -1,5 +1,5 @@
 """
-Browse Deals — the polished California feed + detail screen.
+Browse Deals — the polished nationwide (U.S.) feed + detail screen.
 
 Pure visual pass: NO API calls. Uses real cached listings (or clearly-marked
 SAMPLE listings if the cache is empty). Photos are grey placeholders with a house
@@ -19,9 +19,10 @@ import streamlit as st  # noqa: E402
 
 from config.settings import settings  # noqa: E402
 from src import metrics  # noqa: E402
+from src.data_sources import rentcast, market  # noqa: E402
 from src.financing import cash_needed  # noqa: E402
 from app.assets.theme import (APP_CSS, DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL,  # noqa: E402
-                              MUTED, score_color)
+                              MUTED, AMBER, RED, score_color)
 from app.icons import TABLER_CSS, ic  # noqa: E402
 from app.helpers import (money, number, dom_label, gmaps_link, pct,  # noqa: E402
                          favicon_path)
@@ -98,6 +99,98 @@ def _facts_html(l) -> str:
             f"{ic('year')} {number(l.year_built)}</div>")
 
 
+# --- Foreclosure / bank-owned helpers --------------------------------------
+GOV_LINKS = [
+    ("HUD HomeStore", "https://www.hudhomestore.gov"),
+    ("HomePath", "https://homepath.fanniemae.com"),
+    ("HomeSteps", "https://www.homesteps.com"),
+]
+
+
+def _bank_badge() -> str:
+    return (f"<span class='badge badge-bank'>{ic('bank',15,'#344054')} "
+            "Bank-owned · foreclosure</span>")
+
+
+def _discount_html(val, price) -> str:
+    """Foreclosure deal signal: the bid vs the lender's estimated value."""
+    avm = getattr(val, "avm", None)
+    if not avm or not price:
+        return ("<div class='facts'>Estimated value not available — "
+                "verify before bidding.</div>")
+    diff = avm - price
+    pctv = abs(diff) / avm * 100
+    if diff > 0:
+        return (f"<div class='facts'>{ic('value',16,PRIMARY_GREEN)} Bid "
+                f"<b>{money(price)}</b> vs est. value <b>{money(avm)}</b> — "
+                f"<b style='color:{PRIMARY_GREEN}'>{pctv:.0f}% below value</b></div>")
+    return (f"<div class='facts'>{ic('value',16,MUTED)} Bid <b>{money(price)}</b> vs "
+            f"est. value <b>{money(avm)}</b> — {pctv:.0f}% above value</div>")
+
+
+# --- Nationwide search: match cached rows + load new areas on demand --------
+def _parse_area(q: str):
+    """Turn a search string into (city, state, zip)."""
+    q = q.strip()
+    if q.isdigit():
+        return None, None, q                          # ZIP
+    if "," in q:
+        city, st_ = [p.strip() for p in q.split(",", 1)]
+        return city, (st_[:2].upper() or None), None   # "City, ST"
+    return q, None, None                              # city only
+
+
+def _matches_area(listing, q: str) -> bool:
+    """Does a cached listing match the search box? (empty query = show all)."""
+    q = (q or "").strip().lower()
+    if not q:
+        return True
+    if q.isdigit():
+        return (listing.zip_code or "").startswith(q)
+    city_q = q.split(",")[0].strip()
+    return city_q in (listing.city or "").lower()
+
+
+def _offer_area_load(q: str) -> None:
+    """When a searched area isn't cached, offer to fetch it (one billable call)."""
+    st.markdown(f"<div style='background:{LIGHT_FILL};color:{DEEP_GREEN};padding:10px "
+                f"14px;border-radius:10px;font-weight:600'>No listings cached for "
+                f"“{q}” yet.</div>", unsafe_allow_html=True)
+    if not settings.has_rentcast:
+        st.warning("Add your RentCast key to .env to load new areas.")
+        return
+    city, state, zipc = _parse_area(q)
+    if st.button(f"Load listings for {q}  (uses 1 RentCast lookup)",
+                 type="primary", key="loadarea"):
+        with st.spinner(f"Fetching {q} from RentCast…"):
+            summary = rentcast.sync_area(city=city, state=state, zip_code=zipc)
+        if summary.get("errors"):
+            st.error("Couldn't load: " + "; ".join(summary["errors"]))
+        elif summary.get("total_seen", 0) == 0:
+            st.warning(f"No active listings found for “{q}”. Try a nearby ZIP or "
+                       "the “City, ST” format.")
+        else:
+            st.success(f"Loaded {summary['new'] + summary['updated']} listing(s) "
+                       f"for {q}.")
+            st.rerun()
+
+
+# --- Risk flags (fire / flood) — the differentiator ------------------------
+def _risk_badges(risk) -> str:
+    """Small fire/flood pills, shown only when there's real risk worth flagging."""
+    if not risk:
+        return ""
+    pills = []
+    if (risk.fire_zone or "") in ("High", "Moderate"):
+        c = RED if risk.fire_zone == "High" else AMBER
+        pills.append(f"<span class='badge' style='background:#FBE9E4;color:{c}'>"
+                     f"{ic('fire',14,c)} {risk.fire_zone} fire risk</span>")
+    if (risk.flood_zone or "") == "High":
+        pills.append(f"<span class='badge' style='background:#FBE9E4;color:{RED}'>"
+                     f"{ic('flood',14,RED)} Flood zone</span>")
+    return " ".join(pills)
+
+
 # ===========================================================================
 # DETAIL
 # ===========================================================================
@@ -114,13 +207,51 @@ def render_detail(row) -> None:
 
     st.markdown(f"<div class='price'>{money(l.list_price)}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='addr'>{l.address or '—'}</div>", unsafe_allow_html=True)
-    st.markdown(_facts_html(l), unsafe_allow_html=True)
-    st.markdown(f"<div class='facts'>{ic('clock')} {dom_label(l.days_on_market)} &nbsp; "
-                f"{ic('location')} {l.city} {l.zip_code}</div>", unsafe_allow_html=True)
+    if row.get("foreclosure"):
+        demo = " <span class='sampletag'>demo</span>" if row.get("demo_foreclosure") else ""
+        st.markdown(_bank_badge() + demo, unsafe_allow_html=True)
+        st.markdown(_discount_html(val, l.list_price), unsafe_allow_html=True)
+        st.markdown(f"<div class='facts'>{ic('gavel',16,'#344054')} Sold as-is — may "
+                    "have liens or auction rules. Beds/baths aren't in foreclosure "
+                    "data; verify everything before bidding.</div>",
+                    unsafe_allow_html=True)
+        st.markdown(f"<div class='facts'>{ic('location')} {l.city} {l.zip_code}</div>",
+                    unsafe_allow_html=True)
+    else:
+        st.markdown(_facts_html(l), unsafe_allow_html=True)
+        st.markdown(f"<div class='facts'>{ic('clock')} {dom_label(l.days_on_market)} &nbsp; "
+                    f"{ic('location')} {l.city} {l.zip_code}</div>", unsafe_allow_html=True)
     link = gmaps_link(l.address)
     if link:
-        st.markdown(f"<a href='{link}' target='_blank'>{ic('location')} "
-                    "Open in Google Maps</a>", unsafe_allow_html=True)
+        st.markdown(f"<a href='{link}' target='_blank' style='color:{DEEP_GREEN}'>"
+                    f"{ic('location')} Open in Google Maps</a>", unsafe_allow_html=True)
+    if row.get("foreclosure"):
+        links = " · ".join(f"<a href='{u}' target='_blank' style='color:{DEEP_GREEN}'>"
+                           f"{n}</a>" for n, u in GOV_LINKS)
+        st.markdown(f"<div class='facts' style='margin-top:6px'>{ic('link',15,MUTED)} "
+                    f"Also check free government foreclosures: {links}</div>",
+                    unsafe_allow_html=True)
+
+    # --- Market context: free FHFA ZIP price trend ---
+    pt = market.price_trend(l.zip_code)
+    if pt and pt.get("change") is not None:
+        up = pt["change"] >= 0
+        col = PRIMARY_GREEN if up else RED
+        arrow = "▲" if up else "▼"
+        st.markdown(f"<div class='facts'>{ic('trending',16,col)} Home prices in "
+                    f"{l.zip_code}: <b style='color:{col}'>{arrow} {abs(pt['change']):.1f}%</b> "
+                    f"in {pt['year']} <span class='muted'>· FHFA</span></div>",
+                    unsafe_allow_html=True)
+
+    # --- Risk flags (the differentiator: insurance-cost warning) ---
+    rb = _risk_badges(row.get("risk"))
+    note = getattr(row.get("risk"), "insurance_note", None)
+    if rb:
+        st.markdown(rb, unsafe_allow_html=True)
+    if note:
+        st.markdown(f"<div style='background:#FBE9C7;color:{AMBER};padding:8px 12px;"
+                    f"border-radius:10px;margin-top:6px;font-weight:600'>"
+                    f"{ic('shield',16,AMBER)} {note}</div>", unsafe_allow_html=True)
 
     st.divider()
     # --- Deal Score + why ---
@@ -158,12 +289,13 @@ def render_detail(row) -> None:
         with st.popover("What's 'estimated value'?"):
             st.write("A computer estimate (an 'AVM') of the home's worth from recent "
                      "nearby sales. A guide, not an appraisal.")
-    rsample = " <span class='sampletag'>sample</span>" if row["rent_sample"] else ""
-    st.markdown(f"{ic('rent',20,PRIMARY_GREEN)} Estimated rent: "
-                f"**{money(rent)}/mo**{rsample}", unsafe_allow_html=True)
-    with st.popover("What's 'estimated rent'?"):
-        st.write("A computer estimate of monthly rent from similar nearby rentals. "
-                 "Actual rent varies.")
+    if not row.get("foreclosure"):
+        rsample = " <span class='sampletag'>sample</span>" if row["rent_sample"] else ""
+        st.markdown(f"{ic('rent',20,PRIMARY_GREEN)} Estimated rent: "
+                    f"**{money(rent)}/mo**{rsample}", unsafe_allow_html=True)
+        with st.popover("What's 'estimated rent'?"):
+            st.write("A computer estimate of monthly rent from similar nearby rentals. "
+                     "Actual rent varies.")
 
     st.divider()
     # --- How much cash you really need ---
@@ -239,7 +371,7 @@ def render_detail(row) -> None:
 # FEED
 # ===========================================================================
 def render_feed(rows, sample_mode) -> None:
-    logo_title = f"{settings.active_state_name} deals"
+    logo_title = "U.S. deals"
     st.markdown(f"<div class='app-header'>{ic('home',20)} {logo_title}"
                 "<span style='font-weight:400;opacity:.85'> · best deals first"
                 "</span></div>", unsafe_allow_html=True)
@@ -248,32 +380,63 @@ def render_feed(rows, sample_mode) -> None:
         st.warning("Showing SAMPLE listings for design preview — no live data used.",
                    icon="🎨")
 
-    with st.expander(f"Filter"):
-        names = settings.city_names()
-        cities = st.multiselect("City", names, default=names)
+    # --- Search any U.S. city or ZIP (cache-first; new areas load on demand) ---
+    q = st.text_input("Search any U.S. city or ZIP",
+                      placeholder="e.g.  Austin, TX   or   78701",
+                      key="area_query").strip()
+
+    with st.expander("Filters"):
         good_only = st.toggle("Good deals only (score ≥ "
                               f"{settings.scoring.get('good_deal_threshold',70)})")
+        fc_only = st.toggle("Bank-owned / foreclosures only")
 
     shown = [r for r in rows
-             if (not cities or r["listing"].city in cities)
-             and (not good_only or r["score"].is_good_deal)]
+             if _matches_area(r["listing"], q)
+             and (not good_only or r["score"].is_good_deal)
+             and (not fc_only or r.get("foreclosure"))]
     shown.sort(key=lambda r: -r["score"].total)
     st.markdown(f"<div class='facts' style='margin:6px 0'>{ic('search')} "
-                f"{len(shown)} home(s)</div>", unsafe_allow_html=True)
+                f"{len(shown)} home(s)" + (f" for “{q}”" if q else "") + "</div>",
+                unsafe_allow_html=True)
+    if any(r.get("demo_foreclosure") for r in shown):
+        st.caption("Bank-owned examples are DEMO placeholders — live foreclosure data "
+                   "connects after the $1-trial key is added.")
+
+    if q and not shown:          # searched an area we haven't cached yet
+        _offer_area_load(q)
 
     for r in shown:
         l, score = r["listing"], r["score"]
         with st.container(border=True):
             st.markdown(_photo_placeholder(), unsafe_allow_html=True)
-            st.markdown(_score_badge(score), unsafe_allow_html=True)
-            st.markdown(f"<div class='price'>{money(l.list_price)}</div>",
-                        unsafe_allow_html=True)
-            st.markdown(f"<div class='addr'>{ic('location',16,MUTED)} "
-                        f"{l.address or '—'}</div>", unsafe_allow_html=True)
-            st.markdown(_facts_html(l), unsafe_allow_html=True)
-            rs = " <span class='sampletag'>sample</span>" if r["rent_sample"] else ""
-            st.markdown(f"<div class='facts'>{ic('rent')} ~{money(r['rent'])}/mo rent{rs}"
-                        f"</div>", unsafe_allow_html=True)
+            if r.get("foreclosure"):
+                demo = (" <span class='sampletag'>demo</span>"
+                        if r.get("demo_foreclosure") else "")
+                st.markdown(_bank_badge() + demo, unsafe_allow_html=True)
+                st.markdown(_score_badge(score), unsafe_allow_html=True)
+                st.markdown(f"<div class='price'>{money(l.list_price)}</div>",
+                            unsafe_allow_html=True)
+                st.markdown("<div class='facts' style='margin-top:-4px'>opening bid / "
+                            "list price</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='addr'>{ic('location',16,MUTED)} "
+                            f"{l.address or '—'}</div>", unsafe_allow_html=True)
+                st.markdown(_discount_html(r["value"], l.list_price),
+                            unsafe_allow_html=True)
+                st.markdown(f"<div class='facts'>{ic('gavel')} Sold as-is — verify "
+                            "details</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(_score_badge(score), unsafe_allow_html=True)
+                st.markdown(f"<div class='price'>{money(l.list_price)}</div>",
+                            unsafe_allow_html=True)
+                st.markdown(f"<div class='addr'>{ic('location',16,MUTED)} "
+                            f"{l.address or '—'}</div>", unsafe_allow_html=True)
+                st.markdown(_facts_html(l), unsafe_allow_html=True)
+                rs = " <span class='sampletag'>sample</span>" if r["rent_sample"] else ""
+                st.markdown(f"<div class='facts'>{ic('rent')} ~{money(r['rent'])}/mo "
+                            f"rent{rs}</div>", unsafe_allow_html=True)
+                rb = _risk_badges(r.get("risk"))
+                if rb:
+                    st.markdown(rb, unsafe_allow_html=True)
             if st.button("See details", key=f"o_{l.id}", use_container_width=True,
                          type="primary"):
                 st.session_state.open_id = l.id
@@ -281,7 +444,7 @@ def render_feed(rows, sample_mode) -> None:
 
     st.divider()
     st.caption("Deal scores are ESTIMATES — a screening tool, not financial advice. "
-               "California only for now.")
+               "Nationwide across the U.S.")
 
 
 # ---- Router ----

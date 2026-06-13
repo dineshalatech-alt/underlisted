@@ -1,4 +1,4 @@
-# ROADMAP TO LAUNCH — California Deal Finder
+# ROADMAP TO LAUNCH — Deal Finder (U.S. nationwide)
 
 The phased path from "runs on my laptop" to "real people are paying for it."
 This is the **launch checklist**; the strategic "why" lives in
@@ -50,7 +50,7 @@ Cloud database + 24/7 worker + hosting; accounts; billing wired to the pricing i
 ## Phase 6 — Marketing video plan (record only; do NOT make now)
 
 **Goal:** short, vertical demo videos that show the app finding a *real* under-priced
-California deal **fast**, to drive trial sign-ups.
+U.S. deal **fast**, to drive trial sign-ups.
 
 **Format & platforms**
 - Vertical (9:16) for **TikTok, Instagram Reels, YouTube Shorts**.

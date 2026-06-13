@@ -33,6 +33,10 @@ class Listing:
     status: Optional[str] = None
     days_on_market: Optional[int] = None
 
+    # Foreclosure/REO only: the lender's estimated value (Data Hub / Redfin-
+    # derived). Regular RentCast listings leave this None and use the AVM instead.
+    est_value: Optional[float] = None
+
     last_seen_run: Optional[str] = None   # ISO timestamp of last sync
     previous_price: Optional[float] = None  # for price-drop detection
 
@@ -57,6 +61,8 @@ class ValueEstimate:
 class RiskFlags:
     fire_zone: Optional[str] = None      # e.g. "High", "Moderate", "None", "Unknown"
     flood_zone: Optional[str] = None     # e.g. "AE", "X", "Unknown"
+    quake_zone: Optional[str] = None     # earthquake risk rating (FEMA NRI)
+    overall_risk: Optional[str] = None   # FEMA NRI overall natural-hazard rating
     insurance_note: Optional[str] = None
 
 

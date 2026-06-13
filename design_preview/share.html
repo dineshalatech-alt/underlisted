@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>California Deal Finder</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--ink:#1F2933;
+    --muted:#667085;--border:#E4E7EC;--amber:#E08A00;--purple:#7C5CFC;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#EEF1F2;color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px}
+  .topbar{text-align:center;padding:14px}
+  .topbar h2{margin:4px 0;color:var(--deep)}
+  .topbar p{color:var(--muted);margin:0}
+  .screens{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  .label{text-align:center;color:var(--muted);font-size:.78rem;letter-spacing:.12em;
+    text-transform:uppercase;margin-bottom:8px}
+  .phone{width:360px;background:#fff;border-radius:26px;overflow:hidden;
+    box-shadow:0 18px 50px rgba(0,0,0,.16);border:1px solid #E3E7E9}
+  .pad{padding:16px}
+  svg.i{width:1em;height:1em;vertical-align:-.15em;stroke:currentColor;fill:none;
+    stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;
+    text-align:center;padding:30px 20px}
+  .logo{width:58px;height:58px;border-radius:15px;background:rgba(255,255,255,.16);
+    display:inline-flex;align-items:center;justify-content:center;font-size:30px}
+  .hero h1{font-size:1.5rem;font-weight:850;margin:.5rem 0 .3rem;line-height:1.15}
+  .hero p{color:#EAFBF4;font-size:.95rem;margin:.2rem auto}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);padding:7px 13px;border-radius:999px;
+    font-weight:700;margin-top:12px;font-size:.82rem}
+  .btn{display:block;width:100%;border:none;border-radius:12px;padding:.75rem;
+    font-weight:700;font-size:.98rem;margin-top:10px}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-ghost{background:#fff;color:var(--deep);border:1.5px solid var(--green)}
+  .feat{border:1px solid var(--border);border-radius:14px;padding:13px;margin-top:10px}
+  .feat h3{margin:.2rem 0;font-size:.98rem}
+  .muted{color:var(--muted);font-size:.88rem}
+  .pricecard{background:var(--fill);border:2px solid var(--green);border-radius:18px;
+    padding:18px;text-align:center;margin-top:14px}
+  .big{font-size:2rem;font-weight:850;color:var(--deep)}
+  .hook{color:var(--amber);font-weight:700;margin-top:6px;font-size:.86rem}
+
+  .card{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:15px}
+  .photo{height:140px;background:#ECEFF1;display:flex;align-items:center;justify-content:center;
+    color:#B6BEC4;font-size:42px;position:relative}
+  .badge{position:absolute;top:10px;left:10px;background:#fff;border-radius:999px;
+    padding:3px 10px;font-size:.74rem;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .badge.green{color:var(--green)}.badge.amber{color:var(--amber)}
+  .gauge{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem}
+  .row{display:flex;justify-content:space-between;align-items:center}
+  .price{font-size:1.3rem;font-weight:850}
+  .facts{color:var(--muted);font-size:.86rem;margin-top:4px}
+  .facts svg{margin-right:1px}
+  .tag{display:inline-block;background:#FBE9C7;color:var(--amber);border-radius:6px;
+    padding:1px 6px;font-size:.7rem;font-weight:700;margin-left:6px}
+  .sep{height:1px;background:var(--border);margin:10px 0}
+  .cashbox{background:var(--fill);border-radius:14px;padding:14px;margin-top:6px}
+  .cashbig{font-size:1.7rem;font-weight:850;color:var(--deep)}
+  .cashline{display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #C7E3D8}
+  .whybar{display:flex;height:13px;border-radius:8px;overflow:hidden;margin:8px 0}
+  .foot{text-align:center;color:#9AA4AC;font-size:.78rem;margin:22px}
+  .g{color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- inline icon sprite (no internet needed) -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="home" viewBox="0 0 24 24"><path d="M5 12l-2 0 9-9 9 9-2 0"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="bed" viewBox="0 0 24 24"><path d="M3 7v11M3 11h18M21 18V9a2 2 0 0 0-2-2h-8v4"/><circle cx="7" cy="10" r="1.5"/></symbol>
+  <symbol id="bath" viewBox="0 0 24 24"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="M7 19l-1 2M18 19l1 2"/></symbol>
+  <symbol id="ruler" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></symbol>
+  <symbol id="cash" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12v4M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-4M3 7h16"/><circle cx="17" cy="14" r="1.2"/></symbol>
+  <symbol id="coins" viewBox="0 0 24 24"><circle cx="9" cy="9" r="5"/><path d="M14.5 6.5a5 5 0 1 1 0 11"/></symbol>
+  <symbol id="receipt" viewBox="0 0 24 24"><path d="M6 3v18l3-2 3 2 3-2 3 2V3z"/><path d="M9 8h6M9 12h6"/></symbol>
+  <symbol id="pig" viewBox="0 0 24 24"><path d="M16 7h2l2 3v4l-2 1-1 3h-3l-1-2H9l-1 2H5l-1-4a5 5 0 0 1 5-5h3a4 4 0 0 1 3-2z"/><circle cx="14" cy="11" r="1"/></symbol>
+  <symbol id="flame" viewBox="0 0 24 24"><path d="M12 3c3 4 5 6 5 9a5 5 0 0 1-10 0c0-1.5.5-2.5 1.5-3.5C9 10 10 8 12 3z"/></symbol>
+  <symbol id="tag" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9-9 9z"/><circle cx="9" cy="9" r="1.3"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="gauge" viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0"/><path d="M12 14l4-3"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+  <symbol id="bldg" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-5h6v5M9 11h.01M15 11h.01"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></symbol>
+</svg>
+
+<div class="topbar">
+  <h2>California Deal Finder</h2>
+  <p>A quick look at the app — find under-priced California homes in seconds.</p>
+</div>
+
+<div class="wrap"><div class="screens">
+
+  <!-- LANDING -->
+  <div>
+    <div class="label">Landing</div>
+    <div class="phone">
+      <div class="hero">
+        <div class="logo"><svg class="i" style="width:30px;height:30px"><use href="#home"/></svg></div>
+        <h1>Find under-priced California homes in seconds</h1>
+        <p>A clear 0–100 deal score, the real rent and value, and how much cash you'd need — in plain English.</p>
+        <div class="pill">$12.99/mo for your first 12 months, then $29.99 · cancel anytime</div>
+      </div>
+      <div class="pad">
+        <button class="btn btn-primary">Start 3-day free trial</button>
+        <button class="btn btn-ghost">Browse deals</button>
+        <div class="feat"><svg class="i g" style="font-size:22px"><use href="#gauge"/></svg>
+          <h3>Instant deal score</h3><div class="muted">Every home gets a 0–100 score — green means a great deal.</div></div>
+        <div class="feat"><svg class="i g" style="font-size:22px"><use href="#bldg"/></svg>
+          <h3>Real rent &amp; value</h3><div class="muted">See value and rent, and whether a home is listed below what it's worth.</div></div>
+        <div class="pricecard">
+          <div style="font-weight:700">Simple pricing</div>
+          <div class="big">$12.99<span style="font-size:1rem;font-weight:600">/mo</span></div>
+          <div class="muted">for your first 12 months, then $29.99/mo</div>
+          <div class="hook">Lock in $12.99/mo for a year — goes up to $29.99 soon.</div>
+          <div class="muted" style="margin-top:8px">
+            <svg class="i g"><use href="#check"/></svg> 3-day free trial &nbsp;
+            <svg class="i g"><use href="#check"/></svg> cancel anytime</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div>
+    <div class="label">Deal feed</div>
+    <div class="phone"><div class="pad">
+      <div class="facts" style="margin-bottom:10px"><svg class="i"><use href="#search"/></svg> 3 California homes · best deal first</div>
+
+      <div class="card">
+        <div class="photo"><svg class="i" style="font-size:40px"><use href="#home"/></svg>
+          <div class="badge green"><svg class="i"><use href="#flame"/></svg> Great deal</div>
+          <div class="gauge" style="background:#1D9E75">92</div></div>
+        <div class="pad">
+          <div class="row"><div class="price">$415,000</div><div class="muted">10% below value</div></div>
+          <div class="muted">2118 Larkspur Ln, Sacramento</div>
+          <div class="facts"><svg class="i"><use href="#bed"/></svg>3 &nbsp;<svg class="i"><use href="#bath"/></svg>2 &nbsp;
+            <svg class="i"><use href="#ruler"/></svg>1,420 &nbsp;<svg class="i"><use href="#cal"/></svg>1998</div>
+          <div class="facts"><svg class="i"><use href="#cash"/></svg> ~$2,500/mo rent <span class="tag">sample</span></div>
+          <button class="btn btn-primary" style="margin-top:10px">See details</button></div>
+      </div>
+
+      <div class="card">
+        <div class="photo"><svg class="i" style="font-size:40px"><use href="#home"/></svg>
+          <div class="badge amber"><svg class="i"><use href="#tag"/></svg> Price cut</div>
+          <div class="gauge" style="background:#1D9E75">78</div></div>
+        <div class="pad">
+          <div class="row"><div class="price">$329,900</div><div class="muted">4% below value</div></div>
+          <div class="muted">540 Commerce Way, Stockton</div>
+          <div class="facts"><svg class="i"><use href="#bed"/></svg>3 &nbsp;<svg class="i"><use href="#bath"/></svg>2 &nbsp;
+            <svg class="i"><use href="#ruler"/></svg>1,180 &nbsp;<svg class="i"><use href="#cal"/></svg>1985</div>
+          <div class="facts"><svg class="i"><use href="#cash"/></svg> ~$2,050/mo rent <span class="tag">sample</span></div>
+          <button class="btn btn-primary" style="margin-top:10px">See details</button></div>
+      </div>
+
+      <div class="card">
+        <div class="photo"><svg class="i" style="font-size:40px"><use href="#home"/></svg>
+          <div class="badge"><svg class="i"><use href="#clock"/></svg> New</div>
+          <div class="gauge" style="background:#E08A00">52</div></div>
+        <div class="pad">
+          <div class="row"><div class="price">$689,000</div><div class="muted">at market value</div></div>
+          <div class="muted">77 Vista Del Sol, Modesto</div>
+          <div class="facts"><svg class="i"><use href="#bed"/></svg>4 &nbsp;<svg class="i"><use href="#bath"/></svg>3 &nbsp;
+            <svg class="i"><use href="#ruler"/></svg>2,240 &nbsp;<svg class="i"><use href="#cal"/></svg>2015</div>
+          <div class="facts"><svg class="i"><use href="#cash"/></svg> ~$3,100/mo rent <span class="tag">sample</span></div>
+          <button class="btn btn-primary" style="margin-top:10px">See details</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div>
+    <div class="label">Home detail</div>
+    <div class="phone">
+      <div class="photo" style="height:170px"><svg class="i" style="font-size:46px"><use href="#home"/></svg>
+        <div class="badge green"><svg class="i"><use href="#flame"/></svg> Great deal</div></div>
+      <div class="pad">
+        <div class="row"><div class="price">$415,000</div>
+          <div class="gauge" style="position:static;background:#1D9E75;width:52px;height:52px;font-size:1.15rem">92</div></div>
+        <div class="muted">2118 Larkspur Ln, Sacramento &nbsp;<svg class="i"><use href="#pin"/></svg> Open in Google Maps</div>
+        <div class="facts"><svg class="i"><use href="#bed"/></svg>3 &nbsp;<svg class="i"><use href="#bath"/></svg>2 &nbsp;
+          <svg class="i"><use href="#ruler"/></svg>1,420 sqft &nbsp;<svg class="i"><use href="#cal"/></svg>1998</div>
+
+        <div class="sep"></div>
+        <strong>Why it scored 92</strong>
+        <div class="whybar"><span style="background:#1D9E75;width:60%"></span>
+          <span style="background:#7C5CFC;width:28%"></span><span style="background:#E08A00;width:12%"></span></div>
+        <div class="muted"><svg class="i"><use href="#bldg"/></svg> 10% below value &nbsp;·&nbsp;
+          <svg class="i"><use href="#cash"/></svg> ~7.2% yield &nbsp;·&nbsp; <svg class="i"><use href="#clock"/></svg> fresh listing</div>
+
+        <div class="sep"></div>
+        <strong><svg class="i"><use href="#wallet"/></svg> How much cash you really need</strong>
+        <div class="cashbox">
+          <div class="cashbig">$28,200</div>
+          <div class="muted">to buy this home (FHA, live-in)</div>
+          <div class="cashline"><span><svg class="i"><use href="#coins"/></svg> Down payment (3.5%)</span><strong>$14,525</strong></div>
+          <div class="cashline"><span><svg class="i"><use href="#receipt"/></svg> Closing costs</span><strong>$8,300</strong></div>
+          <div class="cashline"><span><svg class="i"><use href="#pig"/></svg> Reserves</span><strong>$5,375</strong></div>
+        </div>
+        <p class="muted" style="margin-top:10px">Estimates only — a screening tool, not advice. Fair Housing: scoring never uses
+          demographic or "neighborhood quality" signals.</p>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<p class="foot">Preview · sample data · grey placeholders (no live photos). The working app runs on Streamlit.</p>
+</body>
+</html>

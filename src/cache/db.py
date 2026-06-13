@@ -47,6 +47,21 @@ _SCHEMA = [
         cities INTEGER, new_count INTEGER, updated_count INTEGER,
         estimates_updated INTEGER, billable_calls INTEGER, notes TEXT)""",
     """CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)""",
+    """CREATE TABLE IF NOT EXISTS saved_searches (
+        id TEXT PRIMARY KEY, user_id TEXT, name TEXT, city TEXT, zip_code TEXT,
+        max_price REAL, min_score INTEGER, foreclosures_only INTEGER,
+        created_at TEXT, last_checked TEXT, email TEXT)""",
+    """CREATE TABLE IF NOT EXISTS alert_log (
+        search_id TEXT, listing_id TEXT, address TEXT, score INTEGER, matched_at TEXT,
+        notified INTEGER DEFAULT 0,
+        PRIMARY KEY (search_id, listing_id))""",
+]
+
+# Columns added after the tables first shipped. ALTER ... ADD COLUMN works on both
+# SQLite and PostgreSQL; we run them every connect and ignore "already exists".
+_MIGRATIONS = [
+    "ALTER TABLE saved_searches ADD COLUMN email TEXT",
+    "ALTER TABLE alert_log ADD COLUMN notified INTEGER DEFAULT 0",
 ]
 
 
@@ -57,6 +72,11 @@ def connect():
     try:
         for stmt in _SCHEMA:
             conn.execute(backend.ddl(stmt))
+        for stmt in _MIGRATIONS:
+            try:
+                conn.execute(backend.ddl(stmt))
+            except Exception:
+                pass  # column already exists — that's fine (idempotent)
     except Exception:
         cm.__exit__(None, None, None)
         raise
@@ -290,3 +310,90 @@ def upsert_listing(listing_id: str, address: str, city: str, zip_code: str,
         )
         return {"is_new": is_new, "price_changed": price_changed,
                 "previous_price": previous_price}
+
+
+# --- Saved searches + alerts ----------------------------------------------
+
+def _slugish(s: str) -> str:
+    return "".join(c if c.isalnum() else "-" for c in (s or "").lower())[:30].strip("-")
+
+
+def add_saved_search(user_id, name, city, zip_code, max_price, min_score,
+                     foreclosures_only, email=None) -> str:
+    sid = f"{user_id}:{_slugish(name)}:{now_iso()}"
+    with connect() as conn:
+        conn.execute(
+            "INSERT INTO saved_searches (id, user_id, name, city, zip_code, max_price, "
+            "min_score, foreclosures_only, created_at, last_checked, email) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (sid, user_id, name, city, zip_code, max_price, min_score,
+             1 if foreclosures_only else 0, now_iso(), None,
+             (email or "").strip() or None),
+        )
+    return sid
+
+
+def list_saved_searches(user_id) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT * FROM saved_searches WHERE user_id = ? ORDER BY created_at DESC",
+            (user_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def all_saved_searches() -> list[dict]:
+    with connect() as conn:
+        return [dict(r) for r in conn.execute("SELECT * FROM saved_searches").fetchall()]
+
+
+def delete_saved_search(sid) -> None:
+    with connect() as conn:
+        conn.execute("DELETE FROM saved_searches WHERE id = ?", (sid,))
+        conn.execute("DELETE FROM alert_log WHERE search_id = ?", (sid,))
+
+
+def set_search_checked(sid, when) -> None:
+    with connect() as conn:
+        conn.execute("UPDATE saved_searches SET last_checked = ? WHERE id = ?",
+                     (when, sid))
+
+
+def record_alert_match(search_id, listing_id, address, score, when) -> bool:
+    """Record a match; returns True only if it's NEW (so the worker can email it)."""
+    with connect() as conn:
+        cur = conn.execute(
+            "INSERT INTO alert_log (search_id, listing_id, address, score, matched_at) "
+            "VALUES (?, ?, ?, ?, ?) ON CONFLICT(search_id, listing_id) DO NOTHING",
+            (search_id, listing_id, address, score, when))
+        return bool(getattr(cur, "rowcount", 0))
+
+
+def unnotified_matches() -> list[dict]:
+    """Matched deals that haven't been emailed yet, only for searches that have an
+    email address. Joined with the search so the worker knows where to send."""
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT a.search_id, a.listing_id, a.address, a.score, a.matched_at, "
+            "s.name AS search_name, s.email AS email "
+            "FROM alert_log a JOIN saved_searches s ON a.search_id = s.id "
+            "WHERE a.notified = 0 AND s.email IS NOT NULL AND s.email <> '' "
+            "ORDER BY a.matched_at"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def mark_notified(search_id, listing_id) -> None:
+    with connect() as conn:
+        conn.execute(
+            "UPDATE alert_log SET notified = 1 "
+            "WHERE search_id = ? AND listing_id = ?", (search_id, listing_id))
+
+
+def list_alerts(user_id, limit: int = 50) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT a.address, a.score, a.matched_at FROM alert_log a "
+            "JOIN saved_searches s ON a.search_id = s.id "
+            "WHERE s.user_id = ? ORDER BY a.matched_at DESC LIMIT ?",
+            (user_id, limit)).fetchall()
+        return [dict(r) for r in rows]

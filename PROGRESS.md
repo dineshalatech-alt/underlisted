@@ -1,6 +1,127 @@
-# PROGRESS — NorCal Deal Finder
+# PROGRESS — Deal Finder (U.S. nationwide)
 
 A running log of what we've built, the current state, and what's next.
+
+---
+
+## Email alerts switched ON + pricing update — 2026-06-12
+
+- **Deal-alert emails are LIVE.** Added `RESEND_API_KEY` to `.env`; built
+  `src/notify/email_sender.py` (Resend HTTP API, green-themed digest, no blue).
+  `db.py` now stores an **email per saved search** + a `notified` flag (migrations
+  auto-add the columns). The worker (`refresh_worker.py` step 1f) emails one digest
+  per saved search for new matches and marks them sent (never double-emails).
+  My Alerts page now has an **"Email me at"** field.
+  ✅ **Verified:** real test email sent to dineshalatech@gmail.com (Resend id returned).
+- **Caveat:** sends from Resend's shared test address → can only reach the owner's
+  own Resend email until a **domain is verified** in Resend. Set `ALERT_FROM_EMAIL`
+  after that to email real customers.
+- **Pricing updated:** path is now **$12.99/mo intro (12 mo) → $29.99 now → rising to
+  $44.99 later**. Hook changed to *"Lock in $12.99/mo for a year — the price is rising
+  to $44.99 soon."* Updated in app/main.py, MASTER_SPEC, MARKETING_NOTES, PROJECT_MEMORY.
+
+---
+
+## Growth features ("do all") — 2026-06-12
+
+Built the four growth levers from GROWTH_STRATEGY.md (all free, 0 API calls):
+1. **SEO + PR static site** — `tools/gen_site.py` writes hostable HTML to `site/`:
+   `index.html`, `deals-in-<city>.html` (one per city), `report-underpriced.html`.
+   Real SEO/PR assets (Streamlit can't rank; static HTML can). Needs HOSTING to go live.
+2. **Free "Is it a good deal?" funnel** — `app/pages/2_Check_A_Deal.py`: type a city/ZIP,
+   see the top-scored home + a verdict, free, no signup. Cache-first.
+3. **Saved searches + deal alerts** — `app/pages/3_My_Alerts.py` + `db.py`
+   (saved_searches / alert_log tables) + worker matching step (`update_alerts`).
+   Save a search → worker records matching deals. **Email sending DORMANT** until an
+   email account is added (needs EMAIL_* creds). Verified: a saved search matched 2 deals.
+4. **Underpriced report** — generated as part of the static site (PR asset).
+
+Still needed to fully activate: **hosting** (for the SEO pages/site) and a **free email
+account** (to actually send alerts). Both are accounts you create.
+
+---
+
+## Free data sources wired — FEMA risk + FHFA price trend — 2026-06-12
+
+Two more FREE (no-key, not billable) sources added to the database:
+- **FHFA House Price Index (ZIP-level)** — `src/data_sources/market.py` downloads the
+  free FHFA ZIP5 file (19,024 ZIPs) into `data/fhfa_zip5.json` (parsed once; worker
+  refreshes ~yearly via `update_market`). Detail page now shows **"Home prices in
+  <ZIP>: ▲/▼ X% in <year> · FHFA"**.
+- **FEMA risk extended** to **earthquake + overall** rating (NRI fields ERQK_RISKR /
+  RISK_RATNG) on top of fire+flood. New `RiskFlags.quake_zone` / `.overall_risk`;
+  earthquake badge + insurance note where High.
+- **HUD Fair Market Rents** — key slot added (`HUD_FMR_TOKEN` in settings/.env.example);
+  needs a FREE token (5-min signup) before wiring its lookup. Dormant until added.
+- Verified live on cached Sacramento listings (95827: flood AE + prices −0.8% 2025).
+  **0 billable calls.**
+
+---
+
+## Fire/flood RISK flags — the moat — DONE (free, live) — 2026-06-12
+
+Wired the differentiator using **free FEMA data (no key, not billable)**:
+- `src/data_sources/risk.py` — FEMA **National Flood Hazard Layer** (flood zone) +
+  FEMA **National Risk Index** (wildfire rating). Shared cache, 180-day TTL. Both are
+  free ArcGIS REST endpoints (verified live by point).
+- Wired into the **Deal Score** (`risk` factor now reflects real fire/flood) and the
+  **UI**: red "Flood zone" / "fire risk" badges on cards + an amber insurance-cost
+  callout on the detail. Worker refreshes risk each run (`worker.update_risk`).
+- Verified live on the 8 cached Sacramento listings — one (95827) is FEMA flood zone
+  **AE**: shows the badge + note and its score dropped to 17. **0 billable calls.**
+
+**Paid services we currently have keys for:** RentCast (working) + Google Street View
+(key set but 403-parked). Foreclosure Data Hub + Gemini not set. Everything else on the
+68-source list needs a new account/key (can't be "wired" without sign-up).
+
+---
+
+## Nationwide switch (copy + groundwork) — 2026-06-12
+
+Scope changed from California-only to **whole U.S.** (decision recorded in
+`memory/nationwide-scope.md` + MASTER_SPEC). Done so far (no API calls):
+- **App copy** → nationwide: landing headline "Find under-priced **U.S.** homes",
+  page title "Deal Finder", "Nationwide listings", disclaimers updated; feed header
+  now "U.S. deals"; marketing one-liner → "American homes".
+- **Feed filter** city options now derive from the **data actually loaded** (any
+  state), not a fixed CA list.
+- **Demo foreclosures** diversified to **Cleveland OH + Atlanta GA** to show
+  nationwide (Foreclosure Data Hub is flat-fee, all 50 states).
+- **foreclosure.sync_listings** now takes optional `state` / `zips` (on-demand any
+  U.S. area). Links recolored green (no blue, house style). Key docs updated.
+- **Nationwide search built (option A):** a "Search any U.S. city or ZIP" box on the
+  feed. Cache-first — cached areas show instantly & free; an un-cached area shows an
+  explicit green **"Load … (uses 1 RentCast lookup)"** button that only bills when
+  clicked (`rentcast.sync_area()`). Verified with **0 API calls** (Load not clicked).
+- **Still cost-smart:** fetch **by searched area on demand**, never bulk-sync the
+  country. Remaining: CA references in some secondary docs/README to sweep; the
+  Streamlit info box renders blue (could swap for a green box for strict house style).
+
+---
+
+## Foreclosure / bank-owned homes (Foreclosure Data Hub) — code DONE, awaiting $1 key
+
+Added a new data source for cheap bank-owned / foreclosure (REO) homes, since
+RentCast carries none. Built to the approved plan; **no live data yet** (needs the
+$1 trial key). All verified with NO API calls.
+
+- **Backend:** `src/data_sources/foreclosure.py` (mirrors rentcast.py: fetch → map →
+  cache via shared `listings` table with `FC:` id prefix; usage kind `foreclosure`).
+  `config/settings.py` reads `FORECLOSURE_API_KEY` (+ `has_foreclosure`). New
+  `Listing.est_value` field. `config/cache.yaml`: foreclosure TTL + `sync_foreclosure`
+  / `max_foreclosure_per_city`. Worker (`worker/refresh_worker.py`) syncs foreclosures
+  after listings — **skipped silently until the key is set**. RentCast's loader now
+  excludes `FC:` rows.
+- **UI** (`app/pages/0_Browse_Deals.py`): "Bank-owned · foreclosure" badge, a
+  "Bank-owned / foreclosures only" filter, and a lighter card showing **bid vs
+  estimated value** ("X% below value") + a sold-as-is warning + free HUD/HomePath/
+  HomeSteps links. No beds/baths/rent (foreclosure data lacks them).
+- **Demo:** until the live feed is connected, 2 clearly-marked DEMO foreclosures show
+  so the feature is visible (`app/sample_data.py`). Verified: 8 real + 2 demo rows,
+  21%/18% below value, **0 billable calls**. Screenshots in `design_preview/fc_*.png`.
+- **Phase A (pending you):** sign up for the $1 trial → add `FORECLOSURE_API_KEY` to
+  `.env` → run `.tmp/foreclosure_probe.py` to confirm CA fields, then the worker loads
+  real foreclosures. Plan: `~/.claude/plans/synchronous-foraging-hamster.md`.
 
 ---
 

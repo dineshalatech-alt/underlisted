@@ -41,14 +41,42 @@ def _read_yaml(filename: str) -> dict:
         return yaml.safe_load(f) or {}
 
 
+def _secret(key: str, default: str = "") -> str:
+    """Read one secret value.
+
+    Order: local environment first (your `.env` via dotenv, or a host's env
+    vars), then Streamlit Cloud's encrypted `st.secrets`. Streamlit is imported
+    LAZILY and only if the env var is missing, so the worker, gen_site, and other
+    non-Streamlit tools never need (or load) Streamlit. Works the same locally
+    and in the cloud — no code changes between them.
+    """
+    val = os.getenv(key, "")
+    if val:
+        return val.strip()
+    try:  # only reached on Streamlit Cloud, where st.secrets exists
+        import streamlit as st
+        if key in st.secrets:
+            return str(st.secrets[key]).strip()
+    except Exception:
+        pass
+    return default
+
+
 @dataclass
 class Settings:
     """One object that holds everything the app needs to be configured."""
 
     # API keys (empty string if not set yet — the app warns instead of crashing).
     rentcast_api_key: str = ""
+    foreclosure_api_key: str = ""
+    hud_fmr_token: str = ""
     streetview_api_key: str = ""
     gemini_api_key: str = ""
+    resend_api_key: str = ""
+    # The "from" address on alert emails. Defaults to Resend's shared test sender,
+    # which works with no domain setup (it can only email YOUR own Resend account
+    # address until you verify a domain). Override with ALERT_FROM_EMAIL once you do.
+    alert_from_email: str = "Deal Finder <onboarding@resend.dev>"
 
     # Parsed YAML config.
     cities: dict = field(default_factory=dict)
@@ -66,12 +94,24 @@ class Settings:
         return bool(self.rentcast_api_key)
 
     @property
+    def has_foreclosure(self) -> bool:
+        return bool(self.foreclosure_api_key)
+
+    @property
+    def has_hud_fmr(self) -> bool:
+        return bool(self.hud_fmr_token)
+
+    @property
     def has_streetview(self) -> bool:
         return bool(self.streetview_api_key)
 
     @property
     def has_gemini(self) -> bool:
         return bool(self.gemini_api_key)
+
+    @property
+    def has_resend(self) -> bool:
+        return bool(self.resend_api_key)
 
     def missing_required_keys(self) -> list[str]:
         """Which REQUIRED keys still need to be filled in (for the UI warning)."""
@@ -146,9 +186,14 @@ def get_settings() -> Settings:
     """Build the Settings object once and reuse it (cached)."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     return Settings(
-        rentcast_api_key=os.getenv("RENTCAST_API_KEY", "").strip(),
-        streetview_api_key=os.getenv("STREETVIEW_API_KEY", "").strip(),
-        gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
+        rentcast_api_key=_secret("RENTCAST_API_KEY"),
+        foreclosure_api_key=_secret("FORECLOSURE_API_KEY"),
+        hud_fmr_token=_secret("HUD_FMR_TOKEN"),
+        streetview_api_key=_secret("STREETVIEW_API_KEY"),
+        gemini_api_key=_secret("GEMINI_API_KEY"),
+        resend_api_key=_secret("RESEND_API_KEY"),
+        alert_from_email=_secret("ALERT_FROM_EMAIL")
+        or "Underlisted <onboarding@resend.dev>",
         cities=_read_yaml("cities.yaml"),
         scoring=_read_yaml("scoring_weights.yaml"),
         financing=_read_yaml("financing.yaml"),

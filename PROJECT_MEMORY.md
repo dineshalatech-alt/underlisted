@@ -7,11 +7,11 @@
 
 ## Where we are right now (plain English)
 
-We're building a **California-only, beginner-friendly deal-finder app** that finds
+We're building a **nationwide (U.S.), beginner-friendly deal-finder app** that finds
 under-priced homes and explains them simply. The whole pipeline works: **RentCast
 is proven live**, real Sacramento listings are loaded, and the app looks polished —
 landing page, mobile feed, detail page with a "how much cash you need" section,
-Tabler icons, logo. Pricing is locked (**$12.99/mo for 12 months, then $29.99**).
+Tabler icons, logo. Pricing: **$12.99/mo for 12 months → $29.99 now → rising to $44.99 later**.
 The one cosmetic thing still broken is **Google photos (403)** — parked on purpose;
 the app works fine with grey placeholders.
 
@@ -29,7 +29,7 @@ rows — see MASTER_SPEC).
 ## Mind map — the whole project at a glance
 
 ```
-CALIFORNIA DEAL FINDER
+U.S. DEAL FINDER (nationwide)
 │
 ├── ✅ DONE
 │   ├── Phase 1 — Scaffold (structure, config, runnable app)

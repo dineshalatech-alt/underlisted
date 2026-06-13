@@ -11,14 +11,16 @@ A scratchpad for taglines, hooks, and ad/video copy. Pricing of record lives in
 ## The one-liner (approved)
 
 > **"Zillow shows you homes; DealCheck makes you do the math. We just tell you
-> which California homes are actually good deals — and why."**
+> which American homes are actually good deals — and why."**
 
 ---
 
 ## Pricing copy (use everywhere)
 
 - Standard: **"$12.99/mo for your first 12 months, then $29.99/mo — cancel anytime"**
-- Hook: **"Lock in $12.99/mo for a year — goes up to $29.99 soon."**
+- Hook: **"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."**
+- *(Pricing path: $12.99 intro → $29.99 standard now → $44.99 planned. The hook
+  points at the eventual $44.99 to make the lock-in feel bigger.)*
 
 ---
 

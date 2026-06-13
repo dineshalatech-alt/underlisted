@@ -1,4 +1,4 @@
-# MASTER_SPEC — California Deal Finder
+# MASTER_SPEC — Deal Finder (U.S. nationwide)
 
 The single source of truth for **what** this product is, **how it's priced**, and
 **which decisions are locked in**. Day-to-day build status lives in
@@ -13,7 +13,7 @@ The single source of truth for **what** this product is, **how it's priced**, an
 ## One-line product
 
 A dead-simple, beginner-friendly, **visual** tool that finds under-priced
-**California** homes, gives each a clear 0–100 deal score, and explains — in plain
+**U.S.** homes, gives each a clear 0–100 deal score, and explains — in plain
 English — what it'd really cost to buy. Built to run **cheaply per customer**.
 
 ---
@@ -21,16 +21,20 @@ English — what it'd really cost to buy. Built to run **cheaply per customer**.
 ## Pricing (LOCKED)
 
 **Founding-member intro offer:**
-- **$12.99/month for the first 12 months**, then **$29.99/month**.
+- **$12.99/month for the first 12 months**, then **$29.99/month** (current standard).
 - New customers who sign up **after** the intro period start at **$29.99/month**.
+- **Planned increase:** standard rises to **$44.99/month** later (date TBD). The
+  $12.99 founding intro is the lock-in against this rise.
 - 3-day free trial · cancel anytime.
 
 **Approved pricing copy (use everywhere):**
 - Standard line: **"$12.99/mo for your first 12 months, then $29.99/mo — cancel anytime"**
-- Hook line: **"Lock in $12.99/mo for a year — goes up to $29.99 soon."**
+- Hook line: **"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."**
 
-> Change history: standard price raised from $24.99 → **$29.99** on 2026-06-07.
-> Intro ($12.99 for 12 months) unchanged.
+> Change history:
+> - 2026-06-07: standard raised $24.99 → **$29.99**.
+> - 2026-06-12: **future standard set to $44.99** (current price stays $29.99 for now);
+>   marketing hook now points to the $44.99 rise. Intro ($12.99/12 mo) unchanged.
 
 **Tiers to consider later (NOT now):**
 A two-tier structure once the product is established —
@@ -45,7 +49,9 @@ Decision deferred until we have paying customers; record only.
 
 ## Locked product decisions
 
-- **California only** for now (more states later).
+- **Nationwide (whole U.S.)** as of 2026-06-12 (changed from the earlier
+  California-only pilot). Fetch data **by the area a user searches, on demand** —
+  do NOT bulk-sync the whole country (see [PROGRESS.md] / cost architecture).
 - **Low data cost per customer** is a core constraint: shared cache keyed by
   property, precompute scores, never fetch on page load, lazy images, per-user cap.
   (See [PROGRESS.md](PROGRESS.md) / cost architecture.)
@@ -80,7 +86,7 @@ They are enhancements *on top of* it, not replacements.
 ## Marketing one-liner (approved)
 
 > **"Zillow shows you homes; DealCheck makes you do the math. We just tell you
-> which California homes are actually good deals — and why."**
+> which American homes are actually good deals — and why."**
 
 Full marketing copy, hooks, and the video plan live in
 [MARKETING_NOTES.md](MARKETING_NOTES.md) and

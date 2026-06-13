@@ -18,9 +18,9 @@ import os
 import sqlite3
 from contextlib import contextmanager
 
-from config.settings import DATA_DIR
+from config.settings import DATA_DIR, _secret
 
-DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+DATABASE_URL = _secret("DATABASE_URL")
 IS_POSTGRES = DATABASE_URL.startswith(("postgres://", "postgresql://"))
 
 SQLITE_PATH = DATA_DIR / "cache.db"

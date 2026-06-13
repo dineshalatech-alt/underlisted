@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Guide — Host + Email (free, 10 minutes)</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--ink:#1F2933;--muted:#667085;--amber:#E08A00}
+  *{box-sizing:border-box}
+  body{margin:0;background:#F2F4F5;color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:780px;margin:0 auto;padding:24px}
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;
+    border-radius:18px;padding:26px 24px}
+  .hero h1{margin:.2rem 0;font-size:1.7rem}
+  .hero p{color:#EAFBF4;margin:.2rem 0}
+  h2{color:var(--deep);margin-top:30px;border-bottom:2px solid var(--fill);padding-bottom:6px}
+  a{color:var(--deep);font-weight:700}
+  .step{background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:14px 18px;margin:10px 0;
+    display:flex;gap:14px;align-items:flex-start}
+  .num{background:var(--green);color:#fff;font-weight:800;border-radius:50%;width:30px;height:30px;
+    flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+  .tip{background:var(--fill);border-left:4px solid var(--green);padding:10px 14px;border-radius:8px;margin:10px 0}
+  .warn{background:#FBE9C7;border-left:4px solid var(--amber);padding:10px 14px;border-radius:8px;margin:10px 0;
+    color:#7a5b00}
+  code{background:#EEF2F0;padding:2px 6px;border-radius:6px;font-size:.92em}
+  .path{background:#EEF2F0;padding:8px 12px;border-radius:8px;word-break:break-all;font-size:.92em}
+  .foot{color:#9AA4AC;font-size:.85rem;text-align:center;margin:26px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🚀 Setup Guide — get online + turn on email</h1>
+    <p>Two free accounts, about 10 minutes. No coding. Just follow the steps.</p>
+  </div>
+
+  <h2>Part 1 · Put your deal pages online (free)</h2>
+  <p>This makes your <code>site</code> folder a real website people can find on Google.
+     Easiest way: <b>Netlify Drop</b> — you literally drag a folder onto a web page.</p>
+
+  <div class="step"><div class="num">1</div><div>
+    Open your <b>site</b> folder. It's here:
+    <div class="path">C:\Users\dines\OneDrive\Documents\14. Real Estate\site</div>
+    (Tip: open File Explorer, paste that path in the address bar, press Enter.)
+  </div></div>
+  <div class="step"><div class="num">2</div><div>
+    In your web browser, go to <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a>.
+  </div></div>
+  <div class="step"><div class="num">3</div><div>
+    <b>Drag the whole <code>site</code> folder</b> onto that page and drop it. Wait ~30 seconds.
+  </div></div>
+  <div class="step"><div class="num">4</div><div>
+    You'll get a <b>live link</b> like <code>something-random.netlify.app</code>. That's your site — open it!
+  </div></div>
+  <div class="step"><div class="num">5</div><div>
+    Click <b>Sign up</b> (free) to <b>keep</b> the site, rename it, and later add your own
+    web address (domain).
+  </div></div>
+  <div class="tip"><b>To update the site later:</b> in the project, run
+    <code>python tools/gen_site.py</code>, then drag the <code>site</code> folder onto Netlify
+    again. (We can automate this later.)</div>
+  <div class="tip"><b>Want your own name</b> (like <code>yourbrand.com</code>)? Buy one (~$10/yr at
+    Namecheap or Cloudflare) and connect it in Netlify under "Domain settings." Optional, do it anytime.</div>
+
+  <h2>Part 2 · Turn on email alerts (free)</h2>
+  <p>This lets the app email people "a deal just dropped!". We'll use <b>Resend</b> — a free,
+     beginner-friendly email service (3,000 emails/month free).</p>
+
+  <div class="step"><div class="num">1</div><div>
+    Go to <a href="https://resend.com" target="_blank">resend.com</a> and click <b>Sign up</b> (free). Verify your email.
+  </div></div>
+  <div class="step"><div class="num">2</div><div>
+    In the dashboard, open <b>API Keys</b> → <b>Create API Key</b> → <b>Copy</b> it.
+    It starts with <code>re_</code>.
+  </div></div>
+  <div class="step"><div class="num">3</div><div>
+    Open your <b>.env</b> file (in the project folder) and add this line, pasting your key after the <code>=</code>:
+    <div class="path">RESEND_API_KEY=re_your_key_here</div>
+    Save the file.
+  </div></div>
+  <div class="step"><div class="num">4</div><div>
+    Tell me <b>"email done"</b> — I'll wire the alert emails and send a test to you first.
+  </div></div>
+  <div class="warn"><b>Note:</b> for testing, Resend lets you send from a built-in address. To email
+    real customers from <i>your</i> brand later, you "verify your domain" in Resend (a 5-minute step
+    we can do once you have a domain).</div>
+
+  <h2>Part 3 · After you're done</h2>
+  <ul>
+    <li>Send me your <b>live site link</b> (optional) — I'll help polish it.</li>
+    <li>Say <b>"email done"</b> once the Resend key is in <code>.env</code> — I'll switch on alerts.</li>
+  </ul>
+
+  <div class="warn">🔒 <b>Keep keys private:</b> paste them only into the <code>.env</code> file —
+    never into chat or anywhere public. The <code>.env</code> file is already kept private.</div>
+
+  <p class="foot">That's it — two free signups and you're live. Questions on any step? Just ask.</p>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# NorCal Deal Finder 🏡
+# Deal Finder 🏡
 
-Find for-sale homes across **Northern California**, see a real photo of each one,
+Find for-sale homes across the **United States**, see a real photo of each one,
 what it could rent for, how good a "deal" it is, and — in plain English — **how
 much cash you'd really need to buy it.**
 
@@ -22,7 +22,7 @@ For each home for sale, it shows you:
 3. **Rent estimate** — what it might rent for each month, plus simple yardsticks
    (gross yield, the "1% rule", a rough cap rate).
 4. **Value check** — is it listed *above* or *below* its estimated value?
-5. **Risk flags** — fire zone? flood zone? (California insurance matters.)
+5. **Risk flags** — fire zone? flood zone? (insurance cost can make or break a deal.)
 6. **A Deal Score (0–100)** — with a "why it scored this" breakdown so you can
    trust it.
 7. **"How much cash you really need"** — one big number, then a friendly breakdown

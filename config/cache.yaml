@@ -14,6 +14,8 @@ ttl:
   value_estimate_days:   7     # AVM changes slowly -> weekly
   rent_estimate_days:    7     # rent estimate -> weekly
   market_stats_days:     7     # zip market stats -> weekly
+  foreclosure_listings_hours: 12   # bank-owned/auction data changes faster -> twice a day
+  risk_days:           180     # fire/flood risk barely changes -> refresh ~twice a year
   images_days:        3650     # ~never: a building's exterior/aerial doesn't change
 
 # Scheduled sync. The APP NEVER fetches on page load — a schedule does.
@@ -32,6 +34,13 @@ worker:
   max_estimates_per_run:    50       # cap value+rent calls per run (cost guard)
   prewarm_photos:        false       # keep images lazy by default…
   prewarm_top_n:             0       # …unless >0: pre-fetch photos for N newest homes
+  sync_foreclosure:       true       # also pull bank-owned/foreclosure listings
+  max_foreclosure_per_city: 100      # per-run cap per zip/city for foreclosures (cost guard)
+  update_risk:            true       # fetch FREE FEMA fire/flood risk for cached listings
+  max_risk_per_run:        300       # cap risk lookups per run (free, but be polite)
+  update_market:          true       # refresh FREE FHFA ZIP price-trend file (~yearly)
+  update_alerts:          true       # match saved searches and record alert hits
+  send_alert_emails:      true       # email those matches (only if RESEND_API_KEY is set)
 
 # Image sizes — smallest that still looks good. Don't pull 4K for a card.
 images:
@@ -52,5 +61,6 @@ cost_estimates_usd:
   rentcast_listings: 0.0       # RentCast is usually quota-based, not per-call
   rentcast_value:    0.0
   rentcast_rent:     0.0
+  foreclosure:       0.0       # Foreclosure Data Hub is a flat monthly fee, not per-call
   streetview:        0.007     # ~$7 per 1,000 Street View images
   aerial:            0.002     # ~$2 per 1,000 Static Map images

@@ -30,7 +30,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from config.settings import settings  # noqa: E402
 from src.cache import backend, db  # noqa: E402
-from src.data_sources import rentcast, streetview  # noqa: E402
+from src.data_sources import rentcast, streetview, foreclosure, risk, market  # noqa: E402
+from src.notify import email_sender  # noqa: E402
 
 
 def _wcfg() -> dict:
@@ -78,6 +79,110 @@ def run_once(*, full: bool = False, progress=None) -> dict:
         notes.append(f"listings: {exc}")
         summary = {"new": 0, "updated": 0, "total_seen": 0, "price_drops": []}
         cities = 0
+
+    # 1b) Foreclosure / bank-owned listings — separate source, same shared cache.
+    #     Skipped silently until FORECLOSURE_API_KEY is set. A foreclosure hiccup
+    #     is noted but does NOT fail the whole run.
+    if (cfg.get("sync_foreclosure", True) and settings.has_foreclosure
+            and status != "error"):
+        try:
+            _log(progress, "Refreshing foreclosure listings...")
+            fc = foreclosure.sync_listings(
+                limit_per_area=int(cfg.get("max_foreclosure_per_city", 100)),
+                incremental=not full,
+                progress=lambda m: _log(progress, m),
+            )
+            summary["new"] += fc["new"]
+            summary["updated"] += fc["updated"]
+            for err in fc["errors"]:
+                notes.append(f"foreclosure {err}")
+        except Exception as exc:
+            notes.append(f"foreclosure: {exc}")
+
+    # 1c) Risk flags — FREE FEMA fire/flood for cached listings (not billable).
+    if cfg.get("update_risk", True) and status != "error":
+        budget = int(cfg.get("max_risk_per_run", 300))
+        done = 0
+        _log(progress, f"Updating FEMA fire/flood risk (up to {budget})...")
+        for listing in rentcast.load_cached_listings():
+            if listing.latitude is None or listing.longitude is None:
+                continue
+            try:
+                risk.get_risk(listing, cache_only=False)  # free; caches result
+            except Exception as exc:
+                notes.append(f"risk {listing.id}: {exc}")
+            done += 1
+            if done >= budget:
+                break
+
+    # 1d) Market context — FREE FHFA ZIP price-trend file (refreshes ~yearly).
+    if cfg.get("update_market", True) and status != "error":
+        try:
+            n = market.ensure_fresh()
+            if n:
+                _log(progress, f"Refreshed FHFA price-trend data ({n} ZIPs).")
+        except Exception as exc:
+            notes.append(f"market: {exc}")
+
+    # 1e) Saved-search alerts — match cached deals, record hits (email dormant).
+    if cfg.get("update_alerts", True) and status != "error":
+        try:
+            from app import sample_data as _sd
+            rows, _ = _sd.display_rows()
+            new_total = 0
+            for s in db.all_saved_searches():
+                for r in rows:
+                    l = r["listing"]
+                    if s.get("city") and s["city"].lower() not in (l.city or "").lower():
+                        continue
+                    if s.get("zip_code") and not (l.zip_code or "").startswith(str(s["zip_code"])):
+                        continue
+                    if s.get("max_price") and l.list_price and l.list_price > s["max_price"]:
+                        continue
+                    if s.get("min_score") and r["score"].total < s["min_score"]:
+                        continue
+                    if s.get("foreclosures_only") and not r.get("foreclosure"):
+                        continue
+                    if db.record_alert_match(s["id"], l.id, l.address, r["score"].total,
+                                             db.now_iso()):
+                        new_total += 1
+                db.set_search_checked(s["id"], db.now_iso())
+            if new_total:
+                tail = ("" if settings.has_resend
+                        else " (email dormant until RESEND_API_KEY is added)")
+                _log(progress, f"Alerts: {new_total} new matching deal(s) recorded{tail}.")
+        except Exception as exc:
+            notes.append(f"alerts: {exc}")
+
+    # 1f) Email the new matches — one digest per saved search that has an email.
+    #     Only runs when a Resend key is present; otherwise it's a no-op.
+    if (cfg.get("send_alert_emails", True) and settings.has_resend
+            and status != "error"):
+        try:
+            pending = db.unnotified_matches()
+            # Group matches by the search they belong to.
+            by_search: dict[str, dict] = {}
+            for m in pending:
+                g = by_search.setdefault(
+                    m["search_id"],
+                    {"email": m["email"], "name": m["search_name"], "items": []})
+                g["items"].append(m)
+
+            sent = 0
+            for sid, g in by_search.items():
+                res = email_sender.send_alert_digest(
+                    g["email"], g["name"], g["items"],
+                    app_url=settings.cache.get("app_url"))
+                if res.get("ok"):
+                    for m in g["items"]:
+                        db.mark_notified(sid, m["listing_id"])
+                    sent += 1
+                else:
+                    notes.append(f"email {sid}: {res.get('error') or res.get('reason')}")
+            if sent:
+                _log(progress, f"Alerts: emailed {sent} digest(s).")
+        except Exception as exc:
+            notes.append(f"email: {exc}")
 
     # 2) Value/rent — only stale ones bill (TTL), capped per run.
     if cfg.get("update_value_rent", True) and status != "error":

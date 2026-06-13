@@ -1,5 +1,5 @@
 """
-NorCal Deal Finder — marketing / landing page (the front door).
+Underlisted — marketing / landing page (the front door). Nationwide (U.S.).
 
 This is the entry screen at http://localhost:8501. The actual app (the deal feed)
 is the "Browse Deals" page. Pure visual — no API calls.
@@ -20,7 +20,7 @@ from app.assets.theme import DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL, AMBER  # noq
 from app.icons import TABLER_CSS, ic  # noqa: E402
 from app.helpers import logo_data_uri, favicon_path  # noqa: E402
 
-st.set_page_config(page_title="NorCal Deal Finder", page_icon=favicon_path(),
+st.set_page_config(page_title="Underlisted", page_icon=favicon_path(),
                    layout="centered")
 
 LOGO = logo_data_uri()
@@ -54,10 +54,11 @@ st.markdown(TABLER_CSS + f"""
 st.markdown(f"""
 <div class="hero">
   <img src="{LOGO}" width="76" style="border-radius:18px"/>
-  <h1>Find under-priced California homes in seconds</h1>
+  <h1>Find under-priced U.S. homes in seconds</h1>
   <p>A beginner-friendly deal finder. See a clear 0–100 deal score, the real rent
      and value, and exactly how much cash you'd need — in plain English.</p>
   <div class="pricepill">$12.99/mo for your first 12 months, then $29.99 · cancel anytime</div>
+  <!-- pricing: $12.99 intro (12 mo) -> $29.99 standard -> rising to $44.99 later -->
 </div>
 """, unsafe_allow_html=True)
 
@@ -89,7 +90,7 @@ f3.markdown(f"<div class='feat'>{ic('wallet',26,PRIMARY_GREEN)}<h3>Know your cas
 st.write("")
 st.markdown("### How it works")
 s1, s2, s3 = st.columns(3)
-s1.markdown(f"{ic('search',22,PRIMARY_GREEN)} **1. Browse** the California feed.",
+s1.markdown(f"{ic('search',22,PRIMARY_GREEN)} **1. Browse** the nationwide feed.",
             unsafe_allow_html=True)
 s2.markdown(f"{ic('gauge' if False else 'score',22,PRIMARY_GREEN)} **2. Scan scores** "
             "— green = great deal.", unsafe_allow_html=True)
@@ -102,10 +103,10 @@ st.markdown(f"""
   <div style="font-weight:700;font-size:1.1rem">Simple pricing</div>
   <div class="big">$12.99<span style="font-size:1.1rem;font-weight:600">/mo</span></div>
   <div class="muted">for your first 12 months, then $29.99/mo</div>
-  <div style="margin-top:6px;color:{AMBER};font-weight:700">Lock in $12.99/mo for a year — goes up to $29.99 soon.</div>
+  <div style="margin-top:6px;color:{AMBER};font-weight:700">Lock in $12.99/mo for a year — the price is rising to $44.99 soon.</div>
   <div style="margin-top:8px">{ic('check',18,PRIMARY_GREEN)} 3-day free trial &nbsp;
      {ic('check',18,PRIMARY_GREEN)} cancel anytime &nbsp;
-     {ic('check',18,PRIMARY_GREEN)} California listings</div>
+     {ic('check',18,PRIMARY_GREEN)} Nationwide listings</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -116,4 +117,4 @@ if st.button("Start 3-day free trial  →", type="primary", use_container_width=
 st.divider()
 st.caption("Estimates only — a screening tool, not investment advice or a loan "
            "offer. Fair Housing: scoring never uses demographic or 'neighborhood "
-           "quality' signals. California only for now; more states later.")
+           "quality' signals. Now nationwide across the U.S.")

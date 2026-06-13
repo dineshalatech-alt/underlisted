@@ -27,3 +27,11 @@ Thumbs.db
 
 # --- Streamlit ---
 .streamlit/secrets.toml
+
+# --- Large media (videos) — keep the repo light, host these elsewhere ---
+*.mp4
+*.mov
+*.webm
+
+# --- Personal / account paperwork — never upload (may contain private info) ---
+*.pdf

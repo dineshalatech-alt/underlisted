@@ -267,6 +267,48 @@ def last_sync_time() -> Optional[str]:
     return db.get_meta("lastsync:global")
 
 
+def sync_area(*, city: Optional[str] = None, state: Optional[str] = None,
+              zip_code: Optional[str] = None, status: str = "Active",
+              limit: int = MAX_LIMIT) -> dict:
+    """
+    Fetch ONE arbitrary U.S. area on demand (a city+state or a ZIP) and cache it.
+
+    This powers nationwide "search any city/ZIP": it bills exactly ONE RentCast call,
+    caches the results in the shared store (so every later viewer is free), and is
+    only ever called when the user explicitly asks to load a new area.
+
+    Returns: {new, updated, total_seen, errors[], synced_at}
+    """
+    when = _now_iso()
+    new_count = updated_count = total_seen = 0
+    try:
+        raw_listings = fetch_listings_raw(city=city, state=state, zip_code=zip_code,
+                                          status=status, limit=limit)
+    except RentCastError as exc:
+        return {"new": 0, "updated": 0, "total_seen": 0,
+                "errors": [str(exc)], "synced_at": when}
+
+    for raw in raw_listings:
+        listing = raw_to_listing(raw)
+        if not listing.id:
+            continue
+        total_seen += 1
+        result = db.upsert_listing(
+            listing_id=listing.id, address=listing.address, city=listing.city,
+            zip_code=listing.zip_code, list_price=listing.list_price,
+            payload=raw, when_iso=when,
+        )
+        if result["is_new"]:
+            new_count += 1
+        else:
+            updated_count += 1
+
+    area_key = zip_code or (f"{city},{state}" if city else "area")
+    db.set_meta(f"lastsync:area:{area_key}", when)
+    return {"new": new_count, "updated": updated_count, "total_seen": total_seen,
+            "errors": [], "synced_at": when}
+
+
 # --- Read cached listings for display (NO API call) ------------------------
 
 def load_cached_listings(
@@ -282,6 +324,7 @@ def load_cached_listings(
     with db.connect() as conn:
         rows = conn.execute(
             "SELECT id, payload, previous_price FROM listings "
+            "WHERE id NOT LIKE 'FC:%' "       # foreclosures load via foreclosure.py
             "ORDER BY last_seen DESC LIMIT ?",
             (limit,),
         ).fetchall()

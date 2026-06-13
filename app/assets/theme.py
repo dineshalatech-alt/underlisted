@@ -54,6 +54,7 @@ APP_CSS = f"""
   .badge-good {{ background: {LIGHT_FILL}; color: {DEEP_GREEN}; }}
   .badge-warn {{ background: #FBE9C7; color: {AMBER}; }}
   .badge-bad  {{ background: #F9D6D1; color: {RED}; }}
+  .badge-bank {{ background: #EAECF0; color: #344054; }}
   .muted {{ color: {MUTED}; font-size: 0.9rem; }}
   .stApp h1, .stApp h2, .stApp h3 {{ color: {INK}; }}
   div[data-testid="stMetricValue"] {{ color: {DEEP_GREEN}; }}
