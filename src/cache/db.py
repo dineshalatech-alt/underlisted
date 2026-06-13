@@ -72,11 +72,17 @@ def connect():
     try:
         for stmt in _SCHEMA:
             conn.execute(backend.ddl(stmt))
+        conn.commit()  # finalize tables before running migrations
+        # Migrations exist for OLD databases. On a FRESH database these columns
+        # already exist, so each ALTER errors. Run each in its OWN transaction:
+        # PostgreSQL aborts the whole transaction on any error, so without this a
+        # harmless "already exists" would poison every command after it.
         for stmt in _MIGRATIONS:
             try:
                 conn.execute(backend.ddl(stmt))
+                conn.commit()
             except Exception:
-                pass  # column already exists — that's fine (idempotent)
+                conn.rollback()  # column already exists — that's fine (idempotent)
     except Exception:
         cm.__exit__(None, None, None)
         raise
