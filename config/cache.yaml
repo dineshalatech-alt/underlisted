@@ -8,6 +8,12 @@
 # All of these are yours to tune.
 # ------------------------------------------------------------------
 
+# Your Payhip subscription checkout link (from payhip.com). Paste your product
+# link here — it looks like  https://payhip.com/b/XXXXX  — to switch ON the
+# green "Subscribe" button on the landing page. Leave it as "" (blank) and the
+# page shows the free preview button only. This is the ONLY place to change it.
+checkout_url: ""
+
 # How long cached data stays "fresh" before we'd re-fetch it.
 ttl:
   listings_hours:       24     # listings refresh about once a day (scheduled)

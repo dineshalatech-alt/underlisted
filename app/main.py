@@ -16,9 +16,15 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import streamlit as st  # noqa: E402
 
+from config.settings import settings  # noqa: E402
 from app.assets.theme import DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL, AMBER  # noqa: E402
 from app.icons import TABLER_CSS, ic  # noqa: E402
 from app.helpers import logo_data_uri, favicon_path  # noqa: E402
+
+# Your Payhip subscription link (set it in config/cache.yaml -> checkout_url).
+# When present, the landing page shows a real "Subscribe" button; otherwise it
+# shows the free preview button only.
+CHECKOUT_URL = (settings.cache.get("checkout_url") or "").strip()
 
 st.set_page_config(page_title="Underlisted", page_icon=favicon_path(),
                    layout="centered")
@@ -64,12 +70,20 @@ st.markdown(f"""
 
 st.write("")
 c1, c2 = st.columns(2)
-if c1.button("Start 3-day free trial", type="primary", use_container_width=True):
+if CHECKOUT_URL:
+    c1.link_button("Subscribe — lock in $12.99/mo", CHECKOUT_URL,
+                   type="primary", use_container_width=True)
+else:
+    if c1.button("Start 3-day free trial", type="primary", use_container_width=True):
+        st.switch_page("pages/0_Browse_Deals.py")
+if c2.button("Browse deals (free preview)", use_container_width=True):
     st.switch_page("pages/0_Browse_Deals.py")
-if c2.button("Browse deals", use_container_width=True):
-    st.switch_page("pages/0_Browse_Deals.py")
-st.caption("No charge today — this is a preview. Card required when billing is "
-           "switched on later.")
+if CHECKOUT_URL:
+    st.caption("Secure checkout by Payhip · cancel anytime. Browse the preview "
+               "free, subscribe to lock in the founding price.")
+else:
+    st.caption("No charge today — this is a preview. Card required when billing is "
+               "switched on later.")
 
 st.write("")
 st.markdown("### Why people use it")
@@ -111,8 +125,12 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 st.write("")
-if st.button("Start 3-day free trial  →", type="primary", use_container_width=True):
-    st.switch_page("pages/0_Browse_Deals.py")
+if CHECKOUT_URL:
+    st.link_button("Subscribe — lock in $12.99/mo  →", CHECKOUT_URL,
+                   type="primary", use_container_width=True)
+else:
+    if st.button("Start 3-day free trial  →", type="primary", use_container_width=True):
+        st.switch_page("pages/0_Browse_Deals.py")
 
 st.divider()
 st.caption("Estimates only — a screening tool, not investment advice or a loan "
