@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from urllib.parse import quote as _url_quote
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,6 +20,7 @@ import streamlit as st  # noqa: E402
 
 from config.settings import settings  # noqa: E402
 from src import metrics  # noqa: E402
+from src.models import listing_contact  # noqa: E402
 from src.data_sources import rentcast, market  # noqa: E402
 from src.financing import cash_needed  # noqa: E402
 from src.affordability import afford  # noqa: E402
@@ -338,6 +340,80 @@ def _render_afford(l, occupancy, loan_type, band, risk) -> None:
 # ===========================================================================
 # DETAIL
 # ===========================================================================
+def _render_agent_contact(l) -> None:
+    """Show a 'Call / Email the listing agent' block.
+
+    The BUYER initiates contact: the buttons are plain tel:/mailto: links that
+    open the buyer's OWN phone or email app. We never auto-send or message agents.
+    RentCast's terms allow displaying this contact info to our paid users.
+
+    Graceful fallback (agent -> brokerage office -> neutral "ask a local agent"):
+    we always show something useful, never an empty/broken box.
+    """
+    c = listing_contact(l)
+
+    st.markdown(f"#### {ic('user',22,DEEP_GREEN)} Call / Email the listing agent",
+                unsafe_allow_html=True)
+
+    # The address, so the buyer can reference the exact home when they reach out.
+    if l.address:
+        st.markdown(f"<div class='facts'>{ic('location',16,MUTED)} {l.address}</div>",
+                    unsafe_allow_html=True)
+
+    if c["kind"] == "agent":
+        st.markdown(f"<div class='addr'>{ic('user',18,PRIMARY_GREEN)} {c['name']}</div>",
+                    unsafe_allow_html=True)
+        if l.office_name:
+            st.caption(f"{l.office_name}")
+    elif c["kind"] == "office":
+        st.markdown(f"<div class='addr'>{ic('bank',18,PRIMARY_GREEN)} {c['name']}</div>",
+                    unsafe_allow_html=True)
+        st.caption("Listing brokerage (the listing agent wasn't provided).")
+    else:
+        # Neutral fallback — no agent or office on this record yet.
+        mls = f" · MLS #{c['mls_number']}" if c.get("mls_number") else ""
+        st.markdown(f"<div class='addr'>{ic('user',18,MUTED)} {c['name']}"
+                    f"<span class='muted'>{mls}</span></div>", unsafe_allow_html=True)
+        st.caption("No listing-agent contact on this record yet. Any licensed local "
+                   "agent can pull up this home" + (f" by its MLS number." if mls
+                   else " and help you see it."))
+
+    # One-tap buttons that open the BUYER's own phone / email app.
+    btns = []
+    if c.get("phone"):
+        tel = "tel:" + "".join(ch for ch in c["phone"] if ch.isdigit() or ch == "+")
+        btns.append(("phone", "Call", tel, f"{c['phone']}"))
+    if c.get("email"):
+        subj = f"Question about {l.address or 'your listing'}"
+        mailto = f"mailto:{c['email']}?subject={_url_quote(subj)}"
+        btns.append(("mail", "Email", mailto, c["email"]))
+    if c.get("website"):
+        site = c["website"]
+        if not site.lower().startswith(("http://", "https://")):
+            site = "https://" + site
+        btns.append(("globe", "Website", site, "Listing / agent site"))
+
+    if btns:
+        cols = st.columns(len(btns))
+        for col, (icon, label, href, sub) in zip(cols, btns):
+            col.markdown(
+                f"<a href='{href}' target='_blank' "
+                f"style='display:block;text-align:center;text-decoration:none;"
+                f"background:{LIGHT_FILL};color:{DEEP_GREEN};font-weight:700;"
+                f"padding:.7rem 1rem;border-radius:12px;'>"
+                f"{ic(icon,18,DEEP_GREEN)} {label}</a>"
+                f"<div class='muted' style='text-align:center;font-size:.85rem;"
+                f"margin-top:3px'>{sub}</div>",
+                unsafe_allow_html=True)
+    else:
+        # No phone/email/website at all — keep it honest and useful.
+        st.info("Contact details aren't published for this listing yet. Open it in "
+                "Google Maps above, or ask any local buyer's agent to look it up.")
+
+    st.caption("You contact the agent directly from your own phone or email — "
+               "Underlisted never messages agents for you.")
+
+
 def render_detail(row) -> None:
     l = row["listing"]
     val, rent, score = row["value"], row["rent"], row["score"]
@@ -515,6 +591,9 @@ def render_detail(row) -> None:
 
     st.divider()
     _render_afford(l, occupancy, loan_type, band, row.get("risk"))
+
+    st.divider()
+    _render_agent_contact(l)
 
     st.divider()
     st.caption("All figures are ESTIMATES to help you screen homes — not advice, an "

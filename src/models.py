@@ -40,6 +40,61 @@ class Listing:
     last_seen_run: Optional[str] = None   # ISO timestamp of last sync
     previous_price: Optional[float] = None  # for price-drop detection
 
+    # --- Listing-agent contact (from RentCast listingAgent / listingOffice) ---
+    # RentCast's terms allow showing these to our end users so the BUYER can call
+    # or email the listing agent themselves. We never auto-send. All optional:
+    # older cached listings (and homes with no agent block) simply leave them None.
+    agent_name: Optional[str] = None
+    agent_phone: Optional[str] = None
+    agent_email: Optional[str] = None
+    agent_website: Optional[str] = None
+    office_name: Optional[str] = None
+    office_phone: Optional[str] = None
+    office_email: Optional[str] = None
+    office_website: Optional[str] = None
+    mls_number: Optional[str] = None       # e.g. for "Ask a local agent · MLS #..."
+    mls_name: Optional[str] = None
+
+
+def listing_contact(listing: "Listing") -> dict:
+    """Pick the best contact to show the BUYER, with a graceful fallback chain.
+
+    Order: real listing agent -> brokerage office -> a neutral
+    "Ask a local agent" line (optionally with the MLS number). Always returns a
+    usable block so the UI never shows an empty/broken contact box.
+
+    Returns a dict: {kind, name, phone, email, website, mls_number}
+      kind = "agent" | "office" | "neutral"
+    The phone/email/website may be None even for agent/office; the UI shows only
+    the buttons it actually has.
+    """
+    if listing.agent_name or listing.agent_phone or listing.agent_email:
+        return {
+            "kind": "agent",
+            "name": listing.agent_name or "Listing agent",
+            "phone": listing.agent_phone,
+            "email": listing.agent_email,
+            "website": listing.agent_website,
+            "mls_number": listing.mls_number,
+        }
+    if listing.office_name or listing.office_phone or listing.office_email:
+        return {
+            "kind": "office",
+            "name": listing.office_name or "Listing brokerage",
+            "phone": listing.office_phone,
+            "email": listing.office_email,
+            "website": listing.office_website,
+            "mls_number": listing.mls_number,
+        }
+    return {
+        "kind": "neutral",
+        "name": "Ask a local agent",
+        "phone": None,
+        "email": None,
+        "website": None,
+        "mls_number": listing.mls_number,
+    }
+
 
 @dataclass
 class RentEstimate:

@@ -108,8 +108,25 @@ def fetch_listings_raw(
 
 # --- Mapping raw JSON -> our Listing model ---------------------------------
 
+def _contact_field(block, key: str) -> Optional[str]:
+    """Safely read name/phone/email/website from a listingAgent/listingOffice block.
+
+    RentCast may omit the block entirely, send null, or (rarely) send a non-dict.
+    We treat blank strings as missing so the UI can fall back cleanly.
+    """
+    if not isinstance(block, dict):
+        return None
+    val = block.get(key)
+    if val is None:
+        return None
+    text = str(val).strip()
+    return text or None
+
+
 def raw_to_listing(raw: dict) -> Listing:
     """Convert one RentCast JSON record into our tidy Listing object."""
+    agent = raw.get("listingAgent") or {}
+    office = raw.get("listingOffice") or {}
     return Listing(
         id=str(raw.get("id") or raw.get("formattedAddress")),
         address=raw.get("formattedAddress") or raw.get("addressLine1") or "",
@@ -126,6 +143,17 @@ def raw_to_listing(raw: dict) -> Listing:
         property_type=raw.get("propertyType"),
         status=raw.get("status"),
         days_on_market=raw.get("daysOnMarket"),
+        # --- Listing-agent contact (rides along in the cached payload; no API call) ---
+        agent_name=_contact_field(agent, "name"),
+        agent_phone=_contact_field(agent, "phone"),
+        agent_email=_contact_field(agent, "email"),
+        agent_website=_contact_field(agent, "website"),
+        office_name=_contact_field(office, "name"),
+        office_phone=_contact_field(office, "phone"),
+        office_email=_contact_field(office, "email"),
+        office_website=_contact_field(office, "website"),
+        mls_number=_contact_field(raw, "mlsNumber"),
+        mls_name=_contact_field(raw, "mlsName"),
     )
 
 

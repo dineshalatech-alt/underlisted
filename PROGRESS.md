@@ -4,6 +4,72 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## Video hero on the website + live CLI deploys — 2026-06-14 (Juliet + Serena)
+
+- **Why:** the owner wanted to share the website with a friend. The old `file:///` path only
+  worked on the owner's own machine — a friend's browser can't open local files — so the page
+  had to go live on the public web. We also took the owner's Kling animation
+  (`Smoothly_animate_from_the_firs_Kling_30__78676.mp4`, ≈12 MB) and made it the hero, because
+  "it tells everything."
+- **What we built (Juliet):**
+  - `tools/gen_site.py` — added `import shutil` + a `HERO_VIDEO_SRC` pointer; new `.hero-video`
+    CSS (full-bleed `<video object-fit:cover>`, rounded 22px, a deep-teal→ink gradient **scrim**
+    over the video so the white headline + green CTA stay readable on any frame, brand shadow,
+    mobile breakpoint). Rewrote the **index** hero to render the video with the headline +
+    "Get early access →" CTA overlaid. The old gradient is now the fallback background if the
+    video fails to load. City/report pages keep clean text heroes on purpose (one animated
+    moment = premium; everywhere = noise). `build()` copies the mp4 → `site/assets/hero.mp4`
+    on every build, so the change survives rebuilds (don't hand-edit `site/index.html`).
+  - Asset shipped: `site/assets/hero.mp4` (~12 MB). Rebuilt with
+    `.venv\Scripts\python.exe tools\gen_site.py`; verified the video markup is in the output
+    and text/CTA stay readable at desktop + mobile.
+- **Went LIVE (Serena):** installed the **Netlify CLI** (`npm i -g netlify-cli`), logged in as
+  dineshalatech@gmail.com, linked the folder to the **findrealestatedeals** site
+  (`netlify link --name findrealestatedeals` → wrote `.netlify/` to `.gitignore`), and deployed
+  with `netlify deploy --prod --dir "site"`. **Deploy is live** at
+  **https://underlistedhomes.com** (and findrealestatedeals.netlify.app).
+- **New capability:** future updates no longer need drag-and-drop. Re-publish anytime with
+  `netlify deploy --prod --dir "site"` (owner can just say "publish the site").
+- **Untouched:** waitlist form / Netlify Forms, pricing, all selling/payment copy. No billable
+  API calls. Suggested next visual step: mirror the video-hero onto the app landing
+  (`app/main.py`) so app + site feel like one brand.
+
+---
+
+## "Call / Email the listing agent" button — 2026-06-14 (Atlas)
+
+- **Why:** the deal page told you a home was a good deal but gave you no way to ACT on it.
+  Scout confirmed (`research/CONTACT_THE_DEAL_2026-06-14.html`) RentCast already returns,
+  per for-sale listing, a `listingAgent` and `listingOffice` block (name/phone/email/website)
+  plus `formattedAddress` and `mlsNumber` — and RentCast's terms explicitly allow showing this
+  contact info to our paid users. We weren't mapping it. **Zero new API calls** — the agent data
+  rides along inside listings we already cache.
+- **What I built:**
+  - `src/models.py` — added optional, nullable contact fields to `Listing`
+    (agent_name/phone/email/website, office_*, mls_number, mls_name). Old saved listings
+    just leave them `None` — no data-format break. Added a pure helper `listing_contact()`
+    that picks the best contact with a fallback chain: **agent → brokerage office → neutral
+    "Ask a local agent · MLS #…"**, so the UI never shows an empty/broken box.
+  - `src/data_sources/rentcast.py` — `raw_to_listing()` now maps those fields via a defensive
+    `_contact_field()` (handles missing/null/non-dict blocks and treats blank strings as missing).
+  - `app/pages/0_Browse_Deals.py` — new **"Call / Email the listing agent"** block on the deal
+    detail view: shows the agent name + the property address + one-tap **Call** (`tel:`),
+    **Email** (`mailto:` pre-filled with the address), and **Website** buttons. The buttons
+    open the BUYER's own phone/email app — **we never auto-send or message agents** (RentCast
+    bans automated solicitation). Neutral fallback line when no contact is published.
+- **No DB schema change needed:** listings are stored as the full RentCast JSON in
+  `listings.payload` (TEXT) and rebuilt via `raw_to_listing()`, so the new fields flow through
+  automatically (confirmed in `src/cache/db.py` + `rentcast.load_cached_listings`).
+- **Tests:** `tests/test_agent_contact.py` (7 tests) — agent mapping, office fallback, neutral
+  fallback, blank-string handling, non-dict blocks, and a pre-feature "old listing" record.
+  Full suite green: agent-contact 7/7, free-sources 9/9, affordability 10/10.
+- **Verify locally:** `.venv/Scripts/python.exe tests/test_agent_contact.py`; then run the app
+  and open any deal — the agent block appears under "How much cash you really need".
+- **Note on live fill-rate:** RentCast is frozen until July 7, so real agent fill-rate is
+  unverified. The fallback chain means the block is safe either way.
+
+---
+
 ## FREE "Learn the basics" glossary page on the website — 2026-06-14 (Juliet)
 
 - **Owner's ask:** "just like I don't understand what you say, customers won't — explain it

@@ -56,6 +56,10 @@ ICONS = {
     "bank": "ti-building-bank",     # bank-owned / foreclosure
     "gavel": "ti-gavel",            # auction / sold as-is
     "link": "ti-external-link",     # outbound links (HUD/HomePath/HomeSteps)
+    "phone": "ti-phone",            # call the listing agent
+    "mail": "ti-mail",              # email the listing agent
+    "globe": "ti-world",            # agent / brokerage website
+    "user": "ti-user",              # listing agent / contact person
 }
 
 
