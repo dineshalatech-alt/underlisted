@@ -25,7 +25,7 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 
 ---
 
-## 2. Current status (2026-06-13)
+## 2. Current status (2026-06-14)
 
 | Piece | Status |
 |---|---|
@@ -37,31 +37,33 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 | ☁️ Code **cloud-ready** (`st.secrets`) + pushed to **GitHub** (now **public**) | ✅ `github.com/dineshalatech-alt/underlisted` |
 | 🖥️ **App online** (Streamlit Cloud) | ✅ LIVE: `underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app` (keys in st.secrets) |
 | 🗄️ Hosted **Postgres** (Supabase) + `DATABASE_URL` | ✅ **LIVE** — connected via **Session pooler** (`postgres.nemvzwcxlhyjsjaappkt@aws-1-us-east-1.pooler.supabase.com:5432`). `DATABASE_URL` in Streamlit Secrets; Admin/Usage shows backend = **PostgreSQL**. Fixed a Postgres transaction-abort bug (migrations now run each in their own transaction — `src/cache/db.py:connect()`). DB connected but **empty** until the worker runs. |
-| 🔁 Auto-refresh **worker** (GitHub Actions cron) | 🚧 **RESUME HERE** — next step. Create `.github/workflows/refresh.yml` (cron) running `python -m worker.refresh_worker`; add GitHub Actions Secrets (`RENTCAST_API_KEY`, `RESEND_API_KEY`, `ALERT_FROM_EMAIL`, `DATABASE_URL`). Fills the shared Postgres so the app shows real homes. |
-| 💳 **Payment button** ($29.99/mo) | ⏳ Next (provider TBD — ask before wiring) |
+| 🔁 Auto-refresh **worker** (GitHub Actions cron) | ✅ **Code complete** (`.github/workflows/refresh.yml` + `worker/refresh_worker.py`, daily/manual). ⏳ Not switched on yet — needs GitHub Actions Secrets, and **RentCast quota is maxed → worker PAUSED until July 7 reset** (don't run before then = overage). Fills shared Postgres when on. |
+| 💳 **Payment button** | ✅ **Built** — config-driven Payhip "Subscribe" button, dormant until a link is pasted into `config/cache.yaml: checkout_url`. Founding price **$18.99/mo** (landing). Never change selling logic without asking. |
+| 🗂️ **Data sources** (mostly free) | ✅ Live: RentCast (listings/value/rent), FEMA risk, FHFA trend, **live mortgage rate** (Freddie Mac, no key), **HUD Fair Market Rents** (free fallback rent). Nationwide = **12 states**. Paid options (ATTOM/HouseCanary/First Street) await owner OK — see `research/data_sources/`. |
+| 🧭 **Strategy / moat** | ✅ Set: *for buyers who'll LIVE in the home, not flip it* + insurance-risk + **"Can I Afford It?"** = the moat to build next. See `develop/`. |
+| 🎨 **Design** | Landing is **dark-luxe** (black + DM Sans + gold) with a **"Why Underlisted"** section; warm palette still on other pages. Owned by **Juliet**. |
 
 ---
 
 ## 3. The plan / next steps (in order)
 
-1. **Deploy the app on Streamlit Community Cloud** from the GitHub repo.
-   - Main file: `app/main.py` · Branch: `master`.
-   - **Blocker hit:** Streamlit said "repository does not exist" → it can't see the
-     *private* repo. Fix = sign into Streamlit as **dineshalatech-alt** (the repo owner)
-     **and** grant private-repo access; OR make the repo public (no secrets/PII in it).
-   - Add **Secrets** (TOML) in Streamlit: `RENTCAST_API_KEY`, `STREETVIEW_API_KEY`,
-     `RESEND_API_KEY`, `ALERT_FROM_EMAIL`, and later `DATABASE_URL`.
-2. **Free Supabase Postgres** → copy its connection string into the `DATABASE_URL` secret
-   (Streamlit Cloud filesystem is ephemeral; SQLite won't persist). Code already supports
-   Postgres via `DATABASE_URL` (see `src/cache/backend.py`).
-3. **Worker on a schedule** (GitHub Actions cron) running `python -m worker.refresh_worker`
-   — it makes the billable API calls + sends alert emails. Keep cost guards on.
-4. **Payment** ($29.99/mo). Provider not chosen (Payhip / Stripe / Lemon Squeezy). Streamlit
-   has no native paywall — decide enforcement approach. **Do not touch selling/payment logic
-   without asking** (standing rule).
-5. **Optional / later:** Foreclosure Data Hub key (~$49/mo, not subscribed — trial expired),
-   HUD FMR token (free), fix Google Street View 403, **verify a domain in Resend** so alert
-   emails can reach real customers (today they only reach the owner's own address).
+1. **Build the "Can I Afford It?" moat** ← **RESUME HERE.** Owner approved. Personal affordability
+   badge (enter income/cash/debts → green/amber/red + "you'd have $X left/month") + a **Surprise-Cost**
+   panel (insurance range, property tax, PMI, HOA) + a plain "why this score". Highest-leverage
+   differentiator and needs **NO RentCast** (logic on data we already have). Files Atlas flagged:
+   `src/cache/db.py` (small user-prefs table), `app/pages/0_Browse_Deals.py` (badges), the deal-score
+   module. Show estimates as labelled ranges (trust); keep personal inputs out of logs.
+2. **RentCast upgrade** — quota maxed; **paused until July 7 reset** (or upgrade sooner: Foundation
+   $74/1,000 req, Growth $199/5,000). Then I run ONE controlled worker test to fill the DB with real
+   nationwide homes. The #1 paid step. **Don't run the worker before this is sorted (overage).**
+3. **Go-live gate** — after RentCast: add GitHub Actions Secrets + run the worker; create the Payhip
+   $18.99 product + paste link into `config/cache.yaml: checkout_url`. See `GO_LIVE_CHECKLIST.html`.
+4. **Mirror the "Why Underlisted" section to the static `site/`** so app + website match (Juliet).
+5. **Optional/later:** free keys (FRED/Census/crime/Walk Score), paid data (ATTOM/HouseCanary/First
+   Street — owner OK), **verify a domain in Resend** (so alert emails reach real customers).
+
+> Living docs: `develop/` (goals, map, how-we-win, strategy PDF) · `team/` (roster + improvement loop) ·
+> `research/data_sources/` (data plan + costs) · `PROGRESS.md` (session timeline, newest on top).
 
 ---
 
