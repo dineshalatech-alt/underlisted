@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Underlisted — Connection Map (which key goes where)</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--ink:#1F2933;--muted:#667085;--amber:#E08A00;--red:#C0392B;--line:#E4E7EC}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 22px}
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:16px;padding:20px 22px;margin-bottom:12px}
+  .hero h1{font-size:30px;margin-bottom:4px}
+  .hero p{color:#EAFBF4;font-size:16px}
+  h2{color:var(--deep);font-size:21px;margin:22px 0 8px;border-bottom:2px solid var(--fill);padding-bottom:5px}
+  table{width:100%;border-collapse:collapse;margin:8px 0}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+  th{background:var(--fill);color:var(--deep)}
+  code{background:#EEF2F0;padding:1px 5px;border-radius:5px;font-size:.92em}
+  .legend{font-size:13px;color:var(--muted);margin-top:6px}
+  .key{color:var(--deep);font-weight:800}
+  .pill{display:inline-block;background:var(--fill);color:var(--deep);font-weight:700;border-radius:999px;padding:2px 9px;font-size:12px}
+  .pill.warn{background:#FBE9C7;color:#7a5b00}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🗺️ Underlisted — Connection Map</h1>
+    <p>Which key unlocks which helper, and how it's all wired together.</p>
+  </div>
+
+  <!-- ===================== THE MAP ===================== -->
+  <svg viewBox="0 0 1180 600" width="100%" style="background:#F7FAF9;border:1px solid var(--line);border-radius:14px">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#1D9E75"/>
+      </marker>
+    </defs>
+
+    <!-- SECRET BOX (left) -->
+    <rect x="30" y="150" width="280" height="300" rx="14" fill="#E1F5EE" stroke="#1D9E75" stroke-width="2"/>
+    <text x="170" y="182" text-anchor="middle" font-size="19" font-weight="800" fill="#0F6E56">🔒 Your Secret Box</text>
+    <text x="170" y="204" text-anchor="middle" font-size="12" fill="#667085">(Streamlit Secrets / .env)</text>
+    <text x="52" y="246" font-size="14" font-weight="700" fill="#1F2933">🔑 RENTCAST_API_KEY</text>
+    <text x="52" y="282" font-size="14" font-weight="700" fill="#1F2933">🔑 RESEND_API_KEY</text>
+    <text x="52" y="318" font-size="14" font-weight="700" fill="#1F2933">🔑 STREETVIEW_API_KEY</text>
+    <text x="52" y="354" font-size="14" font-weight="700" fill="#1F2933">🔑 DATABASE_URL</text>
+    <text x="52" y="392" font-size="12" fill="#667085">ALERT_FROM_EMAIL (setting)</text>
+    <text x="52" y="424" font-size="12" fill="#667085">+ blank: FORECLOSURE / HUD / GEMINI</text>
+
+    <!-- APP (center) -->
+    <rect x="450" y="230" width="250" height="140" rx="14" fill="#0F6E56"/>
+    <text x="575" y="288" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">🧑‍💼 Underlisted</text>
+    <text x="575" y="314" text-anchor="middle" font-size="14" fill="#EAFBF4">App (Streamlit)</text>
+    <text x="575" y="334" text-anchor="middle" font-size="14" fill="#EAFBF4">+ Worker</text>
+
+    <!-- arrow: secret box -> app -->
+    <line x1="312" y1="300" x2="448" y2="300" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <text x="380" y="290" text-anchor="middle" font-size="11" fill="#667085">gives keys</text>
+
+    <!-- HELPER BOXES (right) -->
+    <!-- RentCast -->
+    <rect x="860" y="40" width="290" height="100" rx="12" fill="#fff" stroke="#E4E7EC" stroke-width="2"/>
+    <text x="880" y="72" font-size="17" font-weight="800" fill="#1F2933">🚚 RentCast</text>
+    <text x="880" y="94" font-size="12" fill="#667085">home listings, value, rent</text>
+    <text x="880" y="122" font-size="12" font-weight="800" fill="#0F6E56">key: RENTCAST_API_KEY</text>
+    <!-- Resend -->
+    <rect x="860" y="170" width="290" height="100" rx="12" fill="#fff" stroke="#E4E7EC" stroke-width="2"/>
+    <text x="880" y="202" font-size="17" font-weight="800" fill="#1F2933">📮 Resend</text>
+    <text x="880" y="224" font-size="12" fill="#667085">sends alert emails</text>
+    <text x="880" y="252" font-size="12" font-weight="800" fill="#0F6E56">key: RESEND_API_KEY</text>
+    <!-- Supabase -->
+    <rect x="860" y="300" width="290" height="100" rx="12" fill="#fff" stroke="#E4E7EC" stroke-width="2"/>
+    <text x="880" y="332" font-size="17" font-weight="800" fill="#1F2933">🗄️ Supabase</text>
+    <text x="880" y="354" font-size="12" fill="#667085">the database (remembers data)</text>
+    <text x="880" y="382" font-size="12" font-weight="800" fill="#0F6E56">key: DATABASE_URL</text>
+    <!-- Street View -->
+    <rect x="860" y="430" width="290" height="100" rx="12" fill="#fff" stroke="#E4E7EC" stroke-width="2"/>
+    <text x="880" y="462" font-size="17" font-weight="800" fill="#1F2933">📷 Google Street View</text>
+    <text x="880" y="484" font-size="12" fill="#667085">house photos</text>
+    <text x="880" y="512" font-size="12" font-weight="800" fill="#C0392B">key: STREETVIEW_API_KEY (parked)</text>
+
+    <!-- arrows: app -> helpers -->
+    <line x1="700" y1="270" x2="858" y2="90"  stroke="#1D9E75" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <line x1="700" y1="285" x2="858" y2="220" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <line x1="700" y1="320" x2="858" y2="350" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <line x1="700" y1="345" x2="858" y2="480" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+    <text x="575" y="420" text-anchor="middle" font-size="13" fill="#667085">Each arrow = the app showing a key 🔑 to unlock that helper</text>
+  </svg>
+
+  <!-- ===================== TABLES ===================== -->
+  <h2>🔑 Which key unlocks which helper</h2>
+  <table>
+    <tr><th>The key</th><th>Unlocks</th><th>So the app can…</th></tr>
+    <tr><td class="key">RENTCAST_API_KEY</td><td>🚚 RentCast</td><td>get home listings, values, rents</td></tr>
+    <tr><td class="key">RESEND_API_KEY</td><td>📮 Resend</td><td>send alert emails</td></tr>
+    <tr><td class="key">DATABASE_URL</td><td>🗄️ Supabase</td><td>read & save all data (address + password)</td></tr>
+    <tr><td class="key">STREETVIEW_API_KEY</td><td>📷 Google Street View</td><td>show house photos <span class="pill warn">parked / 403</span></td></tr>
+  </table>
+
+  <h2>📦 Where the keys live (the secret boxes)</h2>
+  <table>
+    <tr><th>Secret box</th><th>Used by</th></tr>
+    <tr><td><code>.env</code> file (your computer)</td><td>local testing on your laptop</td></tr>
+    <tr><td>Streamlit <b>Secrets</b></td><td>your live app</td></tr>
+    <tr><td>GitHub Actions <b>Secrets</b></td><td>the auto-refresh worker (next step)</td></tr>
+  </table>
+
+  <h2>🤝 Connections that do NOT use a key</h2>
+  <table>
+    <tr><th>Connection</th><th>How it connects instead</th></tr>
+    <tr><td>GitHub → Streamlit</td><td>your <b>GitHub login</b> (you authorized it)</td></tr>
+    <tr><td>Namecheap → Netlify</td><td><b>DNS records</b> (A <code>75.2.60.5</code>, CNAME <code>www</code>)</td></tr>
+    <tr><td>You → Netlify</td><td>you <b>drag the <code>site</code> folder</b> in</td></tr>
+    <tr><td>Visitors → Netlify</td><td>the <b>waitlist form</b> saves their emails (built-in)</td></tr>
+  </table>
+
+  <p class="legend">Underlisted · internal wiring map · keep private (shows how your system is connected).</p>
+</div>
+</body>
+</html>

@@ -4,6 +4,102 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## Landing → "Why Underlisted" content section added — 2026-06-14 (Juliet)
+
+- **Owner wanted our reasons-to-choose-us on the landing**, clean/simple/organized, with the
+  emotional frame: a home is the **biggest purchase of your life** — use Underlisted first.
+  Copy came from Serena in `develop/WEBSITE_WHY_US.md`.
+- **`app/main.py`** — added a new "Why Underlisted" section **between "How it works" and the
+  banknote pricing card** (selling/Payhip/$18.99 logic untouched). It has, top to bottom:
+  a calm **frame band** pull-quote (gold hairline, gold bold accents); an eyebrow + title
+  ("Why Underlisted" / "The whole picture, in plain English"); **5 benefit cards** in an equal
+  grid (3 + 2 centered) reusing the existing dark-glass `.feat` style with **gold number badges**
+  + Tabler icons; a bold **contrast block** (grey setup line → off-white payoff, "actually good"
+  in gold); a small **trust strip** with gold dot separators; and a closing one-liner above the
+  existing pricing card.
+- New CSS lives in the same `<style>` block in `main.py` (`.frameband`, `.section-eyebrow`,
+  `.section-title`, `.feat .num`, `.contrast`, `.trust`) — cohesive with dark-luxe, no theme rip-out.
+- ✅ Verified: `py_compile` clean, app served 200, screenshots in `design_preview/`
+  (`why_us_section.png`, `why_us_contrast.png`, `why_us_trust.png`). 0 billable calls.
+
+---
+
+## Landing → "Dark luxe" (black + DM Sans + gold) — 2026-06-14
+
+- **Owner asked to copy an Apple-style dark theme** (black `#000`, off-white `#F5F5F7`,
+  **DM Sans**) for the app landing — keeping the gold buttons, gold-foil `$18.99` banknote,
+  and dollar-bill motif (gold-on-black = luxury). Scope: **app landing only**.
+- `app/main.py`: DM Sans imported + forced app-wide; `.stApp` now black with the dollar-bill
+  SVG pattern recolored **gold** (faint); off-white body text; hero scrim fades to black;
+  feature cards → **dark glass** (gold hairline border, white head, grey body); section
+  headings white; the banknote keeps its cream surface + dark text so it reads as a real bill.
+- `.streamlit/config.toml`: theme switched to `base="dark"`, gold `primaryColor`, black bg,
+  off-white text. (Restart required — done.)
+- ✅ Verified: compiles, app serves 200, screenshots in `design_preview/` (`dark_top.png`,
+  `dark_feat.png`, `note_card.png`). Payment/checkout untouched. 0 billable calls.
+- Note: warm cream palette still lives in `app/assets/theme.py` for the OTHER pages (Browse
+  Deals etc.) — they're unchanged. A future pass can take dark-luxe app-wide if owner wants.
+
+---
+
+## Differentiation strategy + develop/ & team/ folders + new standing rule — 2026-06-14
+
+- **Competitor research (Scout) + brainstorm (Atlas + Serena):** every serious rival (Mashvisor,
+  PropStream, DealCheck, DealMachine, Reventure) serves INVESTORS or is market-level. **Nobody serves
+  the plain-English first-time BUYER.** Our wedge: "for people who'll LIVE in the home, not flip it" +
+  insurance-risk + "can you afford THIS home?". Chosen moat to build next: **"Can I Afford It?" +
+  Surprise-Cost** (personal affordability badge + budget-killer warnings) — mostly logic on data we
+  already pay for. Atlas mapped the build (`db.py` prefs table, `0_Browse_Deals.py`, deal-score module).
+- **New `develop/` folder:** `DEVELOPMENT.md` (goals, map, how-we-win, optimization priorities) +
+  `Underlisted_Strategy.html` + **`Underlisted_Strategy.pdf`** (branded, with an arrow MAP of the
+  engine→funnel + gold "optimize here" callouts). PDF rendered via Playwright/Chromium (`.tmp/html_to_pdf.py`).
+- **New `team/` folder:** `TEAM.md` — roster (Atlas builds · Serena grows · Scout researches · Juliet
+  designs), what each does, and the improvement loop. PROGRESS.md remains the timeline.
+- **New STANDING RULE added to global `~/.claude/CLAUDE.md`:** every project always gets a `develop/`
+  folder (project map + goals + how-we-win) and a `team/` folder (roster + running log + how we improve).
+- RentCast still paused until July 7 (owner choice); upgrade = #1 paid step when ready.
+
+---
+
+## Early-bird pricing + gold/dollar-bill touch (landing only) — 2026-06-14
+
+- **Owner pricing decision (landing page ONLY for now):** show anchor **~~$99.99/mo~~**
+  struck through → **$18.99/mo** early-bird ("Founding-member rate, locked in for life").
+- **Gold + dollar-bill design** added to `app/main.py`: a banknote-style "Founding Member"
+  card — gold double border, guilloché engraving lines, gold corner `$` seals, gold-foil
+  shimmering `$18.99`, and a serial-number line. Hero pill matches (struck $99.99 → $18.99).
+  New CSS classes: `.gold-foil` (animated foil text), `.note` / `.seal` (banknote).
+- ⚠️ **Scope limited:** other pages + marketing still show the OLD ladder
+  ($12.99 → $29.99 → $44.99) — `app/pages/2_Check_A_Deal.py`, `3_My_Alerts.py`,
+  `MASTER_SPEC.md`, `MARKETING_*`, `PROJECT_MEMORY.md`. NOT changed yet (owner to decide).
+- Warm logo also recolored (coral/cream/gold house); green originals backed up as
+  `app/assets/logo_green_backup.png` / `favicon_green_backup.png`.
+- **All landing buttons → gold** (gold-gradient fill, dark text, hover lift) + a faint
+  **engraved dollar-bill pattern** woven into the page background (`.stApp`, subtle SVG
+  watermark so text stays readable). Owner: keep subtle, landing page only for now.
+- ✅ Verified: compiles, app serves 200, screenshots in `design_preview/`
+  (`after_pricing.png`, `note_card.png`). Payment/checkout logic untouched. 0 billable calls.
+
+---
+
+## HUD Fair Market Rents wired (FREE area rent fallback) — 2026-06-14
+
+- Owner created a free HUD USER token (Fair Market Rent dataset) → `HUD_FMR_TOKEN` in `.env`.
+- **New source: `src/data_sources/hud_fmr.py`** — fetches each state's full FMR table once
+  (free, cached to `data/hud_fmr/<STATE>.json`, refreshed ~yearly by the worker). `area_rent(listing)`
+  matches a listing's city → its HUD metro and returns the fair-market rent for the bedroom count.
+  Reads only the local cache (NO network on page load). Dormant if the token is missing.
+- **Wired as a FREE fallback rent** in `rentcast.get_rent_estimate()` (new `_hud_rent_fallback`):
+  when RentCast has no rent — including the capped/cache-only page-load path — the app uses the
+  HUD area rent so rent-yield still works at $0. `RentEstimate` gained `source` + `area` fields
+  (backward-compatible) so the UI can label it honestly ("HUD Fair Market Rent (area)").
+- Worker step 1d3 (`update_hud_fmr` in `cache.yaml`) refreshes FMR for every state in the
+  city list. ✅ Verified: CA/TX/GA tables pulled (2026); Sacramento 3-bed = $3,002, 1-bed = $1,832;
+  capped page-load path returns the HUD rent with correct source/area. **0 billable calls.**
+- Integration plan updated: HUD FMR now ✅ done. Remaining free keys (FRED/Census/crime) optional.
+
+---
+
 ## Live mortgage rate wired (FREE, no key) + data-source integration plan — 2026-06-13
 
 - **New source: `src/data_sources/mortgage_rates.py`** — pulls the real current 30-yr

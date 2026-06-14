@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underlisted — Team &amp; Divisions</title>
+<style>
+  :root{
+    --coral:#FF6B5C; --coral-deep:#E2513F; --gold:#F2A93B; --cream:#FFFDF8;
+    --fill:#FBEFE8; --cocoa:#2E2A26; --ink:#1A1A1A; --muted:#7A7066; --border:#ECE3DA;
+    --green:#1FAE7A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       background:var(--cream);line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 22px 60px}
+  .hero{background:linear-gradient(135deg,var(--cocoa),var(--coral-deep));color:#fff;
+        border-radius:22px;padding:30px 28px;box-shadow:0 18px 40px rgba(46,42,38,.22)}
+  .hero h1{font-size:2rem;font-weight:850;letter-spacing:-.5px}
+  .hero p{color:#FFF3EE;font-size:1.08rem;margin-top:6px;max-width:46rem}
+  .goal{display:inline-block;margin-top:14px;background:rgba(255,255,255,.18);
+        border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:7px 16px;
+        font-weight:700;font-size:.98rem}
+  h2{margin:30px 0 8px;font-size:1.25rem;color:var(--cocoa);
+     border-left:5px solid var(--gold);padding-left:10px}
+  .sub{color:var(--muted);font-size:.95rem;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;
+        box-shadow:0 6px 16px rgba(46,42,38,.05)}
+  .card .top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .dot{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
+       justify-content:center;font-weight:850;color:#fff;font-size:1rem;flex:none}
+  .name{font-size:1.15rem;font-weight:800}
+  .role{color:var(--coral-deep);font-weight:700;font-size:.92rem}
+  .owns{font-size:.95rem;margin-top:6px}
+  .why{font-size:.9rem;color:var(--muted);margin-top:6px}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;border-radius:999px;
+       padding:2px 9px;margin-top:10px}
+  .have{background:#E4F7EF;color:#0F8A5F}
+  .new{background:var(--fill);color:var(--coral-deep)}
+  .phase{background:#fff;border:1px dashed var(--coral);border-radius:14px;padding:16px;margin-top:10px}
+  .phase b{color:var(--coral-deep)}
+  table{width:100%;border-collapse:collapse;margin-top:10px;background:#fff;
+        border-radius:12px;overflow:hidden;box-shadow:0 6px 16px rgba(46,42,38,.05)}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-size:.95rem}
+  th{background:var(--cocoa);color:#fff;font-weight:700}
+  .foot{margin-top:24px;color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🏡 Underlisted — Team &amp; Divisions</h1>
+    <p>The divisions that make a #1 product. Each one guards a single pillar of quality,
+       so customers get the most trustworthy, beautiful, beginner-simple deal-finder in the USA.</p>
+    <div class="goal">🎯 Goal: the #1 home-deal app in America — quality first.</div>
+  </div>
+
+  <h2>👑 Leadership</h2>
+  <div class="sub">Owns the outcome and keeps every division pulling the same way.</div>
+  <div class="grid">
+    <div class="card"><div class="top"><div class="dot" style="background:#2E2A26">A</div>
+      <div><div class="name">Atlas</div><div class="role">Chief Executive</div></div></div>
+      <div class="owns">Owns the whole project: priorities, decisions, deploys, and the plan. Protects you from cost, legal &amp; security mistakes.</div>
+      <div class="why">Why: someone must own the outcome and say "this first, that next."</div>
+      <span class="tag have">✓ On the team</span></div>
+  </div>
+
+  <h2>🛠️ Product &amp; Build</h2>
+  <div class="sub">Make it work flawlessly, and make sure the numbers are true.</div>
+  <div class="grid">
+    <div class="card"><div class="top"><div class="dot" style="background:#E2513F">F</div>
+      <div><div class="name">Forge</div><div class="role">Head of Engineering &amp; Reliability</div></div></div>
+      <div class="owns">Builds &amp; maintains the app, the background worker, and the database. Owns speed, uptime, and bug fixes.</div>
+      <div class="why">Why: a #1 app never breaks and always loads fast.</div>
+      <span class="tag new">＋ Suggested</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#1FAE7A">V</div>
+      <div><div class="name">Vera</div><div class="role">Head of Quality &amp; Accuracy</div></div></div>
+      <div class="owns">Tests everything before it ships AND guards that the deal score, value, rent, and "cash needed" are trustworthy.</div>
+      <div class="why">Why: our ONE promise is honest numbers. Wrong math = dead product.</div>
+      <span class="tag new">＋ Suggested</span></div>
+  </div>
+
+  <h2>💛 Customer-Facing</h2>
+  <div class="sub">Beautiful, simple, helpful — so people love it and stay.</div>
+  <div class="grid">
+    <div class="card"><div class="top"><div class="dot" style="background:#FF6B5C">J</div>
+      <div><div class="name">Juliet</div><div class="role">Head of Design &amp; Brand</div></div></div>
+      <div class="owns">The look, feel, and simplicity across app + website. Hero visuals, layout, color, motion, polish.</div>
+      <div class="why">Why: trust is visual — beautiful + simple wins beginners.</div>
+      <span class="tag have">✓ On the team</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#F2A93B">H</div>
+      <div><div class="name">Hazel</div><div class="role">Head of Customer Success</div></div></div>
+      <div class="owns">Onboarding, help, replies, refunds, reviews. Turns first-time users into loyal fans and 5-star ratings.</div>
+      <div class="why">Why: word-of-mouth + retention is how #1 is kept, not won once.</div>
+      <span class="tag new">＋ Suggested</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#2E2A26">Q</div>
+      <div><div class="name">Quill</div><div class="role">Head of Content &amp; Education</div></div></div>
+      <div class="owns">Plain-English guides, blog/SEO articles, the "teach a beginner" content that builds trust AND brings free traffic.</div>
+      <div class="why">Why: helpful content = Google traffic + authority + trust.</div>
+      <span class="tag new">＋ Suggested</span></div>
+  </div>
+
+  <h2>📣 Growth &amp; Market</h2>
+  <div class="sub">Get the right people in the door — and know the market cold.</div>
+  <div class="grid">
+    <div class="card"><div class="top"><div class="dot" style="background:#E2513F">S</div>
+      <div><div class="name">Serena</div><div class="role">Head of Growth &amp; Marketing</div></div></div>
+      <div class="owns">Campaigns, SEO, ads, launch, social, email, partnerships. Owns the funnel from "never heard of us" to "subscribed."</div>
+      <div class="why">Why: the best product still needs people to find it.</div>
+      <span class="tag new">＋ Suggested</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#1FAE7A">S</div>
+      <div><div class="name">Scout</div><div class="role">Head of Research &amp; Market Intel</div></div></div>
+      <div class="owns">Finds new data sources, watches competitors, and spots where our buyers/investors gather to market.</div>
+      <div class="why">Why: better data + knowing rivals = a lasting edge.</div>
+      <span class="tag have">✓ On the team</span></div>
+  </div>
+
+  <h2>🛡️ Guardrails (protect the company)</h2>
+  <div class="sub">Stay profitable, legal, and safe — the boring stuff that sinks companies if ignored.</div>
+  <div class="grid">
+    <div class="card"><div class="top"><div class="dot" style="background:#F2A93B">P</div>
+      <div><div class="name">Penny</div><div class="role">Head of Finance &amp; Cost</div></div></div>
+      <div class="owns">Watches API quota &amp; cost guards, pricing, unit economics, and payment operations. Keeps each customer profitable.</div>
+      <div class="why">Why: a deal-finder dies if data costs more than customers pay.</div>
+      <span class="tag new">＋ Suggested</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#E2513F">P</div>
+      <div><div class="name">Portia</div><div class="role">Head of Legal &amp; Compliance</div></div></div>
+      <div class="owns">Fair Housing, data licensing/ToS, privacy, disclaimers, and the visa/tax/benefits questions about income.</div>
+      <div class="why">Why: real estate is regulated — one mistake can be costly.</div>
+      <span class="tag new">＋ Suggested</span></div>
+
+    <div class="card"><div class="top"><div class="dot" style="background:#2E2A26">K</div>
+      <div><div class="name">Knox</div><div class="role">Head of Security &amp; Trust</div></div></div>
+      <div class="owns">Secrets handling, customer-data protection, and account security. Guards the keys and the data.</div>
+      <div class="why">Why: a data leak destroys trust overnight.</div>
+      <span class="tag new">＋ Suggested</span></div>
+  </div>
+
+  <h2>🗓️ Smart build order (don't hire all 11 at once)</h2>
+  <div class="phase"><b>Phase 1 — Finish the launch &amp; protect quality (now):</b>
+    <b>Forge</b> (reliability), <b>Vera</b> (accuracy/QA), <b>Penny</b> (cost guard).
+    These make sure what we ship works, the numbers are honest, and costs stay safe.</div>
+  <div class="phase"><b>Phase 2 — Win &amp; keep customers (at/after launch):</b>
+    <b>Serena</b> (growth), <b>Quill</b> (content/SEO), <b>Hazel</b> (support).
+    Bring people in and make them stay.</div>
+  <div class="phase"><b>Phase 3 — Scale safely (as you grow):</b>
+    <b>Portia</b> (legal), <b>Knox</b> (security).
+    Atlas guards the basics today; these go deep once there's revenue + real customer data.</div>
+
+  <h2>📋 The team at a glance</h2>
+  <table>
+    <tr><th>Name</th><th>Division</th><th>Status</th><th>Phase</th></tr>
+    <tr><td>Atlas</td><td>Chief Executive</td><td>✓ On the team</td><td>—</td></tr>
+    <tr><td>Juliet</td><td>Design &amp; Brand</td><td>✓ On the team</td><td>—</td></tr>
+    <tr><td>Scout</td><td>Research &amp; Market Intel</td><td>✓ On the team</td><td>—</td></tr>
+    <tr><td>Forge</td><td>Engineering &amp; Reliability</td><td>＋ Suggested</td><td>1</td></tr>
+    <tr><td>Vera</td><td>Quality &amp; Accuracy</td><td>＋ Suggested</td><td>1</td></tr>
+    <tr><td>Penny</td><td>Finance &amp; Cost</td><td>＋ Suggested</td><td>1</td></tr>
+    <tr><td>Serena</td><td>Growth &amp; Marketing</td><td>＋ Suggested</td><td>2</td></tr>
+    <tr><td>Quill</td><td>Content &amp; Education</td><td>＋ Suggested</td><td>2</td></tr>
+    <tr><td>Hazel</td><td>Customer Success</td><td>＋ Suggested</td><td>2</td></tr>
+    <tr><td>Portia</td><td>Legal &amp; Compliance</td><td>＋ Suggested</td><td>3</td></tr>
+    <tr><td>Knox</td><td>Security &amp; Trust</td><td>＋ Suggested</td><td>3</td></tr>
+  </table>
+
+  <div class="foot">Underlisted · Team &amp; Divisions · prepared by Atlas (Chief Executive)</div>
+</div>
+</body>
+</html>

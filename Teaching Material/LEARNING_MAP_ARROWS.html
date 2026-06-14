@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How An App Connects — Learning Map (with arrows)</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--ink:#1F2933;--muted:#667085;--amber:#E08A00;--line:#E4E7EC}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 18px}
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:10px}
+  .hero h1{font-size:26px} .hero p{color:#EAFBF4;font-size:15px;margin-top:3px}
+  .note{font-size:13px;color:var(--muted);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🧭 How An App Connects — follow the arrows</h1>
+    <p>The same recipe works for EVERY app/website you build. Learn it once.</p>
+  </div>
+
+  <svg viewBox="0 0 1180 700" width="100%" style="background:#F7FAF9;border:1px solid var(--line);border-radius:14px">
+    <defs>
+      <marker id="ar" markerWidth="11" markerHeight="11" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#1D9E75"/>
+      </marker>
+    </defs>
+
+    <!-- LEGEND -->
+    <text x="24" y="34" font-size="14" font-weight="800" fill="#0F6E56">3 ways things connect:</text>
+    <text x="190" y="34" font-size="14" fill="#1F2933">🔑 a KEY (secret password)</text>
+    <text x="430" y="34" font-size="14" fill="#1F2933">👤 a LOGIN</text>
+    <text x="560" y="34" font-size="14" fill="#1F2933">📍 a DNS ADDRESS</text>
+    <text x="760" y="34" font-size="14" fill="#1F2933">🔒 keys live in a Secret Box</text>
+
+    <!-- ===== STRIP 1 ===== -->
+    <text x="24" y="78" font-size="16" font-weight="800" fill="#0F6E56">① Behind the scenes — fill the database</text>
+    <rect x="24" y="92" width="250" height="86" rx="12" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+    <text x="149" y="126" text-anchor="middle" font-size="15" font-weight="800" fill="#1F2933">🚚 Data sources</text>
+    <text x="149" y="148" text-anchor="middle" font-size="12" fill="#667085">RentCast · FEMA · FHFA</text>
+    <text x="149" y="166" text-anchor="middle" font-size="11" fill="#667085">(homes, risk, prices)</text>
+
+    <line x1="274" y1="135" x2="384" y2="135" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="329" y="126" text-anchor="middle" font-size="11" fill="#667085">🔑 key / free</text>
+
+    <rect x="386" y="92" width="226" height="86" rx="12" fill="#E1F5EE" stroke="#1D9E75" stroke-width="2"/>
+    <text x="499" y="126" text-anchor="middle" font-size="15" font-weight="800" fill="#0F6E56">⚙️ Worker</text>
+    <text x="499" y="148" text-anchor="middle" font-size="12" fill="#667085">(GitHub Actions, on a timer)</text>
+    <text x="499" y="166" text-anchor="middle" font-size="11" fill="#667085">pulls data, stores it</text>
+
+    <line x1="612" y1="135" x2="722" y2="135" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="667" y="126" text-anchor="middle" font-size="11" fill="#667085">🔑 DATABASE_URL</text>
+
+    <rect x="724" y="92" width="210" height="86" rx="12" fill="#0F6E56"/>
+    <text x="829" y="128" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">🗄️ Supabase</text>
+    <text x="829" y="150" text-anchor="middle" font-size="12" fill="#EAFBF4">the database</text>
+
+    <!-- ===== STRIP 2 ===== -->
+    <text x="24" y="244" font-size="16" font-weight="800" fill="#0F6E56">② Your app runs</text>
+    <rect x="24" y="258" width="210" height="86" rx="12" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+    <text x="129" y="292" text-anchor="middle" font-size="15" font-weight="800" fill="#1F2933">📓 GitHub</text>
+    <text x="129" y="314" text-anchor="middle" font-size="12" fill="#667085">your code (master copy)</text>
+
+    <line x1="234" y1="301" x2="344" y2="301" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="289" y="292" text-anchor="middle" font-size="11" fill="#667085">👤 login</text>
+
+    <rect x="346" y="258" width="236" height="86" rx="12" fill="#0F6E56"/>
+    <text x="464" y="292" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">▶️ Streamlit — your App</text>
+    <text x="464" y="314" text-anchor="middle" font-size="12" fill="#EAFBF4">runs the code online</text>
+
+    <!-- secret box feeds app -->
+    <rect x="660" y="258" width="210" height="86" rx="12" fill="#E1F5EE" stroke="#1D9E75" stroke-width="2"/>
+    <text x="765" y="292" text-anchor="middle" font-size="15" font-weight="800" fill="#0F6E56">🔒 Secret Box</text>
+    <text x="765" y="314" text-anchor="middle" font-size="12" fill="#667085">holds the keys</text>
+    <line x1="658" y1="301" x2="584" y2="301" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="620" y="292" text-anchor="middle" font-size="11" fill="#667085">gives keys</text>
+
+    <!-- app reads supabase (up arrow) -->
+    <line x1="500" y1="258" x2="800" y2="180" stroke="#1D9E75" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ar)"/>
+    <text x="640" y="212" text-anchor="middle" font-size="11" fill="#667085">App READS the database ↑</text>
+
+    <!-- ===== STRIP 3 ===== -->
+    <text x="24" y="410" font-size="16" font-weight="800" fill="#0F6E56">③ What a real customer experiences</text>
+    <rect x="24" y="424" width="150" height="86" rx="12" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+    <text x="99" y="462" text-anchor="middle" font-size="15" font-weight="800" fill="#1F2933">🧑 Visitor</text>
+    <text x="99" y="484" text-anchor="middle" font-size="12" fill="#667085">a home buyer</text>
+
+    <line x1="174" y1="467" x2="284" y2="467" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="229" y="458" text-anchor="middle" font-size="11" fill="#667085">📍 types the web address</text>
+
+    <rect x="286" y="424" width="232" height="86" rx="12" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+    <text x="402" y="458" text-anchor="middle" font-size="15" font-weight="800" fill="#1F2933">📋 Netlify site</text>
+    <text x="402" y="480" text-anchor="middle" font-size="12" fill="#667085">public page + waitlist</text>
+    <text x="402" y="498" text-anchor="middle" font-size="11" fill="#667085">(Namecheap domain → here via DNS)</text>
+
+    <line x1="518" y1="467" x2="628" y2="467" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="573" y="458" text-anchor="middle" font-size="11" fill="#667085">opens the app</text>
+
+    <rect x="630" y="424" width="150" height="86" rx="12" fill="#0F6E56"/>
+    <text x="705" y="462" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">▶️ App</text>
+    <text x="705" y="484" text-anchor="middle" font-size="12" fill="#EAFBF4">shows deals</text>
+
+    <line x1="780" y1="467" x2="890" y2="467" stroke="#1D9E75" stroke-width="2.5" marker-end="url(#ar)"/>
+    <text x="835" y="458" text-anchor="middle" font-size="11" fill="#667085">🔑 alert</text>
+
+    <rect x="892" y="424" width="262" height="86" rx="12" fill="#fff" stroke="#1D9E75" stroke-width="2"/>
+    <text x="1023" y="458" text-anchor="middle" font-size="15" font-weight="800" fill="#1F2933">📮 Resend</text>
+    <text x="1023" y="480" text-anchor="middle" font-size="12" fill="#667085">emails the deal</text>
+    <text x="1023" y="498" text-anchor="middle" font-size="11" fill="#667085">back to the visitor ↩</text>
+
+    <!-- bottom takeaway -->
+    <rect x="24" y="556" width="1130" height="120" rx="12" fill="#E1F5EE" stroke="#1D9E75" stroke-width="2"/>
+    <text x="44" y="586" font-size="16" font-weight="800" fill="#0F6E56">💡 The one big lesson (true for EVERY app):</text>
+    <text x="44" y="614" font-size="14" fill="#1F2933">1) You hire helper websites (code host, app host, database, email, data, domain).</text>
+    <text x="44" y="638" font-size="14" fill="#1F2933">2) You connect them THREE ways: 🔑 a key, 👤 a login, or 📍 a DNS address.</text>
+    <text x="44" y="662" font-size="14" fill="#1F2933">3) Keys always go in a 🔒 Secret Box. A Worker fills the database; the App only reads it.</text>
+  </svg>
+
+  <p class="note">Underlisted · learning map · the same pattern repeats for every future app you build.</p>
+</div>
+</body>
+</html>

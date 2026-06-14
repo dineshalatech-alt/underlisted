@@ -1,11 +1,13 @@
-# Streamlit theme — "Warm & trustworthy". Cream base, warm coral accent,
-# near-black text. Trims the developer toolbar for a polished, app-like look.
+# Streamlit theme — "Dark luxe". Black base, gold accent, DM Sans, off-white text.
+# Trims the developer toolbar for a polished, app-like look.
 
 [theme]
-primaryColor = "#FF6B5C"
-backgroundColor = "#FFFDF8"
-secondaryBackgroundColor = "#FBEFE8"
-textColor = "#1A1A1A"
+base = "dark"
+primaryColor = "#E8B948"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#141210"
+textColor = "#F5F5F7"
+font = "sans serif"
 
 [client]
 toolbarMode = "minimal"

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How Underlisted Connects — a plain-English guide</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--ink:#1F2933;--muted:#667085;--amber:#E08A00;--line:#E4E7EC}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55;font-size:14px}
+  .wrap{max-width:820px;margin:0 auto;padding:8px 18px}
+  .hero{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:16px;padding:22px 22px;margin-bottom:8px}
+  .hero h1{margin:.1rem 0;font-size:1.6rem}
+  .hero p{color:#EAFBF4;margin:.3rem 0}
+  h2{color:var(--deep);margin-top:26px;border-bottom:2px solid var(--fill);padding-bottom:5px;font-size:1.2rem}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);font-size:.93rem;vertical-align:top}
+  th{color:var(--deep);background:var(--fill)}
+  .box{background:var(--fill);border-left:4px solid var(--green);border-radius:8px;padding:11px 14px;margin:10px 0}
+  .warn{background:#FBE9C7;border-left:4px solid var(--amber);border-radius:8px;padding:11px 14px;margin:10px 0;color:#7a5b00}
+  code{background:#EEF2F0;padding:1px 5px;border-radius:5px;font-size:.9em}
+  .mono{background:#EEF2F0;border-radius:8px;padding:10px 12px;font-family:Consolas,Menlo,monospace;font-size:.85rem;white-space:pre-wrap}
+  ol li,ul li{margin:4px 0}
+  .foot{color:#9AA4AC;font-size:.8rem;text-align:center;margin:24px 0}
+  .step{font-weight:800;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>🔌 How Underlisted Connects</h1>
+    <p>The plain-English theory of how all your websites work together.</p>
+    <p>For Dinesha · Underlisted (underlistedhomes.com)</p>
+  </div>
+
+  <h2>🏪 Big idea: you're opening a shop</h2>
+  <p>Building an app online is like opening a <b>shop</b>. One person can't do everything, so you
+     hire <b>specialist helpers</b>. Each website you signed up for is <b>one helper with one job</b>.
+     Your app is the <b>manager</b> that tells them all what to do.</p>
+  <table>
+    <tr><th>Helper (website)</th><th>Its one job</th><th>Shop analogy</th></tr>
+    <tr><td>GitHub</td><td>Stores your code</td><td>📓 The recipe book (master copy, kept safe)</td></tr>
+    <tr><td>Streamlit</td><td>Runs your app</td><td>👨‍🍳 The kitchen that cooks using the recipe</td></tr>
+    <tr><td>Supabase</td><td>Remembers data</td><td>🗄️ The filing cabinet (homes, customers)</td></tr>
+    <tr><td>Netlify</td><td>Shows your public page</td><td>📋 The billboard + sign-up sheet (waitlist)</td></tr>
+    <tr><td>Namecheap</td><td>Your web address</td><td>🏠 The street address (underlistedhomes.com)</td></tr>
+    <tr><td>Resend</td><td>Sends emails</td><td>📮 The post office</td></tr>
+    <tr><td>RentCast</td><td>Gives home data</td><td>🚚 The supplier who delivers goods</td></tr>
+  </table>
+
+  <h2>🔑 What is a "key"?</h2>
+  <p>A <b>key</b> is just a <b>secret password</b> that one helper gives you, so your app can prove
+     <i>"I'm allowed to talk to you."</i> Think of it like a <b>VIP badge</b> 🪪.</p>
+  <ul>
+    <li>RentCast says: <i>"Here's your badge. Show it every time you ask me for home data."</i></li>
+    <li>Resend says: <i>"Here's your badge. Show it every time you send an email."</i></li>
+  </ul>
+  <p>Your app shows the right badge → the helper says <i>"OK, you're allowed!"</i> and does the job.
+     <b>Without the key, the helper says "I don't know you — go away."</b> That's why nothing works
+     until the key is in place.</p>
+
+  <h2>📦 Why we hide keys in a "secret box"</h2>
+  <p>If a bad person got your keys, they could pretend to be you (send emails, run up your bills).
+     So we keep keys in a <b>locked secret box</b>:</p>
+  <ul>
+    <li>On your computer → the <code>.env</code> file</li>
+    <li>In the cloud → <b>Streamlit "Secrets"</b></li>
+  </ul>
+  <div class="warn">🔒 <b>Golden rule:</b> never paste a key into a chat, email, or public place. It's like
+     shouting your house-key code in the street.</div>
+
+  <h2>🔗 How two websites actually "connect"</h2>
+  <p>It's always the <b>same 3 steps</b>:</p>
+  <ol>
+    <li><span class="step">The helper gives you a key</span> — you copy a long secret code from their website.</li>
+    <li><span class="step">You put that key in your app's secret box</span> (Streamlit Secrets).</li>
+    <li><span class="step">Your app shows the key</span> every time it talks to that helper, over the internet.</li>
+  </ol>
+  <p>That's it. <b>Every</b> connection — RentCast, Resend, the database — works this exact way. 🎯</p>
+
+  <h2>🗄️ The database key (DATABASE_URL) is special</h2>
+  <p>Most keys are just a password. But <code>DATABASE_URL</code> is an <b>address + password combined</b> —
+     like a note that says: <i>"The filing cabinet is at this building, room 5432, and here's the password
+     to open it."</i></p>
+  <div class="mono">postgresql://  user  :  password  @  address  :  port  /  database
+              (who)     (secret)     (where)   (door)   (which cabinet)</div>
+  <p>So when your app wants to remember something, it reads this note, goes to that exact cabinet,
+     unlocks it, and files the info. 🗂️</p>
+
+  <h2>🚶 The journey of one customer (it all ties together)</h2>
+  <ol>
+    <li>Someone Googles "cheap homes" → finds <b>underlistedhomes.com</b> (the <b>Namecheap</b> address
+        points to the <b>Netlify</b> billboard) 📋</li>
+    <li>They type their email to join → <b>Netlify</b> saves it on the sign-up sheet ✍️</li>
+    <li>Later they open your <b>app</b> (running on <b>Streamlit</b>) 👨‍🍳</li>
+    <li>The app pulls home deals from the <b>Supabase</b> filing cabinet 🗄️ <i>(which the worker filled
+        earlier using <b>RentCast</b> data 🚚)</i></li>
+    <li>When a great deal appears, the app tells <b>Resend</b> to email them 📮</li>
+  </ol>
+  <div class="box">Every arrow between those helpers is unlocked by a <b>key</b> 🔑. That's the whole secret.</div>
+
+  <h2>✅ One-line recap</h2>
+  <p>Each website is a helper with one job. A <b>key</b> is a secret badge that lets your app talk to a
+     helper. You keep keys in a <b>locked box</b> (Secrets). Connect everything by giving your app the
+     right keys — and it manages the whole shop for you.</p>
+
+  <p class="foot">Underlisted · plain-English internal guide · keep private (mentions how your system is wired).</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underlisted — Data Sources Master Log</title>
+<style>
+  :root{--cream:#FFFDF8;--ink:#1A1A1A;--coral:#FF6B5C;--deepcoral:#E2513F;--gold:#F2A93B;--cocoa:#2E2A26;--line:#EADFCF;--soft:#FBF3E7;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;margin:0;background:var(--cream);}
+  .wrap{max-width:980px;margin:0 auto;padding:40px 28px 80px;}
+  header{background:var(--cocoa);color:var(--cream);padding:40px 28px;border-radius:0 0 20px 20px;}
+  header .in{max-width:980px;margin:0 auto;}
+  h1{margin:0 0 6px;font-size:28px;letter-spacing:-.4px;}
+  header p{margin:0;opacity:.92;font-size:15px;}
+  h2{color:var(--deepcoral);font-size:21px;margin:38px 0 10px;padding-bottom:8px;border-bottom:3px solid #F6E7D6;}
+  p,li,td,th{font-size:14.5px;}
+  a{color:var(--deepcoral);font-weight:600;}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden;}
+  th{background:var(--coral);color:#fff;text-align:left;padding:9px 11px;}
+  td{border-bottom:1px solid #F0E4D4;padding:9px 11px;vertical-align:top;}
+  tr:nth-child(even) td{background:var(--soft);}
+  .lead{background:var(--soft);border-left:5px solid var(--coral);padding:14px 18px;border-radius:8px;margin:14px 0;}
+  .big{background:var(--coral);color:#fff;padding:20px 24px;border-radius:12px;margin:22px 0;font-size:15.5px;}
+  .cocoa{background:var(--cocoa);}
+  .tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;}
+  .live{background:#2E9E6B;} .rec{background:var(--deepcoral);} .test{background:var(--gold);} .later{background:#9A9A9A;} .moat{background:var(--cocoa);}
+  .cost{font-weight:800;color:var(--deepcoral);white-space:nowrap;}
+  .step{background:#fff;border:1px solid #F0E4D4;border-left:5px solid var(--coral);border-radius:10px;padding:12px 16px;margin:10px 0;}
+  .step b.n{display:inline-block;background:var(--coral);color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;margin-right:8px;}
+  footer{color:#8a7f70;font-size:12.5px;margin-top:44px;border-top:1px solid var(--line);padding-top:14px;}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>Data Sources — Master Log</h1>
+  <p>The plan to give the whole-USA the best data · what we have · what we can have · what it costs · 2026-06-14 · by Scout</p>
+</div></header>
+<div class="wrap">
+
+<div class="big">
+  <b>Our goal:</b> the best data system covering the <b>whole USA</b>, so a customer in any state opens
+  Underlisted and finds <b>enough homes — with rich, trustworthy detail.</b> You're open to paying for
+  sources that genuinely add value. This log is the running plan to get there.
+</div>
+
+<div class="lead">
+  <b>How cost works here (so paying stays smart):</b> Underlisted uses ONE shared cache. The worker fetches
+  each property <b>once</b>; every customer reads the cache. So a paid source's cost scales with <b>how many
+  homes we cover</b> (we cap that per city), <b>not</b> how many customers visit. Paid data stays predictable.
+</div>
+
+<div class="big" style="background:var(--deepcoral)">
+  ⚠️ <b>2026-06-14 — RentCast limit hit.</b> Our free RentCast tier (50 requests/mo) is maxed for this
+  billing period. RentCast is our <b>main listings feed</b>, so upgrading it is now the <b>#1 paid step</b>
+  (see §6). Customers are unaffected (they read the cache) — only the worker's refresh is paused until you pick a plan.
+</div>
+
+<h2>1. ✅ What we HAVE now — live</h2>
+<table>
+  <tr><th>Source</th><th>Data</th><th>Coverage</th><th>Status</th></tr>
+  <tr><td><b>RentCast</b></td><td>Listings, value (AVM), rent</td><td>Nationwide</td><td><span class="tag test">LIMIT HIT</span> free 50/mo maxed — needs paid plan</td></tr>
+  <tr><td><b>FEMA National Risk Index</b></td><td>Fire, flood, quake + hazards</td><td>Nationwide</td><td><span class="tag live">LIVE</span> our moat</td></tr>
+  <tr><td><b>FHFA House Price Index</b></td><td>ZIP price trend</td><td>Nationwide</td><td><span class="tag live">LIVE</span></td></tr>
+  <tr><td><b>Freddie Mac PMMS</b></td><td>Live 30-yr mortgage rate → true monthly cost</td><td>Nationwide</td><td><span class="tag live">LIVE</span> 6/13 (no key)</td></tr>
+  <tr><td><b>HUD Fair Market Rents</b></td><td>Area rent → free fallback rent</td><td>Nationwide</td><td><span class="tag live">LIVE</span> 6/14</td></tr>
+</table>
+<p>A strong free base already: listings, value, rent, risk, price trends, and a live mortgage rate.</p>
+
+<h2>2. The honest gaps (to be truly whole-USA + rich)</h2>
+<ul>
+  <li><b>Listings depth & freshness</b> — RentCast is our only listings feed. The most complete/fresh listings live in the <b>MLS</b> (gated) or <b>ATTOM</b> (paid).</li>
+  <li><b>Value accuracy</b> — RentCast's AVM is fine; <b>HouseCanary</b> is best-in-class and sharpens our core promise (the Deal Score).</li>
+  <li><b>Property records depth</b> — tax history, owner, deeds. <b>ATTOM</b> is the deepest single API.</li>
+  <li><b>Climate-risk moat</b> — free FEMA is area-level; <b>First Street</b> gives property-level flood/fire — a stronger differentiator.</li>
+</ul>
+
+<h2>3. 🟡 Free add-ons (optional, low priority)</h2>
+<table>
+  <tr><th>Source</th><th>Adds</th><th>Need</th></tr>
+  <tr><td>FRED</td><td>Mortgage rate from the Fed</td><td>Free key (optional — Freddie already live)</td></tr>
+  <tr><td>Census (permits/ACS)</td><td>Supply signal; demographics (display-only)</td><td>Free key</td></tr>
+  <tr><td>FBI Crime</td><td>Area crime (display-only, never scored)</td><td>Free key</td></tr>
+  <tr><td>Walk Score</td><td>Walkability (display-only)</td><td>Free key</td></tr>
+</table>
+
+<h2>4. 💵 Paid options — real costs & value</h2>
+<table>
+  <tr><th>Source</th><th>What it adds</th><th>Cost / month</th><th>Verdict</th></tr>
+  <tr><td><b>Datafiniti</b></td><td>Richer property records — cheapest way to TEST</td><td class="cost">Free trial → $119</td><td><span class="tag test">TEST FIRST ($0)</span></td></tr>
+  <tr><td><b>HouseCanary</b></td><td>Pro value (AVM) → sharper Deal Score</td><td class="cost">from $79</td><td><span class="tag rec">RECOMMEND</span> accuracy</td></tr>
+  <tr><td><b>ATTOM</b></td><td>158M properties: listings + tax + deed + owner + AVM</td><td class="cost">from $95</td><td><span class="tag rec">RECOMMEND</span> depth+breadth</td></tr>
+  <tr><td><b>Mashvisor</b></td><td>Investor analytics (cap rate, ROI, STR)</td><td class="cost">from ~$129</td><td><span class="tag later">CONSIDER</span> investors</td></tr>
+  <tr><td><b>Regrid</b></td><td>Nationwide parcels + ownership (map polygons)</td><td class="cost">$500–$2,000</td><td><span class="tag later">LATER</span> maps only</td></tr>
+  <tr><td><b>First Street</b></td><td>Property-level climate flood/fire (the moat)</td><td class="cost">contact / quote</td><td><span class="tag moat">PURSUE QUOTE</span></td></tr>
+  <tr><td><b>BatchData</b></td><td>155M properties, 700 data points</td><td class="cost">from $1,000</td><td><span class="tag later">SKIP for now</span></td></tr>
+</table>
+<div class="lead">Exact ATTOM / First Street pricing needs a sales quote. <b>I never sign up or spend</b> — you approve,
+then I build the connector (same recipe as RentCast) and the worker fills the shared cache.</div>
+
+<h2>5. 🔒 MLS — the gold standard for listings (future)</h2>
+<p>The freshest, most complete for-sale listings come from the <b>MLS</b> via <b>Bridge Interactive</b>
+(Zillow Group — API is free), <b>Trestle</b> (CoreLogic), or <b>MLS Grid</b>. Catch: each needs an <b>MLS
+membership / data agreement</b> (usually a broker relationship + ~$20–50/mo feed dues per MLS + paperwork).
+Biggest listings-quality jump, but a project — best once we're earning. Not blocking now.</p>
+
+<h2>⭐ 6. Scout's recommended build (best whole-USA system)</h2>
+<div class="step" style="border-left-color:var(--deepcoral)"><b class="n" style="background:var(--deepcoral)">0</b><b>KEEP THE LIGHTS ON — +$74/mo.</b> Upgrade <b>RentCast to Foundation</b> (1,000 req/mo) — our main listings feed, currently maxed. I tune the worker to refresh ~weekly so all 33 cities fit under 1,000 calls. <i>(Growth $199/mo only if you want daily.)</i></div>
+<div class="step"><b class="n">1</b><b>VALIDATE — free.</b> Run the <b>Datafiniti free trial</b> (1,000 records) to confirm richer data beats RentCast for our listings/detail. $0, ~2 weeks.</div>
+<div class="step"><b class="n">2</b><b>DEPTH — +$95/mo.</b> Add <b>ATTOM</b> — the single best nationwide property database (listings + tax + deed + owner + AVM, 158M homes). Most directly delivers "always enough homes."</div>
+<div class="step"><b class="n">3</b><b>ACCURACY — +$79/mo.</b> Add <b>HouseCanary</b> AVM to sharpen the Deal Score (our core promise).</div>
+<div class="step"><b class="n">4</b><b>MOAT — quote.</b> Get a <b>First Street</b> quote for property-level climate risk → strengthens the insurance-risk warning that sets us apart.</div>
+<div class="step"><b class="n">5</b><b>INVESTORS — +$129/mo.</b> Add <b>Mashvisor</b> when we push the beginner-investor audience.</div>
+<div class="step"><b class="n">6</b><b>GOLD-STANDARD LISTINGS — later.</b> Pursue an <b>MLS</b> feed for the freshest, most complete listings once revenue justifies it.</div>
+
+<div class="big cocoa">
+  <b>Budget tiers (per month):</b> &nbsp; Minimum to run nationwide = <b>RentCast $74</b> &nbsp;·&nbsp;
+  Lean = <b>RentCast + ATTOM ~$169</b> &nbsp;·&nbsp;
+  Recommended = <b>+ HouseCanary ~$248</b> &nbsp;·&nbsp;
+  Full moat = <b>+ Mashvisor + First Street ≈ $380–700+</b>.
+</div>
+<div class="lead"><b>RentCast vs ATTOM = different companies.</b> RentCast (what we already use, and the one that emailed you) is the listings/value/rent feed. ATTOM is a separate, bigger paid provider we'd ADD for deep tax/deed/owner records. Upgrading RentCast is <i>not</i> buying ATTOM.</div>
+
+<h2>7. Change log</h2>
+<ul>
+  <li><b>2026-06-14</b> — HUD Fair Market Rents wired (free fallback rent). This folder + log created; register refreshed with paid pricing.</li>
+  <li><b>2026-06-13</b> — Live mortgage rate (Freddie Mac, no key) wired into true monthly cost. Scout register built (25 sources). Nationwide city coverage (12 states).</li>
+  <li><b>Earlier</b> — RentCast, FEMA risk, FHFA price trend live (free base).</li>
+</ul>
+
+<footer>Underlisted · Data Sources Master Log · maintained by Scout · 2026-06-14 · sortable register: DATA_SOURCE_REGISTER.xlsx (same folder)</footer>
+</div>
+</body>
+</html>

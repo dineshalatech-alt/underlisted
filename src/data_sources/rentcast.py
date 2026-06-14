@@ -440,6 +440,15 @@ def get_value_estimate(listing: Listing, *, count_against_user: bool = True,
     )
 
 
+def _hud_rent_fallback(listing: Listing) -> Optional[RentEstimate]:
+    """FREE HUD Fair Market Rent for the listing's metro (no network, no billable call)."""
+    from src.data_sources import hud_fmr
+    fb = hud_fmr.area_rent(listing)
+    if fb:
+        return RentEstimate(monthly_rent=fb["rent"], source=fb["source"], area=fb["area"])
+    return None
+
+
 def get_rent_estimate(listing: Listing, *, count_against_user: bool = True,
                       cache_only: bool = False) -> RentEstimate:
     """
@@ -458,16 +467,25 @@ def get_rent_estimate(listing: Listing, *, count_against_user: bool = True,
         db.note_cache_hit("rentcast_rent")
         raw = cached
     elif cache_only:
-        return RentEstimate()  # capped: don't bill
+        # Capped: don't bill — but a FREE HUD area rent is fine to show.
+        return _hud_rent_fallback(listing) or RentEstimate()
     else:
         db.note_cache_miss("rentcast_rent")
         raw = _avm_call(RENT_URL, listing, "rentcast_rent",
                         count_against_user=count_against_user) or {}
         db.cache_put(cache_key, "rent", raw)
 
+    rent = raw.get("rent")
+    if rent is None:
+        # RentCast had no rent for this address -> free HUD area rent fallback.
+        fb = _hud_rent_fallback(listing)
+        if fb:
+            return fb
+
     return RentEstimate(
-        monthly_rent=raw.get("rent"),
+        monthly_rent=rent,
         rent_low=raw.get("rentRangeLow"),
         rent_high=raw.get("rentRangeHigh"),
         comps=raw.get("comparables", []) or [],
+        source="RentCast" if rent is not None else None,
     )

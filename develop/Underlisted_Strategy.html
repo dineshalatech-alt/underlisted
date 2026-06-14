@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Underlisted — Strategy & Optimization Map</title>
+<style>
+  :root{--cream:#FFFDF8;--ink:#1A1A1A;--coral:#FF6B5C;--deepcoral:#E2513F;--gold:#F2A93B;--cocoa:#2E2A26;--line:#EADFCF;--soft:#FBF3E7;--green:#2E9E6B;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.5;margin:0;background:#fff;}
+  .wrap{max-width:1000px;margin:0 auto;padding:30px 30px 50px;}
+  header{background:var(--cocoa);color:var(--cream);padding:30px;border-radius:14px;margin-bottom:8px;}
+  h1{margin:0 0 4px;font-size:25px;}
+  header p{margin:0;opacity:.92;font-size:14px;}
+  h2{color:var(--deepcoral);font-size:19px;margin:26px 0 8px;padding-bottom:6px;border-bottom:3px solid var(--soft);}
+  p,li,td,th{font-size:13.5px;}
+  .one{background:var(--soft);border-left:5px solid var(--coral);padding:12px 16px;border-radius:8px;margin:10px 0;font-size:14px;}
+  .mapwrap{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--cream);margin:12px 0;}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;}
+  th{background:var(--coral);color:#fff;text-align:left;padding:8px 10px;}
+  td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top;}
+  tr:nth-child(even) td{background:var(--soft);}
+  .win{background:var(--green);color:#fff;font-weight:700;}
+  .opt{background:#FFF3E0;border:1px solid var(--gold);border-radius:8px;padding:10px 14px;margin:8px 0;}
+  .opt b{color:#B6770E;}
+  footer{color:#8a7f70;font-size:11.5px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Underlisted — Strategy &amp; Optimization Map</h1>
+  <p>How the business works · where we optimize · how we win · 2026-06-14 · Atlas + Serena + Scout</p>
+</header>
+
+<h2>1. The goal</h2>
+<div class="one"><b>Underlisted tells a normal person which U.S. home is actually a good deal — and whether they can truly afford it — in plain English.</b> Nationwide. One Deal Score, the true monthly cost, the real cash needed, and a fire/flood insurance-risk warning. For people who want to <i>live</i> in the home, not flip it.</div>
+
+<h2>2. The map — how it works &amp; where we optimize</h2>
+<div class="mapwrap">
+<svg viewBox="0 0 1000 540" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#E2513F"/>
+    </marker>
+    <marker id="arg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#B6770E"/>
+    </marker>
+  </defs>
+
+  <!-- ENGINE label -->
+  <text x="20" y="34" font-size="15" font-weight="700" fill="#2E2A26">THE ENGINE  (we pay once per home, everyone reads the cache)</text>
+
+  <!-- Engine boxes -->
+  <!-- A Data -->
+  <rect x="20" y="60" width="200" height="92" rx="10" fill="#E1F0E9" stroke="#2E9E6B" stroke-width="2"/>
+  <text x="120" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#0F6E56">Data sources</text>
+  <text x="120" y="106" text-anchor="middle" font-size="11" fill="#1A1A1A">RentCast · FEMA risk</text>
+  <text x="120" y="122" text-anchor="middle" font-size="11" fill="#1A1A1A">HUD rent · FHFA trend</text>
+  <text x="120" y="138" text-anchor="middle" font-size="11" fill="#1A1A1A">live mortgage rate</text>
+
+  <!-- B Worker -->
+  <rect x="280" y="60" width="190" height="92" rx="10" fill="#FBE9E6" stroke="#E2513F" stroke-width="2"/>
+  <text x="375" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#E2513F">Worker</text>
+  <text x="375" y="113" text-anchor="middle" font-size="11" fill="#1A1A1A">fetches each home</text>
+  <text x="375" y="129" text-anchor="middle" font-size="11" fill="#1A1A1A">ONCE, on a schedule</text>
+
+  <!-- C Cache -->
+  <rect x="530" y="60" width="180" height="92" rx="10" fill="#FBF3E7" stroke="#F2A93B" stroke-width="2"/>
+  <text x="620" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#B6770E">Shared cache</text>
+  <text x="620" y="113" text-anchor="middle" font-size="11" fill="#1A1A1A">everyone reads this</text>
+  <text x="620" y="129" text-anchor="middle" font-size="11" fill="#1A1A1A">cheap · instant</text>
+
+  <!-- D Insights -->
+  <rect x="770" y="60" width="210" height="92" rx="10" fill="#2E2A26"/>
+  <text x="875" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#FFFDF8">What the buyer sees</text>
+  <text x="875" y="106" text-anchor="middle" font-size="11" fill="#FFFDF8">Deal Score · Afford?</text>
+  <text x="875" y="122" text-anchor="middle" font-size="11" fill="#FFFDF8">Risk · True monthly</text>
+  <text x="875" y="138" text-anchor="middle" font-size="11" fill="#FFFDF8">cost · Cash needed</text>
+
+  <!-- engine arrows -->
+  <line x1="220" y1="106" x2="278" y2="106" stroke="#E2513F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <line x1="470" y1="106" x2="528" y2="106" stroke="#E2513F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <line x1="710" y1="106" x2="768" y2="106" stroke="#E2513F" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- powers down arrow -->
+  <line x1="875" y1="152" x2="875" y2="300" stroke="#2E2A26" stroke-width="2.5" marker-end="url(#ar)" stroke-dasharray="2,0"/>
+  <text x="885" y="230" font-size="11" font-style="italic" fill="#2E2A26">powers</text>
+
+  <!-- FUNNEL label -->
+  <text x="20" y="330" font-size="15" font-weight="700" fill="#2E2A26">THE FUNNEL  (turn visitors into paying members)</text>
+
+  <!-- Funnel boxes -->
+  <rect x="20" y="350" width="220" height="64" rx="10" fill="#fff" stroke="#FF6B5C" stroke-width="2"/>
+  <text x="130" y="377" text-anchor="middle" font-size="13" font-weight="700" fill="#E2513F">Free "Check a Deal"</text>
+  <text x="130" y="396" text-anchor="middle" font-size="11" fill="#1A1A1A">the free taste → email</text>
+
+  <rect x="330" y="350" width="200" height="64" rx="10" fill="#fff" stroke="#FF6B5C" stroke-width="2"/>
+  <text x="430" y="377" text-anchor="middle" font-size="13" font-weight="700" fill="#E2513F">Waitlist / email</text>
+  <text x="430" y="396" text-anchor="middle" font-size="11" fill="#1A1A1A">nurture with the hook</text>
+
+  <rect x="620" y="350" width="220" height="64" rx="10" fill="#2E9E6B"/>
+  <text x="730" y="377" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">$18.99 / mo member</text>
+  <text x="730" y="396" text-anchor="middle" font-size="11" fill="#fff">founding rate, locked in</text>
+
+  <!-- funnel arrows -->
+  <line x1="240" y1="382" x2="328" y2="382" stroke="#E2513F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <line x1="530" y1="382" x2="618" y2="382" stroke="#E2513F" stroke-width="2.5" marker-end="url(#ar)"/>
+  <!-- insights feed the free check (diagonal) -->
+  <line x1="800" y1="300" x2="170" y2="348" stroke="#2E2A26" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#ar)"/>
+
+  <!-- OPTIMIZE callouts (gold) -->
+  <rect x="20" y="180" width="200" height="40" rx="8" fill="#FFF3E0" stroke="#F2A93B" stroke-width="1.5"/>
+  <text x="120" y="197" text-anchor="middle" font-size="10.5" font-weight="700" fill="#B6770E">OPTIMIZE: + ATTOM / First Street</text>
+  <text x="120" y="212" text-anchor="middle" font-size="10" fill="#B6770E">deeper data + climate moat</text>
+  <line x1="120" y1="180" x2="120" y2="154" stroke="#B6770E" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arg)"/>
+
+  <rect x="760" y="180" width="230" height="40" rx="8" fill="#FFF3E0" stroke="#F2A93B" stroke-width="1.5"/>
+  <text x="875" y="197" text-anchor="middle" font-size="10.5" font-weight="700" fill="#B6770E">⭐ OPTIMIZE: "Can I Afford It?"</text>
+  <text x="875" y="212" text-anchor="middle" font-size="10" fill="#B6770E">personal score = our moat</text>
+  <line x1="875" y1="180" x2="875" y2="154" stroke="#B6770E" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arg)"/>
+
+  <rect x="610" y="446" width="240" height="40" rx="8" fill="#FFF3E0" stroke="#F2A93B" stroke-width="1.5"/>
+  <text x="730" y="463" text-anchor="middle" font-size="10.5" font-weight="700" fill="#B6770E">OPTIMIZE: in-house deal videos</text>
+  <text x="730" y="478" text-anchor="middle" font-size="10" fill="#B6770E">cheap nationwide reach → lower CAC</text>
+  <line x1="730" y1="446" x2="730" y2="416" stroke="#B6770E" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arg)"/>
+</svg>
+</div>
+<p style="font-size:12px;color:#666">Red arrows = the live flow. Gold tags = where we invest to optimize. The point: the expensive part (live data) is already built — so our biggest wins are cheap to add.</p>
+
+<h2>3. How we win over the other businesses</h2>
+<p>Every serious competitor is built for <b>investors</b> (cap rate, BRRRR, motivated sellers, jargon) or is market-level. <b>Nobody serves the normal first-time buyer in plain English.</b> That lane is wide open — so we don't out-investor them, we own the lane they abandoned.</p>
+<table>
+  <tr><th>Player</th><th>Who it's really for</th><th>Their language</th></tr>
+  <tr><td>Mashvisor</td><td>Investors</td><td>"Mashmeter", rental revenue, occupancy</td></tr>
+  <tr><td>PropStream ($79–299)</td><td>Wholesalers</td><td>motivated sellers, skip tracing</td></tr>
+  <tr><td>DealCheck ($14)</td><td>Investors</td><td>cap rate, CoC, IRR, DCR</td></tr>
+  <tr><td>DealMachine</td><td>Flippers</td><td>"driving for dollars", off-market</td></tr>
+  <tr><td>Reventure</td><td>Market watchers</td><td>ZIP price forecasts (not per-home)</td></tr>
+  <tr><td class="win">Underlisted</td><td class="win">First-time BUYERS (live-in)</td><td class="win">"Can you afford THIS home? Is it risky?" — plain English</td></tr>
+</table>
+
+<h2>4. The moat we build next</h2>
+<div class="one"><b>"Can I Afford It?" + Surprise-Cost.</b> Enter income, cash, and debts once → every home shows a green/amber/red <b>affordability badge</b> ("you'd have $420 left each month") plus the budget-killers nobody warns about (insurance range, property tax, PMI, HOA), and a plain "why this score" in 3 bullets. No competitor does this, and it's cheap for us — the expensive part (live data + true monthly cost) is already built. It turns our Deal Score from generic into <i>personal to you</i> — a real reason to subscribe.</div>
+
+<h2>5. Optimization priorities (the gold arrows, in words)</h2>
+<div class="opt"><b>1. Build "Can I Afford It?"</b> — highest-leverage moat; mostly logic on data we already pay for. (Atlas leads the build.)</div>
+<div class="opt"><b>2. Deepen the data</b> — RentCast (upgrade) now; ATTOM for depth + First Street for the climate-risk moat, when budget allows.</div>
+<div class="opt"><b>3. In-house deal videos</b> — "find out if you can afford that house in 30 seconds" → cheap nationwide reach, lower cost per customer.</div>
+
+<footer>Underlisted · develop/Underlisted_Strategy · 2026-06-14 · sources: Mashvisor, HonestCasa, TheClose, Reventure (2026 competitor research)</footer>
+</div>
+</body>
+</html>

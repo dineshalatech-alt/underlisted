@@ -33,7 +33,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from config.settings import settings  # noqa: E402
 from src.cache import backend, db  # noqa: E402
 from src.data_sources import (  # noqa: E402
-    rentcast, streetview, foreclosure, risk, market, mortgage_rates)
+    rentcast, streetview, foreclosure, risk, market, mortgage_rates, hud_fmr)
 from src.notify import email_sender  # noqa: E402
 
 
@@ -140,6 +140,22 @@ def run_once(*, full: bool = False, progress=None) -> dict:
                                f"({info.get('source')}, as of {info.get('as_of')}).")
         except Exception as exc:
             notes.append(f"mortgage_rate: {exc}")
+
+    # 1d3) HUD Fair Market Rents — FREE area rent benchmark (needs HUD_FMR_TOKEN).
+    #      Cached per state ~yearly; used as a free fallback rent when RentCast has none.
+    if (cfg.get("update_hud_fmr", True) and settings.has_hud_fmr
+            and status != "error"):
+        try:
+            states = sorted({s for _, s, _ in rentcast._iter_targets()})
+            refreshed = 0
+            for st in states:
+                if hud_fmr.ensure_state_fresh(
+                        st, max_age_days=int(cfg.get("hud_fmr_max_age_days", 300))):
+                    refreshed += 1
+            if refreshed:
+                _log(progress, f"HUD Fair Market Rents refreshed for {refreshed} state(s).")
+        except Exception as exc:
+            notes.append(f"hud_fmr: {exc}")
 
     # 1e) Saved-search alerts — match cached deals, record hits (email dormant).
     if cfg.get("update_alerts", True) and status != "error":

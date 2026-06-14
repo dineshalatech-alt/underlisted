@@ -47,6 +47,8 @@ class RentEstimate:
     rent_low: Optional[float] = None
     rent_high: Optional[float] = None
     comps: list = field(default_factory=list)   # raw rent comparables
+    source: Optional[str] = None                # e.g. "RentCast" or "HUD Fair Market Rent (area)"
+    area: Optional[str] = None                  # set when rent is an area benchmark, not per-home
 
 
 @dataclass

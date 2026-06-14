@@ -47,6 +47,8 @@ worker:
   update_market:          true       # refresh FREE FHFA ZIP price-trend file (~yearly)
   update_mortgage_rate:   true       # refresh FREE Freddie Mac 30-yr rate (true monthly cost)
   mortgage_rate_max_age_days: 7      # rates move weekly -> refresh about weekly
+  update_hud_fmr:         true       # refresh FREE HUD Fair Market Rents (needs HUD_FMR_TOKEN)
+  hud_fmr_max_age_days:   300        # FMR updates ~yearly -> refresh about yearly
   update_alerts:          true       # match saved searches and record alert hits
   send_alert_emails:      true       # email those matches (only if RESEND_API_KEY is set)
 

@@ -1,0 +1,192 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, Arial, sans-serif;
+    color: #1F2933; background: #FBFEFD;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sheet { padding: 16px 20px 20px; }
+
+  /* center node */
+  .center-wrap { text-align: center; margin: 2px 0 14px; }
+  .center {
+    display: inline-block; padding: 14px 34px; border-radius: 999px;
+    background: linear-gradient(135deg, #1D9E75, #0F6E56);
+    color: #fff; font-size: 21px; font-weight: 800; letter-spacing: .2px;
+    box-shadow: 0 6px 18px rgba(15,110,86,.30);
+  }
+  .center .small { display:block; font-size: 12px; font-weight:600; opacity:.92; margin-top:2px; }
+
+  /* legend */
+  .legend {
+    text-align:center; margin: 0 0 14px; font-size: 11.5px; color:#1F2933;
+  }
+  .lg { display:inline-block; margin: 0 8px; padding: 3px 10px; border-radius: 999px;
+        background: #E1F5EE; border:1px solid #cfeadf; }
+  .lgmark { margin-right: 5px; }
+
+  /* grid of branch cards */
+  .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; align-items: start;
+  }
+  .card {
+    border: 1px solid #e3ebe8; border-top: 6px solid var(--accent);
+    border-radius: 12px; background: #fff; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(31,41,51,.06);
+    break-inside: avoid;
+  }
+  .card.span2 { grid-column: span 2; }
+  .chead {
+    padding: 10px 14px 8px; background:
+      linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, #fff), #fff);
+    position: relative;
+  }
+  .ctitle { font-size: 16px; font-weight: 800; color: var(--accent); display:flex; align-items:center; gap:7px; }
+  .cicon { font-size: 17px; }
+  .csub { font-size: 11px; color: #8A97A3; margin-top: 1px; }
+  .badge {
+    position: absolute; top: 10px; right: 12px;
+    background: var(--accent); color:#fff; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  .groups { padding: 8px 12px 12px; }
+  .group { margin-top: 8px; }
+  .group:first-child { margin-top: 2px; }
+  .glabel {
+    font-size: 11.5px; font-weight: 700; color: #0F6E56;
+    margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px dashed #d4e7df;
+  }
+  ul.leaves { list-style: none; margin: 0; padding: 0; }
+  .leaf { display: flex; gap: 6px; align-items: baseline; font-size: 11px;
+          line-height: 1.32; padding: 1.5px 0; }
+  .leaf .mark { flex: 0 0 auto; font-size: 11px; }
+  .leaf .ltxt { color: #1F2933; }
+  .note { display:inline-block; margin-left:6px; font-size: 9.5px; font-weight:700;
+          padding: 0 6px; border-radius: 999px; vertical-align: middle; }
+
+  /* status accents on leaves */
+  .s-done .ltxt { color: #1F2933; }
+  .s-free .mark, .s-done .mark { filter: none; }
+  .s-paid .note { background:#fbeccd; color:#E08A00; }
+  .s-off  .ltxt { color: #8A97A3; }
+  .s-off  .note { background:#eceff1; color:#8A97A3; }
+  .s-warn .ltxt { color: #C0392B; font-weight: 600; }
+
+  .foot { text-align:center; margin-top: 12px; font-size: 10px; color:#8A97A3; }
+</style></head>
+<body>
+  <div class="sheet">
+    <div class="center-wrap">
+      <div class="center">UNDERLISTED
+        <span class="small">find under-priced U.S. homes — type a city, get a plain-English Deal Score</span>
+      </div>
+    </div>
+    <div class="legend"><span class="lg"><span class="lgmark">✅</span>Built / live</span><span class="lg"><span class="lgmark">🆓</span>Free source</span><span class="lg"><span class="lgmark">💲</span>Paid</span><span class="lg"><span class="lgmark">⏳</span>Planned next</span><span class="lg"><span class="lgmark">⚪</span>Not yet / parked</span><span class="lg"><span class="lgmark">⚠️</span>Rule / warning</span></div>
+    <div class="grid">
+      <section class="card" style="--accent:#0F6E56">
+    <header class="chead">
+      <div class="ctitle"><span class="cicon">🔌</span>1 · LIVE SYSTEM</div>
+      <div class="csub">how the apps connect</div>
+      <div class="badge">11/15 built</div>
+    </header>
+    <div class="groups"><div class="group">
+    <div class="glabel">🔑 Connected by API KEY</div>
+    <ul class="leaves"><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">RentCast → home listings / value / rent (RENTCAST_API_KEY)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Resend → sends the alert emails (RESEND_API_KEY)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Supabase → the database (DATABASE_URL: address + password)</span></li><li class="leaf s-off"><span class="mark">⚪</span><span class="ltxt">Google Street View → house photos (STREETVIEW_API_KEY)<span class="note">PARKED / 403</span></span></li></ul>
+  </div><div class="group">
+    <div class="glabel">👤 Connected by LOGIN</div>
+    <ul class="leaves"><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">GitHub stores the code</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Streamlit Cloud runs the app (via GitHub login)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">LIVE: underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">📍 Connected by ADDRESS / DNS</div>
+    <ul class="leaves"><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Namecheap owns domain underlistedhomes.com</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Netlify hosts public site + waitlist (DNS: A @→75.2.60.5, CNAME www)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Netlify Forms captures waitlist emails</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🗝️ Keys live in secret boxes</div>
+    <ul class="leaves"><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">.env (on your computer — local)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Streamlit Secrets (the live app)</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">GitHub Actions Secrets (the worker)</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">⚙️ The Worker (keeps cost low)</div>
+    <ul class="leaves"><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">GitHub Actions cron fills the Supabase database</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">The app only READS the shared cache — never fetches on load</span></li></ul>
+  </div></div>
+  </section>
+      <section class="card" style="--accent:#1D9E75">
+    <header class="chead">
+      <div class="ctitle"><span class="cicon">🗺️</span>2 · DATA SOURCES</div>
+      <div class="csub">all over the USA</div>
+      <div class="badge">0/25 built</div>
+    </header>
+    <div class="groups"><div class="group">
+    <div class="glabel">✅ Wired & FREE (government, no key)</div>
+    <ul class="leaves"><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FEMA National Risk Index — fire / quake</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FEMA National Flood Hazard Layer — flood</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FHFA House Price Index — ZIP price trends</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">✅ Wired & PAID</div>
+    <ul class="leaves"><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">RentCast — listings / value / rent (free 50/mo → $74/mo)</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🏚️ Foreclosure / bank-owned (free gov to browse)</div>
+    <ul class="leaves"><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">HUD HomeStore · Fannie HomePath · Freddie HomeSteps</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">VA · USDA · Treasury · US Marshals · IRS · GSA auctions</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">County tax-sale: Bid4Assets · GovEase · RealAuction</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">Marketplaces: Auction.com · Hubzu · Xome</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🏚️ Foreclosure DATA APIs (paid, licensed)</div>
+    <ul class="leaves"><li class="leaf s-off"><span class="mark">⚪</span><span class="ltxt">Foreclosure Data Hub — OUR PICK ($1 trial → $49/mo)<span class="note">not subscribed yet</span></span></li><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">ATTOM · CoreLogic · PropertyRadar · BatchData · Estated</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">📊 Free market data (download)</div>
+    <ul class="leaves"><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">Zillow Research · Redfin Data Center · Realtor.com Research</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FRED · HUD USER · US Census ACS + TIGER · data.gov</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">HUD Fair Market Rents (free token)</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🏘️ MLS / IDX feeds (need broker approval)</div>
+    <ul class="leaves"><li class="leaf s-off"><span class="mark">⚪</span><span class="ltxt">RESO Web API standard · Bridge Interactive · CoreLogic Trestle</span></li><li class="leaf s-off"><span class="mark">⚪</span><span class="ltxt">SimplyRETS · MLS Grid · Spark API</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🧩 Modern property APIs (paid, some free tiers)</div>
+    <ul class="leaves"><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">Parcl Labs · HelloData.ai · Rentometer</span></li><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">AirDNA · Datafiniti · Mashvisor</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🔥 Free risk / climate</div>
+    <ul class="leaves"><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FEMA NRI · FEMA NFHL · First Street / Risk Factor</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">USGS Earthquake · EPA EJScreen · AirNow</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">USFS Wildfire · CAL FIRE</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">🚶 Livability</div>
+    <ul class="leaves"><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">Walk Score (free tier) · OpenStreetMap / Overpass</span></li><li class="leaf s-free"><span class="mark">🆓</span><span class="ltxt">FCC Broadband Map</span></li><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">GreatSchools (paid)</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">⚠️ RULES (must follow)</div>
+    <ul class="leaves"><li class="leaf s-warn"><span class="mark">⚠️</span><span class="ltxt">Crime / demographic data NEVER used in scoring (Fair Housing) — info only</span></li><li class="leaf s-warn"><span class="mark">⚠️</span><span class="ltxt">Never scrape portals — licensed APIs only</span></li></ul>
+  </div></div>
+  </section>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <section class="card" style="--accent:#1D9E75">
+    <header class="chead">
+      <div class="ctitle"><span class="cicon">✅</span>3 · WHAT'S DONE</div>
+      <div class="csub">already built</div>
+      <div class="badge">10/10 built</div>
+    </header>
+    <div class="groups"><div class="group">
+    <div class="glabel">Shipped</div>
+    <ul class="leaves"><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Brand name Underlisted + owned domain underlistedhomes.com</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Live public site + waitlist (Netlify)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">HTTPS secured</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Email alerts (Resend)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Brand applied across app / site / marketing</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Marketing kit (ads, posts, launch email)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Promo video (map intro + app demo)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Code on GitHub (public)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">App deployed LIVE on Streamlit</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Supabase database created</span></li></ul>
+  </div></div>
+  </section>
+        <section class="card" style="--accent:#E08A00">
+    <header class="chead">
+      <div class="ctitle"><span class="cicon">⏳</span>4 · GAME PLAN / NEXT</div>
+      <div class="csub">in order</div>
+      <div class="badge">0/7 built</div>
+    </header>
+    <div class="groups"><div class="group">
+    <div class="glabel">Do these in order</div>
+    <ul class="leaves"><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">1. Verify the Supabase database connection (tables auto-create)</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">2. Auto-refresh WORKER (GitHub Actions cron): listings + risk + market + alert emails, cost-guarded</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">3. Payment button $29.99/mo (provider TBD — don't wire selling without asking)</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">4. Wire more FREE data (HUD Fair Market Rents token; gov foreclosure browse links)</span></li><li class="leaf s-off"><span class="mark">⚪</span><span class="ltxt">5. Later (when revenue justifies): subscribe Foreclosure Data Hub; verify domain in Resend; fix Street View 403</span></li><li class="leaf s-next"><span class="mark">⏳</span><span class="ltxt">6. GROWTH: SEO city pages (done) · short promo videos · waitlist → launch</span></li></ul>
+  </div><div class="group">
+    <div class="glabel">💲 Pricing path</div>
+    <ul class="leaves"><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">$12.99/mo intro (12 months) → $29.99 now → $44.99 later</span></li></ul>
+  </div></div>
+  </section>
+        <section class="card" style="--accent:#0F6E56">
+    <header class="chead">
+      <div class="ctitle"><span class="cicon">🛡️</span>5 · THE MOAT</div>
+      <div class="csub">why we win</div>
+      <div class="badge">6/7 built</div>
+    </header>
+    <div class="groups"><div class="group">
+    <div class="glabel">Our edge</div>
+    <ul class="leaves"><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Beginner-simple plain-English Deal Score 0–100</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Fire / flood INSURANCE-RISK warning (unique)</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">True monthly cost shown</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Real cash needed shown</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Nationwide USA</span></li><li class="leaf s-done"><span class="mark">✅</span><span class="ltxt">Cheap-to-run shared-cache architecture</span></li><li class="leaf s-paid"><span class="mark">💲</span><span class="ltxt">$12.99 founding price</span></li></ul>
+  </div></div>
+  </section>
+      </div>
+    </div>
+    <div class="foot">Underlisted master mind map · edit map_gen.mjs and re-run to update · brand green #1D9E75</div>
+  </div>
+</body></html>
