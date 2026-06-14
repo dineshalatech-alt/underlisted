@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underlisted — 90-Day Marketing Plan</title>
+<style>
+  :root{
+    --green:#1D9E75; --deep:#0F6E56; --fill:#E1F5EE;
+    --amber:#E08A00; --red:#C0392B; --ink:#111; --muted:#555; --line:#cfe9df;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); line-height:1.55; margin:0; background:#fff;}
+  .wrap{max-width:920px; margin:0 auto; padding:48px 28px 80px;}
+  header{background:var(--green); color:#fff; padding:40px 28px; border-radius:0 0 18px 18px;}
+  header .wrap{padding:0; max-width:920px;}
+  h1{margin:0 0 6px; font-size:30px; letter-spacing:-.5px;}
+  header p{margin:0; opacity:.95; font-size:15px;}
+  h2{color:var(--deep); font-size:22px; margin:42px 0 12px; padding-bottom:8px;
+    border-bottom:3px solid var(--fill);}
+  h3{color:var(--deep); font-size:17px; margin:24px 0 8px;}
+  p,li{font-size:15px;}
+  a{color:var(--deep); font-weight:600;}
+  .lead{background:var(--fill); border-left:5px solid var(--green); padding:14px 18px;
+    border-radius:8px; margin:14px 0; font-size:15px;}
+  .gate{background:#fff6ea; border:1px solid var(--amber); border-left:5px solid var(--amber);
+    padding:16px 20px; border-radius:10px; margin:16px 0;}
+  .gate b{color:var(--amber);}
+  .hook{background:var(--deep); color:#fff; padding:16px 20px; border-radius:10px;
+    font-size:18px; font-weight:700; margin:14px 0;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14px;}
+  th{background:var(--green); color:#fff; text-align:left; padding:9px 12px;}
+  td{border-bottom:1px solid var(--line); padding:9px 12px; vertical-align:top;}
+  tr:nth-child(even) td{background:var(--fill);}
+  .pill{display:inline-block; background:var(--fill); color:var(--deep); font-weight:700;
+    padding:2px 10px; border-radius:999px; font-size:12px; margin-right:6px;}
+  ul{margin:8px 0 8px 0; padding-left:22px;}
+  .funnel{background:var(--fill); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; font-family:Consolas,monospace; font-size:13.5px; white-space:pre; color:var(--deep); overflow-x:auto;}
+  .check li{margin:4px 0;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .card{border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+  .card h3{margin-top:0;}
+  .big{background:var(--green); color:#fff; padding:20px 24px; border-radius:12px; margin:24px 0; font-size:16px;}
+  .num{font-weight:800; color:var(--green);}
+  footer{color:var(--muted); font-size:13px; margin-top:50px; border-top:1px solid var(--line); padding-top:16px;}
+  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Underlisted — 90-Day Marketing Plan</h1>
+    <p>Goal: paying subscribers &nbsp;·&nbsp; Style: faceless / brand-led (AI voice + app screen-recordings) &nbsp;·&nbsp; Effort: 10+ hrs/week &nbsp;·&nbsp; 2026-06-13</p>
+  </div>
+</header>
+<div class="wrap">
+
+<h2>0. The honest gate (read first)</h2>
+<div class="gate">
+  <p style="margin-top:0"><b>Don't spend big on subscriber ads yet.</b> Your app DB is empty (refresh worker not running) and the payment button isn't wired. Sending a paid crowd to a product that can't show real homes or take payment burns money.</p>
+  <p style="margin-bottom:0"><b>Run in waitlist + content mode until BOTH are true:</b> (1) worker live → app shows <b>real homes</b>; (2) <b>payment works</b> end-to-end ($12.99/mo). Then flip the switch and pour fuel. Nothing is wasted — the content & audience built in weeks 1–4 make the paid spike cheap.</p>
+</div>
+<p><b>Readiness checklist before paid scale:</b></p>
+<ul class="check">
+  <li>☐ Worker cron live, DB filled with real listings</li>
+  <li>☐ Payment checkout completes ($12.99/mo)</li>
+  <li>☐ Analytics installed (GA4 or Plausible — free)</li>
+  <li>☐ Meta Pixel + TikTok Pixel + Google tag on site & app</li>
+  <li>☐ Landing page with the offer + urgency hook</li>
+  <li>☐ Email welcome/nurture sequence ready (Resend)</li>
+</ul>
+
+<h2>1. Positioning &amp; the hook</h2>
+<div class="lead"><b>One-liner:</b> "Zillow shows you homes; we tell you which U.S. homes are actually <i>underpriced</i> — and why."</div>
+<div class="hook">"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."</div>
+<p>Scarcity + price anchor. This is your strongest conversion lever — put a "founding price" countdown on the landing page and in every launch email.</p>
+<p><b>4 moat angles for content:</b></p>
+<ul>
+  <li><span class="pill">1</span> Plain-English Deal Score (0–100) — no spreadsheets.</li>
+  <li><span class="pill">2</span> Fire/flood <b>insurance-risk warning</b> — nobody else leads with this.</li>
+  <li><span class="pill">3</span> <b>True monthly cost</b>, not just list price.</li>
+  <li><span class="pill">4</span> <b>Real cash you'd actually need</b> to buy.</li>
+</ul>
+
+<h2>2. Core engine: "Underpriced Home of the Day"</h2>
+<p>One repeatable, faceless format that <b>is</b> the brand. Everything orbits it.</p>
+<div class="card">
+  <h3>The format (60–90s, vertical 9:16)</h3>
+  <ul>
+    <li>Screen-record the app showing one real underpriced home.</li>
+    <li>AI voiceover + bold captions.</li>
+    <li>Script beat: <b>Hook → the number → why it's a deal (Deal Score) → the catch (insurance/true cost) → "find deals like this → link."</b></li>
+    <li>Brand: green #1D9E75, black text, never blue. Logo in corner.</li>
+  </ul>
+  <p><b>Why it wins:</b> faceless, daily, demonstrates the product live, creates FOMO, ends in "get access." One recording → TikTok + Reels + Shorts + Pinterest. <span class="num">1 hour = 4+ posts.</span></p>
+  <p style="margin-bottom:0;background:var(--fill);padding:8px 12px;border-radius:6px"><b>All videos made in-house</b> — no paid outside creators. You own the full pipeline; one person runs it.</p>
+</div>
+<table>
+  <tr><th>Job</th><th>Tool</th><th>Cost</th></tr>
+  <tr><td>Screen record app</td><td>OBS / built-in</td><td>Free</td></tr>
+  <tr><td>AI voiceover</td><td>ElevenLabs</td><td>~$5–22/mo</td></tr>
+  <tr><td>Edit + captions</td><td>CapCut</td><td>Free</td></tr>
+  <tr><td>Graphics/thumbnails</td><td>Canva</td><td>Free</td></tr>
+  <tr><td>Schedule everywhere</td><td>Metricool / Buffer</td><td>Free tier</td></tr>
+</table>
+
+<h2>3. Platforms — ranked for this product</h2>
+<h3>Tier 1 — go all-in</h3>
+<table>
+  <tr><th>Platform</th><th>Why</th><th>Mode</th></tr>
+  <tr><td><b>TikTok</b></td><td>Cheapest organic reach; deal-of-the-day is native; faceless works.</td><td>Organic daily + Spark Ads on winners</td></tr>
+  <tr><td><b>Instagram Reels</b></td><td>Same video, big buyer audience, strong for paid.</td><td>Organic + Meta Ads</td></tr>
+  <tr><td><b>Meta Ads (FB+IG)</b></td><td>Best targeting + volume + cost for first-time buyers. The paid workhorse.</td><td>Paid (Phase 2+)</td></tr>
+  <tr><td><b>Pinterest</b></td><td>Huge home-buying intent, pins live for months, faceless-perfect.</td><td>Organic pins + Idea Pins</td></tr>
+</table>
+<h3>Tier 2 — high value, lower effort</h3>
+<table>
+  <tr><th>Platform</th><th>Why</th></tr>
+  <tr><td><b>YouTube Shorts + long-form</b></td><td>Evergreen SEO — "how to spot an underpriced house" ranks for years.</td></tr>
+  <tr><td><b>SEO (your static site)</b></td><td>Free compounding traffic. Expand your "deals in &lt;city&gt;" page generator.</td></tr>
+  <tr><td><b>Reddit</b></td><td>r/FirstTimeHomeBuyer, r/RealEstate, r/realestateinvesting. Value-first. Cheap ads.</td></tr>
+  <tr><td><b>Email (Resend)</b></td><td>Owned audience — converts best. Nurture → launch push.</td></tr>
+</table>
+<h3>Tier 3 — paid, after Meta is proven</h3>
+<ul>
+  <li><b>Google Search Ads</b> — high intent + branded-search defense + retargeting (Performance Max).</li>
+  <li><b>Facebook group seeding</b> — first-time-buyer + city groups, value-first.</li>
+</ul>
+
+<h2>4. The funnel (content → cash)</h2>
+<div class="funnel">Short video / pin / post
+        ↓  (link in bio / pinned / ad)
+Free "Check A Deal" page  ← your lead magnet
+        ↓  (email capture)
+Waitlist email → nurture (3–5 emails)
+        ↓  (the $12.99 urgency hook)
+$12.99/mo paying subscriber
+        ↓
+Retargeting ads close the undecided</div>
+<div class="lead"><b>Lead magnet = the free deal check.</b> Don't gate it. "Paste any address, get a free Deal Score." That free taste earns the email and the trust to upsell.</div>
+
+<h2>5. Budget &amp; ramp (lean → scale on proof)</h2>
+<p>Budget is flexible — so <b>earn the right to scale</b>: spend tiny until the app converts, then pour fuel on what works.</p>
+<table>
+  <tr><th>Phase</th><th>Monthly spend</th><th>Where it goes</th></tr>
+  <tr><td>Tools (always)</td><td>$0–30</td><td>ElevenLabs + maybe Canva Pro; rest free tiers</td></tr>
+  <tr><td>Phase 1 test</td><td>$300–500</td><td>$10–15/day Meta test creatives + $50 Reddit. Find winning hooks.</td></tr>
+  <tr><td>Phase 2 scale</td><td>$1,000–1,500</td><td>Pour into winning Meta creatives + Spark Ads + branded Google search</td></tr>
+  <tr><td>Phase 3 pour</td><td>Scale to ROAS</td><td>If CAC under target, no cap — keep scaling winners + retargeting</td></tr>
+</table>
+<div class="big">
+  <b>Why you can spend:</b> intro $12.99/mo → $29.99 later. A subscriber who stays ~12 months is worth <span style="color:#fff;text-decoration:underline">$150+</span> (LTV). So you can profitably pay <b>$30–50 to acquire</b> a paying subscriber. Target CAC <b>under $25</b> at start; scale hard while it holds. <b>Never scale a metric you can't see — pixels + analytics first.</b>
+</div>
+
+<h2>6. The "big crowd at once" launch spike</h2>
+<p>The crowd-at-once effect = a <b>coordinated launch moment</b>, fired only when the app is ready:</p>
+<ol>
+  <li><b>Warm the waitlist</b> — 2 teaser emails ("we go live Tuesday, founding $12.99 price").</li>
+  <li><b>Product Hunt launch</b> — free, big early-adopter spike.</li>
+  <li><b>Reddit + FB groups</b> same morning (value framing, not spam).</li>
+  <li><b>Creator seeding</b> — pay 3–5 micro real-estate TikTokers ($50–200 each) to post your deal video that week.</li>
+  <li><b>Paid spike</b> — Meta + TikTok ads at launch budget for 72 hours.</li>
+  <li><b>Urgency close</b> — "founding $12.99 price ends Sunday."</li>
+</ol>
+<p>A synchronized day-1 spike + scarcity deadline brings the crowd <i>and</i> seeds the algorithm so organic keeps rolling after.</p>
+
+<h2>7. 90-day calendar</h2>
+<div class="grid">
+  <div class="card"><h3>Phase 0 — Week 0 (no spend)</h3>
+    <ul><li>Finish worker + payment. Install analytics + all pixels.</li>
+    <li>Set up accounts: TikTok, IG, YouTube, Pinterest, Reddit, Metricool, Meta Ads.</li>
+    <li>Landing page with $12.99 hook + countdown. Write welcome emails.</li>
+    <li>Bank 5 "Underpriced Home of the Day" videos.</li></ul>
+  </div>
+  <div class="card"><h3>Phase 1 — Weeks 1–4 (engine + waitlist)</h3>
+    <ul><li>Deal video <b>daily</b> → TikTok + Reels + Shorts; 3 pins/week.</li>
+    <li>1 SEO city page/week (expand site generator).</li>
+    <li>Value posts in 2 Reddit + 2 FB groups/week (no links first).</li>
+    <li><b>$10–15/day Meta test</b> on 3–5 hooks + $50 Reddit. Nurture every email.</li></ul>
+  </div>
+  <div class="card"><h3>Phase 2 — Weeks 5–8 (turn on paid)</h3>
+    <ul><li>App converts → switch ads to <b>subscriber</b> goal.</li>
+    <li>Scale Meta winners ($30–50/day). Spark Ads on top TikToks.</li>
+    <li>Launch branded Google search + retargeting.</li>
+    <li>A/B the landing page + hook. Start referral ("free month for a friend").</li></ul>
+  </div>
+  <div class="card"><h3>Phase 3 — Weeks 9–12 (spike + scale)</h3>
+    <ul><li>Run the launch-spike playbook on a set date with the founding-price deadline.</li>
+    <li>Scale spend on anything under target CAC. Kill losers weekly.</li>
+    <li>Heavy retargeting on free-deal-check users who didn't subscribe.</li>
+    <li>Double down on the 2–3 channels that produced paid subs; drop the rest.</li></ul>
+  </div>
+</div>
+
+<h2>8. What to measure (weekly)</h2>
+<table>
+  <tr><th>Metric</th><th>Why</th></tr>
+  <tr><td>Cost per email signup</td><td>Phase 1 health</td></tr>
+  <tr><td><b>CAC</b> (cost per paying sub)</td><td>The number that lets you scale</td></tr>
+  <tr><td>Free-check → email rate</td><td>Funnel top health</td></tr>
+  <tr><td>Email → paid conversion</td><td>Nurture + offer health</td></tr>
+  <tr><td>Best hook / creative</td><td>Double down</td></tr>
+  <tr><td>Founding-price take rate</td><td>Is urgency working?</td></tr>
+  <tr><td>Churn (month 2+)</td><td>Protects LTV</td></tr>
+</table>
+
+<h2>9. Cheapest-first tool list</h2>
+<table>
+  <tr><th>Need</th><th>Tool</th><th>Cost</th></tr>
+  <tr><td>Scheduling (multi-platform)</td><td>Metricool / Buffer</td><td>Free tier</td></tr>
+  <tr><td>AI voiceover</td><td>ElevenLabs</td><td>$5–22/mo</td></tr>
+  <tr><td>Video edit + captions</td><td>CapCut</td><td>Free</td></tr>
+  <tr><td>Graphics</td><td>Canva</td><td>Free (Pro $13 optional)</td></tr>
+  <tr><td>Analytics</td><td>GA4 / Plausible</td><td>Free / cheap</td></tr>
+  <tr><td>Ad pixels</td><td>Meta / TikTok / Google</td><td>Free</td></tr>
+  <tr><td>Email</td><td>Resend (have it)</td><td>Free tier</td></tr>
+  <tr><td>Launch</td><td>Product Hunt</td><td>Free</td></tr>
+</table>
+
+<div class="big" style="background:var(--deep)">
+  <b>In one line:</b> Build a faceless "Underpriced Home of the Day" engine, give away free deal-checks to capture emails, nurture with the "$12.99 before it rises to $44.99" hook, prove conversion with tiny ad tests, then fire a coordinated launch spike and scale Meta + TikTok on whatever produces paying subscribers under ~$25 each.
+</div>
+
+<footer>
+  Underlisted · underlistedhomes.com · Marketing plan generated 2026-06-13 · Source: MARKETING_PLAN.md
+</footer>
+</div>
+</body>
+</html>

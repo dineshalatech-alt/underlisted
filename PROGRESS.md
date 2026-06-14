@@ -4,6 +4,86 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## Live mortgage rate wired (FREE, no key) + data-source integration plan — 2026-06-13
+
+- **New source: `src/data_sources/mortgage_rates.py`** — pulls the real current 30-yr
+  fixed rate from **Freddie Mac PMMS** (free public CSV, NO key, not billable), caches it
+  to `data/mortgage_rate.json` (read with no network on page load — mirrors `market.py`).
+  Optional `FRED_API_KEY` upgrade reads the same number from the Fed; falls back to Freddie
+  automatically, so it works out of the box.
+- **Wired into the money math** (`src/financing/cash_needed.py`): "true monthly cost" now
+  uses the LIVE primary rate and keeps the owner's investment **premium** on top. Typed
+  `financing.yaml` rates are now the fallback until the first refresh.
+- **Worker step added** (`refresh_worker.py` 1d2, `update_mortgage_rate` in `cache.yaml`,
+  ~weekly). Settings gained `fred_api_key` + `has_fred`; `.env.example` documents the
+  optional free key.
+- ✅ **Verified end-to-end:** fallback 6.6% → live **6.52%** (Freddie Mac, as of 6/11/2026);
+  $400k P+I $2,478 → $2,458; investment 7.22% (premium preserved). **0 billable calls.**
+- **Scout's data-source register** saved earlier: `research/DATA_SOURCE_REGISTER.xlsx`
+  (25 US real-estate sources, vetted for cost + legal + fit).
+- **New doc: `DATA_SOURCE_INTEGRATION_PLAN.html`** — how to connect ALL 25 sources, what's
+  needed from the owner per source, and the build order. **Next free key to grab: HUD FMR
+  token** (free rent baseline → cuts RentCast cost). Paid options await owner approval; MLS
+  feeds need an MLS membership.
+
+---
+
+## Design upgrade kickoff: Juliet agent + warm landing redesign — 2026-06-13
+
+- **New agent: Juliet** (`.claude/agents/Juliet.md`) — owns DESIGN & BRAND. Job: make the
+  app + website radiant, vibrant, attractive, trustworthy. Uses the general Claude design
+  skills (frontend-design, website-build, video-to-website, nano-banana-images) + the owner's
+  Kling animation as a hero. Roster now: **Atlas** builds · **Serena** grows · **Scout**
+  researches · **Juliet** designs.
+- **Brand color rule LIFTED (owner decision).** The old "light green `#1D9E75`, never blue"
+  rule no longer constrains the *look* of the app/website — full color freedom. Non-color
+  guardrails (no billable calls, don't touch payment/selling, secrets, Fair Housing) still hold.
+  ⚠️ CLAUDE.md §6 + the `document-theme` skill still say green-only — update pending owner OK.
+- **Palette chosen: "Warm & trustworthy"** — cream `#FFFDF8`, near-black text `#1A1A1A`,
+  coral `#FF6B5C` (+ deep `#E2513F`), gold `#F2A93B`, cocoa `#2E2A26`. Added to
+  `app/assets/theme.py` (legacy GREEN_* names aliased so other pages keep working).
+- **Landing redesigned** (`app/main.py`): Kling video as a looping, muted hero background
+  with a poster frame + warm scrim for legibility; coral CTAs; hover-lift feature cards;
+  coral-accented pricing card. Streamlit theme + static serving set in `.streamlit/config.toml`.
+- **Kling video optimized** 12 MB → **548 KB** (`app/static/hero.mp4`, 1280-wide, crf 30,
+  faststart, no audio) + `hero_poster.jpg` (106 KB). Served at `/app/static/`.
+- ✅ Verified: app boots clean, `/app/static/hero.mp4` serves 200, before/after screenshots in
+  `design_preview/` (`before_landing.png` → `after_landing.png`). **0 billable API calls.**
+- **Next (Juliet):** owner approval → carry the warm palette into Browse Deals (feed + detail)
+  and the static `site/` website; recolor the green house logo to match; then update CLAUDE.md §6.
+
+---
+
+## Marketing plan + nationwide city coverage — 2026-06-13
+
+- **Marketing strategy built** (3 deliverables, green-themed, no blue):
+  `MARKETING_PLAN.html/.md` (90-day plan, faceless "Underpriced Home of the Day"
+  engine, funnel, $12.99 hook), `MARKETING_COST_ANALYSIS.html` (live 2026 ad rates;
+  100k impressions ≈ $300–$1,500 paid or free organic; ladder shows 100k ≈ ~6 subs;
+  who-to-reach = buyers/investors/agents-as-channel/creators), and
+  `GO_LIVE_CHECKLIST.html` (plain-English worker + Payhip steps).
+- **Owner decisions:** spend **$0 organic** until the app converts; **all videos
+  produced IN-HOUSE** (no paid outside creators); expand coverage **nationwide**.
+- **Worker + payment = code-complete already** (prior commits). Remaining work is
+  owner-only dashboard steps: add GitHub Actions secrets + run the workflow; create
+  the Payhip $12.99/mo product and paste its link into `config/cache.yaml:checkout_url`.
+- **Nationwide city coverage shipped:** `_iter_targets()` in `src/data_sources/
+  rentcast.py` now reads an optional per-target `state:` (falls back to the file-level
+  default — backward-compatible). `config/cities.yaml` rewritten: kept the 6 CA cities
+  (by zip) and added 15 deal-heavy metros across TX/OH/IN/MO/TN/AL/FL/GA/NC/PA/OK
+  (whole-city search). ✅ Verified: 33 target lookups across 12 states parse cleanly.
+  Fixed stale "NorCal" labels in `worker/refresh_worker.py`.
+- **Next:** owner runs the go-live checklist → then build the **in-house video factory**
+  (one-click: app screen-record + AI voiceover + captions → 9:16 deal video) + first 5 scripts.
+- **New agent: Scout** (`.claude/agents/Scout.md`) — research scout that hunts (1) new DATA
+  sources to enrich the app, (2) new COMPETITORS, (3) new PLACES to market; returns a ranked,
+  green-themed report with cost + legal/ToS check + top pick. Guardrails baked in: no scraping
+  portals, Fair-Housing info-only, never spends/signs up, cites sources. Feeds Atlas (data) and
+  Serena (competitors/marketing). Keeps a running register under `research/` (won't overwrite the
+  existing `DATA_SOURCES_USA*.xlsx`). Roster now: **Atlas** builds · **Serena** grows · **Scout** researches.
+
+---
+
 ## Email alerts switched ON + pricing update — 2026-06-12
 
 - **Deal-alert emails are LIVE.** Added `RESEND_API_KEY` to `.env`; built

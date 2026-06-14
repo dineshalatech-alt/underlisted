@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underlisted — Go-Live Checklist (Worker + Payment)</title>
+<style>
+  :root{--green:#1D9E75;--deep:#0F6E56;--fill:#E1F5EE;--amber:#E08A00;--red:#C0392B;--ink:#111;--muted:#555;--line:#cfe9df;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.6;margin:0;background:#fff;}
+  .wrap{max-width:880px;margin:0 auto;padding:40px 28px 80px;}
+  header{background:var(--green);color:#fff;padding:38px 28px;border-radius:0 0 18px 18px;}
+  header .in{max-width:880px;margin:0 auto;}
+  h1{margin:0 0 6px;font-size:27px;}
+  header p{margin:0;opacity:.95;font-size:15px;}
+  h2{color:var(--deep);font-size:21px;margin:38px 0 10px;padding-bottom:8px;border-bottom:3px solid var(--fill);}
+  p,li{font-size:15px;}
+  a{color:var(--deep);font-weight:600;}
+  .done{background:var(--fill);border-left:5px solid var(--green);padding:12px 16px;border-radius:8px;margin:12px 0;}
+  .step{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:14px 0;}
+  .step h3{margin:0 0 8px;color:var(--deep);font-size:17px;}
+  .num{display:inline-block;background:var(--green);color:#fff;width:26px;height:26px;border-radius:50%;text-align:center;line-height:26px;font-weight:800;margin-right:8px;}
+  code{background:#f2f7f4;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13.5px;}
+  .key{background:#f2f7f4;border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-family:Consolas,monospace;font-size:13px;margin:6px 0;}
+  .gate{background:#fff6ea;border:1px solid var(--amber);border-left:5px solid var(--amber);padding:14px 18px;border-radius:10px;margin:14px 0;}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px;}
+  th{background:var(--green);color:#fff;text-align:left;padding:8px 11px;}
+  td{border-bottom:1px solid var(--line);padding:8px 11px;}
+  tr:nth-child(even) td{background:var(--fill);}
+  footer{color:var(--muted);font-size:12.5px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>Go-Live Checklist — Worker + Payment</h1>
+  <p>Closing the gate so the app shows real homes and can take payment · 2026-06-13</p>
+</div></header>
+<div class="wrap">
+
+<div class="done">
+  <b>The code is finished.</b> The refresh worker, its daily schedule, and the Payhip "Subscribe" button are all built and committed. Everything below is account / dashboard steps — no coding. Do them in order.
+</div>
+
+<h2>Part A — Turn the worker ON (fills the app with real homes)</h2>
+
+<div class="step">
+  <h3><span class="num">1</span> Add the secrets to GitHub</h3>
+  <p>Go to your repo → <b>Settings → Secrets and variables → Actions → New repository secret</b>. Add each of these (name on the left, your real value on the right):</p>
+  <div class="key">DATABASE_URL &nbsp;= &nbsp;(the same Supabase string the app uses)</div>
+  <div class="key">RENTCAST_API_KEY &nbsp;= &nbsp;(your RentCast key)</div>
+  <div class="key">RESEND_API_KEY &nbsp;= &nbsp;(optional — for alert emails)</div>
+  <div class="key">ALERT_FROM_EMAIL &nbsp;= &nbsp;(optional — the "from" address)</div>
+  <p style="margin-bottom:0">These live ONLY in GitHub's secret box — never typed into a file. The worker reads them at run time.</p>
+</div>
+
+<div class="step">
+  <h3><span class="num">2</span> Run it once by hand</h3>
+  <p>Repo → <b>Actions</b> tab → <b>"Refresh listings cache"</b> → <b>Run workflow</b>. Watch it go green (takes a few minutes). After that it runs <b>automatically every day at ~9:00 UTC</b>.</p>
+</div>
+
+<div class="step">
+  <h3><span class="num">3</span> Confirm real homes appeared</h3>
+  <p>Open the live app → it should now show real listings. Or open <b>Admin / Usage</b> → backend should read <b>PostgreSQL</b> and the listing count should be above zero.</p>
+</div>
+
+<div class="gate">
+  <b>Heads-up on coverage:</b> right now the worker only pulls <b>6 Northern California cities</b> (Sacramento, Stockton, Modesto, Vallejo, Antioch, Oakland). So the app will show real homes <i>there</i>. To cover more of the USA we need a small code tweak (the city list currently allows only one state) — see the decision at the bottom.
+</div>
+
+<h2>Part B — Turn payment ON ($12.99/mo)</h2>
+
+<div class="step">
+  <h3><span class="num">1</span> Create the product on Payhip</h3>
+  <p>Sign up at <b>payhip.com</b> → create a <b>Subscription</b> product → price it <b>$12.99/month</b> (you can add the "$12.99 for 12 months, then $29.99" framing in the description). Payhip handles the card payment and gives you a link like <code>https://payhip.com/b/XXXXX</code>.</p>
+</div>
+
+<div class="step">
+  <h3><span class="num">2</span> Paste the link into one file</h3>
+  <p>Open <code>config/cache.yaml</code>, line 15, and put your link between the quotes:</p>
+  <div class="key">checkout_url: "https://payhip.com/b/XXXXX"</div>
+  <p style="margin-bottom:0">Save, commit, push. The green <b>Subscribe</b> button on the landing page switches ON automatically. (Leave it blank and only the free preview shows — that's the current state.)</p>
+</div>
+
+<div class="step">
+  <h3><span class="num">3</span> Test a real checkout</h3>
+  <p>Click your own Subscribe button → make sure the Payhip checkout opens and completes. Once a test payment goes through, the gate is fully closed and you're ready to market.</p>
+</div>
+
+<h2>What I can vs. can't do for you</h2>
+<table>
+  <tr><th>Task</th><th>Who</th></tr>
+  <tr><td>Write/fix the worker + button code</td><td>✅ Me (done)</td></tr>
+  <tr><td>Expand the city coverage (multi-state)</td><td>✅ Me (on your OK)</td></tr>
+  <tr><td>Build the in-house video pipeline</td><td>✅ Me (after homes are live)</td></tr>
+  <tr><td>Add GitHub secrets / run the Action</td><td>👤 You (your login)</td></tr>
+  <tr><td>Create the Payhip product + get the link</td><td>👤 You (your account)</td></tr>
+</table>
+
+<footer>Underlisted · underlistedhomes.com · Go-live checklist · 2026-06-13</footer>
+</div>
+</body>
+</html>

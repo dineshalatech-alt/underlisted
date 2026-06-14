@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underlisted — Data Source Integration Plan</title>
+<style>
+  :root{--cream:#FFFDF8;--ink:#1A1A1A;--coral:#FF6B5C;--deepcoral:#E2513F;--gold:#F2A93B;--cocoa:#2E2A26;--line:#EADFCF;--soft:#FBF3E7;}
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;margin:0;background:var(--cream);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 28px 80px;}
+  header{background:var(--cocoa);color:var(--cream);padding:40px 28px;border-radius:0 0 20px 20px;}
+  header .in{max-width:960px;margin:0 auto;}
+  h1{margin:0 0 6px;font-size:28px;letter-spacing:-.4px;}
+  header p{margin:0;opacity:.92;font-size:15px;}
+  h2{color:var(--deepcoral);font-size:21px;margin:40px 0 10px;padding-bottom:8px;border-bottom:3px solid #F6E7D6;}
+  p,li,td,th{font-size:14.5px;}
+  a{color:var(--deepcoral);font-weight:600;}
+  .lead{background:var(--soft);border-left:5px solid var(--coral);padding:14px 18px;border-radius:8px;margin:14px 0;}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px;background:#fff;border-radius:8px;overflow:hidden;}
+  th{background:var(--coral);color:#fff;text-align:left;padding:9px 11px;}
+  td{border-bottom:1px solid #F0E4D4;padding:9px 11px;vertical-align:top;}
+  tr:nth-child(even) td{background:var(--soft);}
+  .tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;}
+  .done{background:#2E9E6B;} .free{background:var(--gold);} .paid{background:var(--deepcoral);}
+  .mls{background:var(--cocoa);} .skip{background:#9A9A9A;}
+  .big{background:var(--coral);color:#fff;padding:20px 24px;border-radius:12px;margin:22px 0;font-size:15.5px;}
+  .cocoa{background:var(--cocoa);}
+  .keybox{background:#fff;border:1px solid #F0E4D4;border-left:5px solid var(--gold);border-radius:10px;padding:14px 18px;margin:12px 0;}
+  ol li{margin:6px 0;}
+  footer{color:#8a7f70;font-size:12.5px;margin-top:44px;border-top:1px solid #EADFCF;padding-top:14px;}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>Data Source Integration Plan</h1>
+  <p>How we connect each source to Underlisted · what I need from you · build order · 2026-06-13</p>
+</div></header>
+<div class="wrap">
+
+<div class="big">
+  <b>How a source connects, in plain words:</b> every source becomes a small "helper file" that
+  follows the same recipe as our existing ones — <b>fetch the data → map it to our home record →
+  save it in the shared cache.</b> The app only ever reads the cache, so customers never wait and
+  we never pay per page view. Two shapes: <b>(A) API + key</b> (a licensed feed we unlock with a key
+  you grab) and <b>(B) free file/CSV</b> (a public download we refresh on a schedule, no key).
+</div>
+
+<h2>✅ Already connected (live in the app)</h2>
+<table>
+  <tr><th>Source</th><th>How it connects</th><th>Status</th></tr>
+  <tr><td><b>RentCast</b></td><td>API + key — listings, value, rent (your main feed)</td><td><span class="tag done">DONE</span></td></tr>
+  <tr><td><b>FEMA National Risk Index</b></td><td>Free gov endpoint — fire/flood + quake risk</td><td><span class="tag done">DONE</span></td></tr>
+  <tr><td><b>FHFA House Price Index</b></td><td>Free file → local cache — ZIP price trend</td><td><span class="tag done">DONE</span></td></tr>
+  <tr><td><b>Mortgage rate (Freddie Mac)</b></td><td>Free CSV → local cache — powers "true monthly cost"</td><td><span class="tag done">DONE TODAY</span></td></tr>
+</table>
+<div class="lead"><b>Just shipped (no key, $0):</b> your "true monthly cost" now uses the <b>real live 30-year
+rate</b> (6.52% as of 6/11/2026) instead of a typed guess, and refreshes weekly on its own. An optional
+free FRED key can read the same number from the Federal Reserve, but isn't needed.</div>
+
+<h2>🟡 Ready to build — I just need you to grab a FREE key</h2>
+<p>These are free and high-value. Grab the key (links below), paste it in, and I wire the source.</p>
+<table>
+  <tr><th>Source</th><th>What it adds</th><th>What I need from you</th></tr>
+  <tr><td><b>HUD Fair Market Rents</b></td><td>Free rent baseline by county → <b>fewer billable RentCast calls (saves money)</b></td><td><span class="tag free">FREE KEY</span> HUD token (5 min)</td></tr>
+  <tr><td><b>FRED (Fed)</b></td><td>Mortgage rate straight from the Fed (upgrade to today's feed)</td><td><span class="tag free">FREE KEY</span> FRED key (optional)</td></tr>
+  <tr><td><b>Census (permits + ACS)</b></td><td>New-construction supply signal; demographics (display-only)</td><td><span class="tag free">FREE KEY</span> Census key</td></tr>
+  <tr><td><b>FBI Crime Data</b></td><td>Area crime — <b>display only</b> (Fair Housing: never scored)</td><td><span class="tag free">FREE KEY</span> api.data.gov key</td></tr>
+  <tr><td><b>Walk Score</b></td><td>Walkability/transit score — display only</td><td><span class="tag free">FREE KEY</span> Walk Score key</td></tr>
+</table>
+
+<h2>🟢 Ready to build — NO key needed (free public data)</h2>
+<table>
+  <tr><th>Source</th><th>What it adds</th><th>What I need from you</th></tr>
+  <tr><td><b>Redfin / Zillow / Realtor research</b></td><td>Area-level median price, inventory, days-on-market for context (NOT their listings — never scraped)</td><td><span class="tag done">NOTHING</span> I can build it</td></tr>
+  <tr><td><b>FEMA NRI — more hazards</b></td><td>Extend to heat, wind, etc. beyond fire/flood/quake</td><td><span class="tag done">NOTHING</span> I can build it</td></tr>
+</table>
+
+<h2>💵 Worth it later — needs your budget approval (paid)</h2>
+<table>
+  <tr><th>Source</th><th>What it adds</th><th>Cost / what I need</th></tr>
+  <tr><td><b>Datafiniti</b></td><td>Richer property records — cheapest way to test</td><td><span class="tag paid">PAID</span> Free trial, then $119/mo — your OK + key</td></tr>
+  <tr><td><b>HouseCanary</b></td><td>Pro-grade value (AVM) → stronger Deal Score</td><td><span class="tag paid">PAID</span> $79/mo — your OK + key</td></tr>
+  <tr><td><b>ATTOM Data</b></td><td>158M properties: tax, deed, owner, AVM (the big one)</td><td><span class="tag paid">PAID</span> from $95/mo — your OK + key</td></tr>
+  <tr><td><b>Regrid</b></td><td>Map parcels + ownership (only if we add maps)</td><td><span class="tag paid">PAID</span> your OK + key</td></tr>
+  <tr><td><b>Mashvisor</b></td><td>Investor analytics (cap rate, ROI) for the investor audience</td><td><span class="tag paid">PAID</span> your OK + key</td></tr>
+</table>
+
+<h2>🔒 Most complete listings — needs an MLS membership (future)</h2>
+<table>
+  <tr><th>Source</th><th>What it adds</th><th>What I need from you</th></tr>
+  <tr><td><b>Bridge Interactive</b> (Zillow Group)</td><td>Full MLS for-sale listings via RESO API (the gold standard)</td><td><span class="tag mls">MLS</span> apply to an MLS for data access</td></tr>
+  <tr><td><b>Trestle / MLS Grid</b></td><td>MLS listing feeds</td><td><span class="tag mls">MLS</span> MLS membership + fees</td></tr>
+  <tr><td><b>SimplyRETS</b></td><td>Developer-friendly MLS onramp</td><td><span class="tag mls">MLS</span> MLS access + plan</td></tr>
+</table>
+<div class="lead"><b>About MLS:</b> it's the richest listing data, but each MLS requires a membership / broker
+relationship and signed agreements. That's a bigger, later step — worth it once we're earning. Not blocking now.</div>
+
+<h2>🚫 Skip — legal risk or retired</h2>
+<table>
+  <tr><th>Source</th><th>Why skip</th></tr>
+  <tr><td><b>Zillow/Redfin/Realtor scrapers</b> (RapidAPI/Apify)</td><td><span class="tag skip">SKIP</span> Violates their Terms of Service — legal risk. Never use.</td></tr>
+  <tr><td><b>Estated</b></td><td><span class="tag skip">SKIP</span> Being retired into ATTOM in 2026 — use ATTOM instead.</td></tr>
+</table>
+
+<h2>👉 What I need from you (all FREE, ~20 min total)</h2>
+<div class="keybox">
+  <p style="margin-top:0"><b>Grab these free keys and paste each into your <code>.env</code> (and Streamlit Secrets) — then tell me and I'll wire them:</b></p>
+  <ol>
+    <li><b>HUD Fair Market Rents token</b> — <i>top priority, saves money</i> →
+      <a href="https://www.huduser.gov/portal/dataset/fmr-api.html">huduser.gov FMR API</a> → register → "Create API key" → put in <code>HUD_FMR_TOKEN</code></li>
+    <li><b>FRED key</b> (optional mortgage upgrade) →
+      <a href="https://fredaccount.stlouisfed.org/apikeys">fredaccount.stlouisfed.org/apikeys</a> → <code>FRED_API_KEY</code></li>
+    <li><b>Census key</b> (permits/demographics) →
+      <a href="https://api.census.gov/data/key_signup.html">api.census.gov key signup</a></li>
+    <li><b>api.data.gov key</b> (FBI crime, display-only) →
+      <a href="https://api.data.gov/signup/">api.data.gov/signup</a></li>
+  </ol>
+  <p style="margin-bottom:0">For paid sources (Datafiniti/HouseCanary/ATTOM), just say the word and I'll set them up when you approve the spend.</p>
+</div>
+
+<h2>Recommended build order</h2>
+<div class="big cocoa">
+  <b>1.</b> Mortgage rate — <span style="color:#9BE3BE">✅ done today, free.</span> &nbsp;
+  <b>2.</b> HUD rents (free key) — cuts RentCast cost. &nbsp;
+  <b>3.</b> Free market context (Redfin/Zillow research — no key). &nbsp;
+  <b>4.</b> Census permits + crime/walk (free keys, display). &nbsp;
+  <b>5.</b> One paid test — Datafiniti free trial. &nbsp;
+  <b>6.</b> Later: ATTOM/HouseCanary for depth; MLS when we're earning.
+</div>
+
+<footer>Underlisted · Data Source Integration Plan · built by Scout + Serena · 2026-06-13 · Companion file: research/DATA_SOURCE_REGISTER.xlsx</footer>
+</div>
+</body>
+</html>
