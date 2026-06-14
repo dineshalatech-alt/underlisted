@@ -4,6 +4,44 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## In-app "What does this mean?" tooltips — teaching at the point of confusion — 2026-06-14 (Juliet)
+
+- **Why:** the website already had a free plain-English glossary (`site/learn.html`), but a
+  first-time buyer gets confused INSIDE the app — staring at "PMI" or "cash to close" on the
+  deal screen — not on a separate page. The teaching had to live right where the confusion
+  happens. Goal: app + site teach IDENTICALLY, with zero wording drift.
+- **What I built:**
+  - **`src/glossary.py`** — ONE source of truth for all 12 home-buying terms (kid-simple
+    wording + real-dollar examples, lifted verbatim from learn.html). A `Term` dataclass per
+    entry, plus `app_tip(key)` that converts the site's `<b>…</b>` to Streamlit `**…**` markdown,
+    optionally appends the example and a "Learn the basics →" link. Edit a definition HERE and
+    both surfaces update.
+  - **`tools/gen_site.py`** — now imports `src.glossary` and builds the learn page from that
+    shared list (deleted the duplicate `LEARN_TERMS` block). Rebuilt the site: **`learn.html`
+    is byte-identical** to before — pure consolidation, no visible change.
+  - **`app/pages/0_Browse_Deals.py`** — new local `_explain(term_key)` helper renders a small,
+    collapsed **`st.popover`** ("What does this mean?") that opens only on tap (calm, airy — no
+    clutter). Wired in next to: **Deal Score**, the **insurance-risk warning**, **estimated
+    value**, the **"Can I afford it?"** heading, a 3-column row of **True monthly cost / PMI / HOA**
+    helpers under the surprise-cost panel, and **cash to close / down payment**. Replaced the old
+    ad-hoc popovers (deal score, estimated value) so their wording now matches the site exactly.
+    Added a gentle "New to home-buying words? Learn the basics →" link near the bottom disclaimer.
+  - **`tests/test_glossary.py`** — 9 tests: all app-referenced keys exist, no dup keys, every term
+    has words, HTML→markdown conversion, **the app tip uses the same sentences as the learn page**
+    (anti-drift), example/link toggles, the insurance term is flagged as a warning, and gen_site
+    builds its cards from the shared glossary. All pass. Existing suites still green
+    (agent-contact 7/7, affordability 10/10).
+- **Verify locally:** `.venv\Scripts\python.exe -m streamlit run app/main.py` → Browse Deals →
+  open any home → tap any "What does this mean?" pill. Screenshots in `design_preview/`
+  (`tip_1_detail_full.png`, `tip_2_dealscore_open.png`, `tip_3_pmi_open.png`). Run the tests with
+  `.venv\Scripts\python.exe tests\test_glossary.py`.
+- **Untouched:** payment/selling/landing logic, saved data formats. NO billable API calls (sample
+  data only). Fair Housing respected — every tooltip explains the *product*, never people/areas.
+- **Next visual step:** the website's learn.html still uses the old green theme; a later pass could
+  bring it onto the warm cream/coral/gold brand to match the app.
+
+---
+
 ## Video hero on the website + live CLI deploys — 2026-06-14 (Juliet + Serena)
 
 - **Why:** the owner wanted to share the website with a friend. The old `file:///` path only

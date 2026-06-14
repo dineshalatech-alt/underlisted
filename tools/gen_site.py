@@ -28,6 +28,7 @@ HERO_VIDEO_SRC = ROOT / "Smoothly_animate_from_the_firs_Kling_30__78676.mp4"
 
 from app import sample_data            # noqa: E402  (no streamlit imported here)
 from src.data_sources import market    # noqa: E402
+from src import glossary                # noqa: E402  (shared term wording: app + site)
 
 OUT = ROOT / "site"
 GREEN, DEEP, INK, MUTED, AMBER, RED = "#1D9E75", "#0F6E56", "#1F2933", "#667085", "#E08A00", "#C0392B"
@@ -183,132 +184,35 @@ def nav_html(here: str = "") -> str:
     )
 
 
-# Plain-English glossary. Each entry: (anchor, icon, short label, title, [paragraphs],
-# example HTML or None, warn=True for the caution-colored cards). Written to be read
-# by a first-time buyer — everyday words, define any term right where it's used.
-LEARN_TERMS = [
-    ("deal-score", "🎯", "Deal Score",
-     "Deal Score (0–100)",
-     ["This is one simple number that tells you, at a glance, how good a home looks "
-      "as a deal. Higher is better.",
-      "We color it so you don't have to think: <b>green = looks like a good deal</b>, "
-      "<b>amber = okay, look closer</b>, <b>red = probably not a great deal</b>."],
-     "<div class='scorekey'><span style='background:#1D9E75'><span class='dot'></span>"
-     "70–100 Good</span><span style='background:#E08A00'><span class='dot'></span>"
-     "45–69 Okay</span><span style='background:#C0392B'><span class='dot'></span>"
-     "0–44 Weak</span></div>", False),
-
-    ("underpriced", "🏷️", "Underpriced",
-     "Underpriced / undervalued",
-     ["It means the home is being sold for <b>less than what it's probably worth</b>. "
-      "That's the kind of home we hunt for.",
-      "Think of it like finding a $100 jacket on sale for $70 — same jacket, smaller price."],
-     "<b>Example:</b> a home is listed at $270,000, but homes just like it are worth "
-     "about $300,000. It's underpriced by roughly $30,000.", False),
-
-    ("estimated-value", "📏", "Estimated value",
-     "Estimated value",
-     ["This is <b>our best guess of what the home is really worth</b>, based on what "
-      "similar nearby homes are worth.",
-      "It's an estimate, not a promise — but it gives you a fair yardstick to compare "
-      "the asking price against."],
-     "<b>Example:</b> if our estimated value is $300,000 and the seller is asking "
-     "$270,000, the price looks like a bargain.", False),
-
-    ("insurance-risk", "🔥", "Insurance risk",
-     "Insurance-risk warning (fire / flood)",
-     ["Some areas catch fire or flood more often. Insurance companies know this, so "
-      "they <b>charge a lot more</b> to insure a home there — sometimes hundreds extra "
-      "every month.",
-      "We flag it early so a 'cheap' home doesn't surprise you with a giant insurance "
-      "bill later."],
-     "<b>Example:</b> two homes cost the same, but one sits in a flood zone. That one "
-     "can cost much more to insure every single month.", True),
-
-    ("true-monthly-cost", "💸", "True monthly cost",
-     "True monthly cost",
-     ["Most websites only show the loan payment. But owning a home costs more than that. "
-      "We add it <b>all</b> up so you see the real number.",
-      "True monthly cost = mortgage <b>+</b> property tax <b>+</b> insurance <b>+</b> PMI "
-      "(if any) <b>+</b> HOA (if any) <b>+</b> a little for upkeep."],
-     "<b>Example:</b> the loan is $1,500/mo, but with tax, insurance and the rest it's "
-     "really about $2,050/mo. That's the number you actually pay.", False),
-
-    ("pmi", "🛡️", "PMI",
-     "PMI (private mortgage insurance)",
-     ["PMI is an <b>extra monthly fee you pay when your down payment is under 20%</b>. "
-      "It protects the lender, not you.",
-      "The good news: once you've paid down enough of the loan, PMI usually goes away."],
-     "<b>Example:</b> you put down 10% instead of 20%, so you pay maybe $100–$200 a month "
-     "extra in PMI until you build up more ownership.", False),
-
-    ("hoa", "🏘️", "HOA",
-     "HOA (homeowners association) fee",
-     ["Some homes — especially condos and homes in planned neighborhoods — charge a "
-      "<b>monthly fee for shared upkeep</b>: things like lawns, pools, hallways, or trash.",
-      "Not every home has one. When a home does, we include it in the true monthly cost."],
-     "<b>Example:</b> a condo might charge $250/mo in HOA fees to keep the building and "
-     "grounds nice.", False),
-
-    ("property-tax", "🧾", "Property tax",
-     "Property tax",
-     ["This is a <b>yearly tax you pay on a home</b> to your local government. It usually "
-      "helps pay for schools, roads and services.",
-      "We spread it across the year so it shows up in your monthly cost, where you'll "
-      "actually feel it."],
-     "<b>Example:</b> a $3,600 yearly property tax is about $300 added to each month.",
-     False),
-
-    ("cash-to-close", "💵", "Cash to close",
-     "Cash to close / down payment",
-     ["This is the <b>real cash you need up front</b> to buy the home — before you move in.",
-      "It's mainly your down payment (your share of the price) plus closing costs (one-time "
-      "fees for paperwork, the loan and so on)."],
-     "<b>Example:</b> on a $300,000 home, a 10% down payment is $30,000, plus a few "
-     "thousand in closing costs — so you'd need roughly $35,000 in hand.", False),
-
-    ("afford", "✅", "Can I afford it?",
-     "Can I afford it? (green / amber / red)",
-     ["You tell us your income, your savings and your monthly debts. We check whether a "
-      "home <b>fits YOUR money</b> — and answer in plain colors.",
-      "<b>Green = comfortably yes</b>, <b>amber = tight, be careful</b>, <b>red = a stretch "
-      "right now</b>. We also show how much you'd have left over each month."],
-     "<b>Example:</b> 'Green — you'd have about $600 left every month after the home is "
-     "paid for.' Your numbers stay private.", False),
-
-    ("days-on-market", "📅", "Days on market",
-     "Days on market",
-     ["This is simply <b>how long the home has been for sale</b>.",
-      "A home that's sat for a long time can mean the seller is more willing to "
-      "<b>negotiate</b> — which can be your chance to ask for a better price."],
-     "<b>Example:</b> a home listed 4 days ago may sell fast; one listed 120 days ago "
-     "might have room to bargain.", False),
-
-    ("mortgage-rate", "📈", "Mortgage rate",
-     "Mortgage rate",
-     ["A mortgage is the loan you use to buy a home. The <b>mortgage rate is the interest "
-      "you pay to borrow</b> that money, shown as a percentage.",
-      "Even a small change in the rate can move your monthly payment by a lot — so it's "
-      "worth watching."],
-     "<b>Example:</b> on a $300,000 loan, going from 6% to 7% can add roughly $200 to "
-     "your monthly payment.", False),
-]
+# The plain-English glossary now lives in ONE place: src/glossary.py (shared by
+# this site generator AND the app's in-app "What does this mean?" tooltips, so the
+# website and the app teach with identical wording). Edit the words there.
+#
+# The Deal Score card gets a small colored key (a website-only flourish), keyed by
+# the glossary term id so it stays attached to the right card.
+LEARN_EXTRA_EG = {
+    "deal-score":
+        "<div class='scorekey'><span style='background:#1D9E75'><span class='dot'>"
+        "</span>70–100 Good</span><span style='background:#E08A00'><span class='dot'>"
+        "</span>45–69 Okay</span><span style='background:#C0392B'><span class='dot'>"
+        "</span>0–44 Weak</span></div>",
+}
 
 
 def learn_page_body() -> str:
     toc = "".join(
-        f"<a href='#{anchor}'>{label}</a>"
-        for anchor, _ic, label, *_ in LEARN_TERMS
+        f"<a href='#{t.key}'>{t.label}</a>" for t in glossary.TERMS
     )
     cards = []
-    for anchor, ic, _label, title, paras, eg, warn in LEARN_TERMS:
-        body = "".join(f"<p>{p}</p>" for p in paras)
+    for t in glossary.TERMS:
+        body = "".join(f"<p>{p}</p>" for p in t.paragraphs)
+        eg = LEARN_EXTRA_EG.get(t.key, t.example)
         if eg:
             body += f"<div class='eg'>{eg}</div>"
-        cls = "term warnterm" if warn else "term"
+        cls = "term warnterm" if t.warn else "term"
         cards.append(
-            f"<div class='{cls}' id='{anchor}'>"
-            f"<h2><span class='ic'>{ic}</span>{title}</h2>{body}</div>"
+            f"<div class='{cls}' id='{t.key}'>"
+            f"<h2><span class='ic'>{t.icon}</span>{t.title}</h2>{body}</div>"
         )
     return (
         "<div class='learn-intro'>"

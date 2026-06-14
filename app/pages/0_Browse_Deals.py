@@ -20,6 +20,7 @@ import streamlit as st  # noqa: E402
 
 from config.settings import settings  # noqa: E402
 from src import metrics  # noqa: E402
+from src import glossary  # noqa: E402  (shared plain-English wording: app + site)
 from src.models import listing_contact  # noqa: E402
 from src.data_sources import rentcast, market  # noqa: E402
 from src.financing import cash_needed  # noqa: E402
@@ -76,6 +77,24 @@ st.session_state.setdefault("open_id", None)
 
 FACTOR_COLORS = {"value_discount": "#1D9E75", "rent_yield": "#2E86C1",
                  "days_on_market": "#8E44AD", "risk": "#F39C12"}
+
+
+# --- In-app teaching: "What does this mean?" helpers -----------------------
+# The SAME kid-simple wording the website's "Learn the basics" page uses, placed
+# right where people get confused. Tucked inside a small popover so the screen
+# stays calm and airy — the teaching only appears when someone taps for it.
+def _explain(term_key: str, *, label: str = "What does this mean?",
+             example: bool = True) -> None:
+    """Render a small tucked-away popover explaining one glossary term.
+
+    Pulls plain-English text from src/glossary.py (one source of truth shared with
+    the website), so the app and site teach identically. Stays out of the way
+    until tapped — no clutter.
+    """
+    t = glossary.get(term_key)
+    with st.popover(label, use_container_width=False):
+        st.markdown(f"**{t.icon} {t.title}**")
+        st.markdown(glossary.app_tip(term_key, include_example=example))
 
 
 def _label(score) -> str:
@@ -281,6 +300,7 @@ def _render_afford(l, occupancy, loan_type, band, risk) -> None:
     price = l.list_price or 0
     st.markdown(f"#### {ic('wallet',22,DEEP_GREEN)} Can I afford it?",
                 unsafe_allow_html=True)
+    _explain("afford", label="What does 'Can I afford it?' mean?")
 
     # --- Surprise-Cost panel: the true monthly cost, honest ranges ---
     hoa_known = st.toggle("I know this home's HOA dues", key=f"hoatog_{l.id}")
@@ -293,6 +313,14 @@ def _render_afford(l, occupancy, loan_type, band, risk) -> None:
     st.markdown(_cost_rows(mc), unsafe_allow_html=True)
     st.caption("The surprise costs first-time buyers forget — each shown as an honest "
                "low–high range, not a single pretend number.")
+    # Small, tucked-away helpers for the two terms people trip on most here.
+    h1, h2, h3 = st.columns(3)
+    with h1:
+        _explain("true-monthly-cost", label="True monthly cost?", example=False)
+    with h2:
+        _explain("pmi", label="What's PMI?")
+    with h3:
+        _explain("hoa", label="What's HOA?")
     with st.expander("What each cost is"):
         for it in mc.items:
             st.markdown(f"**{it.label}** — {it.note}")
@@ -472,14 +500,13 @@ def render_detail(row) -> None:
         st.markdown(f"<div style='background:#FBE9C7;color:{AMBER};padding:8px 12px;"
                     f"border-radius:10px;margin-top:6px;font-weight:600'>"
                     f"{ic('shield',16,AMBER)} {note}</div>", unsafe_allow_html=True)
+    if rb or note:
+        _explain("insurance-risk", label="What does this warning mean?")
 
     st.divider()
     # --- Deal Score + why ---
     st.markdown(_score_badge(score), unsafe_allow_html=True)
-    with st.popover("What's the deal score?"):
-        st.write("A 0–100 rating of how good a deal this looks — mostly how far "
-                 "below its estimated value it's listed, plus rent yield. Higher "
-                 "= better. It's a screening guide, not a guarantee.")
+    _explain("deal-score", label="What does the Deal Score mean?")
     # Plain-English, one-line "why this score" — the biggest reason in words.
     plain = _why_in_plain_english(score)
     if plain:
@@ -513,9 +540,7 @@ def render_detail(row) -> None:
         if val.value_low and val.value_high:
             st.caption(f"Value range {money(val.value_low)}–{money(val.value_high)} · "
                        f"{len(val.comps or [])} comparable sales")
-        with st.popover("What's 'estimated value'?"):
-            st.write("A computer estimate (an 'AVM') of the home's worth from recent "
-                     "nearby sales. A guide, not an appraisal.")
+        _explain("estimated-value", label="What does 'estimated value' mean?")
     if not row.get("foreclosure"):
         rsample = " <span class='sampletag'>sample</span>" if row["rent_sample"] else ""
         st.markdown(f"{ic('rent',20,PRIMARY_GREEN)} Estimated rent: "
@@ -563,6 +588,8 @@ def render_detail(row) -> None:
          "(usually 2–5%).")
     st.markdown(f"= {ic('wallet',18,DEEP_GREEN)} **Cash to close: "
                 f"{money(cn.cash_to_close)}**", unsafe_allow_html=True)
+    _explain("cash-to-close",
+             label="What is 'cash to close' / a down payment?")
     st.markdown("**Money you keep (don't spend)**")
     line("reserves", "Reserves", money(cn.reserves),
          f"{cn.reserves_months} months", "Cash the lender wants you to keep in "
@@ -596,6 +623,13 @@ def render_detail(row) -> None:
     _render_agent_contact(l)
 
     st.divider()
+    st.markdown(
+        f"<div style='background:{LIGHT_FILL};border-radius:12px;padding:12px 16px;"
+        f"margin:2px 0 6px'>{ic('info',18,DEEP_GREEN)} New to home-buying words? "
+        f"<a href='{glossary.LEARN_URL_PUBLIC}' target='_blank' "
+        f"style='color:{DEEP_GREEN};font-weight:700'>Learn the basics →</a> "
+        f"<span class='muted'>— every term on this page, in plain English. Free.</span>"
+        "</div>", unsafe_allow_html=True)
     st.caption("All figures are ESTIMATES to help you screen homes — not advice, an "
                "appraisal, or a loan offer. Verify with a licensed lender and agent.")
 
