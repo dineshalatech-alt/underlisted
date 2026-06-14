@@ -73,6 +73,7 @@ class Settings:
     streetview_api_key: str = ""
     gemini_api_key: str = ""
     resend_api_key: str = ""
+    fred_api_key: str = ""  # optional: free FRED key for live mortgage rates
     # The "from" address on alert emails. Defaults to Resend's shared test sender,
     # which works with no domain setup (it can only email YOUR own Resend account
     # address until you verify a domain). Override with ALERT_FROM_EMAIL once you do.
@@ -112,6 +113,10 @@ class Settings:
     @property
     def has_resend(self) -> bool:
         return bool(self.resend_api_key)
+
+    @property
+    def has_fred(self) -> bool:
+        return bool(self.fred_api_key)
 
     def missing_required_keys(self) -> list[str]:
         """Which REQUIRED keys still need to be filled in (for the UI warning)."""
@@ -192,6 +197,7 @@ def get_settings() -> Settings:
         streetview_api_key=_secret("STREETVIEW_API_KEY"),
         gemini_api_key=_secret("GEMINI_API_KEY"),
         resend_api_key=_secret("RESEND_API_KEY"),
+        fred_api_key=_secret("FRED_API_KEY"),
         alert_from_email=_secret("ALERT_FROM_EMAIL")
         or "Underlisted <onboarding@resend.dev>",
         cities=_read_yaml("cities.yaml"),

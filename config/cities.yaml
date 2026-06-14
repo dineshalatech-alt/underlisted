@@ -1,33 +1,110 @@
 # ------------------------------------------------------------------
-# TARGET CITIES / ZIPS  (Northern California)
+# TARGET CITIES / ZIPS  (nationwide)
 # ------------------------------------------------------------------
 # This is YOURS to edit — no coding needed.
 #
-# To ADD a city: copy one "- name:" block, change the name and state,
-#   and list the zip codes you care about (find them on usps.com).
+# Each city block can have its own "state:" (two-letter code). If you
+# leave a city's state off, it uses the file-level default below.
+#
+# To ADD a city:   copy one "- name:" block, change name + state.
+#   * Give it "zips: [...]" to search exact neighborhoods (more precise), OR
+#   * Give it "zips: []" to search the WHOLE city (simplest).
 # To REMOVE a city: delete its whole "- name:" block.
-# Leave "zips: []" empty to search the whole city.
 #
 # Keep the dashes and indentation exactly as shown.
+# Tip: each city/zip = one API lookup per refresh. The per-run cap
+#      (max_listings_per_city in cache.yaml) keeps cost in check.
 # ------------------------------------------------------------------
 
+# Default state, used only for cities that don't set their own "state:".
 state: CA
 
 targets:
+  # ---- California (original launch region, by zip for precision) ----
   - name: Sacramento
+    state: CA
     zips: ["95820", "95823", "95838", "95824"]
 
   - name: Stockton
+    state: CA
     zips: ["95205", "95206", "95210"]
 
   - name: Modesto
+    state: CA
     zips: ["95351", "95354", "95350"]
 
   - name: Vallejo
+    state: CA
     zips: ["94590", "94591", "94589"]
 
   - name: Antioch
+    state: CA
     zips: ["94509", "94531"]
 
   - name: Oakland
+    state: CA
     zips: ["94601", "94603", "94621"]
+
+  # ---- Nationwide deal-heavy metros (whole-city search) ----
+  # These are affordable, high-inventory, investor-active markets — the
+  # kind most likely to surface genuine "underpriced" homes. Add zips later
+  # to any of them if you want to focus on specific neighborhoods.
+  - name: Houston
+    state: TX
+    zips: []
+
+  - name: San Antonio
+    state: TX
+    zips: []
+
+  - name: Cleveland
+    state: OH
+    zips: []
+
+  - name: Columbus
+    state: OH
+    zips: []
+
+  - name: Indianapolis
+    state: IN
+    zips: []
+
+  - name: Kansas City
+    state: MO
+    zips: []
+
+  - name: St. Louis
+    state: MO
+    zips: []
+
+  - name: Memphis
+    state: TN
+    zips: []
+
+  - name: Birmingham
+    state: AL
+    zips: []
+
+  - name: Jacksonville
+    state: FL
+    zips: []
+
+  - name: Tampa
+    state: FL
+    zips: []
+
+  - name: Atlanta
+    state: GA
+    zips: []
+
+  - name: Charlotte
+    state: NC
+    zips: []
+
+  - name: Pittsburgh
+    state: PA
+    zips: []
+
+  - name: Oklahoma City
+    state: OK
+    zips: []

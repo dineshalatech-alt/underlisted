@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from config.settings import settings
+from src.data_sources import mortgage_rates
 
 CREDIT_BANDS = ["740+", "680-739", "620-679", "580-619", "<580"]
 
@@ -56,10 +57,21 @@ def compute(price: float, *, occupancy: str = "live_in",
     reserves_cfg = f.get("reserves_months", {})
     term = int(f.get("loan_term_years", 30))
 
+    # Base rates: start from the typed config, then overlay the LIVE 30-yr rate if
+    # the worker has fetched it (Freddie Mac / FRED). Reading the cached rate does
+    # NO network call, so this stays safe on page load. The investment premium
+    # (the gap the owner set between the two rates) is preserved on top of live.
+    cfg_primary = float(rates.get("primary_residence", 6.6))
+    cfg_investment = float(rates.get("investment", 7.3))
+    live30 = mortgage_rates.current_30yr_rate()
+    if live30:
+        premium = cfg_investment - cfg_primary
+        cfg_primary, cfg_investment = live30, live30 + premium
+
     # Down payment % + base rate by occupancy/loan type.
     if occupancy == "investment":
         dp_pct = float(dp_cfg.get("investment", {}).get("default", 20))
-        base_rate = float(rates.get("investment", 7.3))
+        base_rate = cfg_investment
         months = int(reserves_cfg.get("investment", 6))
     else:
         live = dp_cfg.get("live_in", {})
@@ -70,7 +82,7 @@ def compute(price: float, *, occupancy: str = "live_in",
             dp_pct = float(live.get("va", 0))
         else:
             dp_pct = float(live.get("conventional", 3))
-        base_rate = float(rates.get("primary_residence", 6.6))
+        base_rate = cfg_primary
         months = int(reserves_cfg.get("live_in", 0))
 
     rate = base_rate + float(bumps.get(credit_band, 0))

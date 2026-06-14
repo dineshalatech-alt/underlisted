@@ -7,9 +7,12 @@
 
 # Yearly interest rates (as percents). The app nudges these UP for
 # lower credit-score bands using "rate_bumps" below.
+# NOTE: once the worker runs, the app uses the LIVE 30-yr rate (free Freddie Mac
+# feed) for primary_residence and keeps your investment "premium" (the gap below)
+# on top of it. These typed numbers are the fallback used until the first refresh.
 interest_rates:
   primary_residence: 6.6     # you'll live in it
-  investment:        7.3     # you'll rent it out
+  investment:        7.3     # you'll rent it out (premium = investment - primary)
 
 # Extra interest added (in percentage points) for weaker credit.
 # Applied on top of the base rate above. 740+ is the baseline (0).

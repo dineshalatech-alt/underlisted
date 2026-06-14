@@ -2,7 +2,8 @@
 Background worker — the automated job that keeps the shared cache fresh.
 
 This is NOT an AI agent. It's a plain scheduled job. On each run it:
-  1. Incrementally fetches new/changed RentCast listings for your NorCal cities.
+  1. Incrementally fetches new/changed RentCast listings for your configured cities
+     (edit the list in config/cities.yaml — nationwide, multi-state).
   2. Refreshes value & rent estimates that have gone stale (per the expiry windows).
   3. Writes everything to the SHARED cache. Users only ever READ from that cache.
 
@@ -23,6 +24,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+import traceback
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -30,7 +32,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from config.settings import settings  # noqa: E402
 from src.cache import backend, db  # noqa: E402
-from src.data_sources import rentcast, streetview, foreclosure, risk, market  # noqa: E402
+from src.data_sources import (  # noqa: E402
+    rentcast, streetview, foreclosure, risk, market, mortgage_rates)
 from src.notify import email_sender  # noqa: E402
 
 
@@ -104,16 +107,19 @@ def run_once(*, full: bool = False, progress=None) -> dict:
         budget = int(cfg.get("max_risk_per_run", 300))
         done = 0
         _log(progress, f"Updating FEMA fire/flood risk (up to {budget})...")
-        for listing in rentcast.load_cached_listings():
-            if listing.latitude is None or listing.longitude is None:
-                continue
-            try:
-                risk.get_risk(listing, cache_only=False)  # free; caches result
-            except Exception as exc:
-                notes.append(f"risk {listing.id}: {exc}")
-            done += 1
-            if done >= budget:
-                break
+        try:
+            for listing in rentcast.load_cached_listings():
+                if listing.latitude is None or listing.longitude is None:
+                    continue
+                try:
+                    risk.get_risk(listing, cache_only=False)  # free; caches result
+                except Exception as exc:
+                    notes.append(f"risk {listing.id}: {exc}")
+                done += 1
+                if done >= budget:
+                    break
+        except Exception as exc:
+            notes.append(f"risk loop: {exc}")
 
     # 1d) Market context — FREE FHFA ZIP price-trend file (refreshes ~yearly).
     if cfg.get("update_market", True) and status != "error":
@@ -123,6 +129,17 @@ def run_once(*, full: bool = False, progress=None) -> dict:
                 _log(progress, f"Refreshed FHFA price-trend data ({n} ZIPs).")
         except Exception as exc:
             notes.append(f"market: {exc}")
+
+    # 1d2) Mortgage rate — FREE Freddie Mac PMMS (weekly 30-yr), powers true monthly cost.
+    if cfg.get("update_mortgage_rate", True) and status != "error":
+        try:
+            info = mortgage_rates.ensure_fresh(
+                max_age_days=int(cfg.get("mortgage_rate_max_age_days", 7)))
+            if info:
+                _log(progress, f"Mortgage rate refreshed: {info.get('rate30')}% "
+                               f"({info.get('source')}, as of {info.get('as_of')}).")
+        except Exception as exc:
+            notes.append(f"mortgage_rate: {exc}")
 
     # 1e) Saved-search alerts — match cached deals, record hits (email dormant).
     if cfg.get("update_alerts", True) and status != "error":
@@ -188,21 +205,24 @@ def run_once(*, full: bool = False, progress=None) -> dict:
     if cfg.get("update_value_rent", True) and status != "error":
         budget = int(cfg.get("max_estimates_per_run", 50))
         _log(progress, f"Refreshing stale value/rent (up to {budget} properties)...")
-        for listing in rentcast.load_cached_listings():
-            calls_at_start = db.total_billable_calls()
-            try:
-                # Each returns instantly from cache if still fresh (no bill);
-                # only stale estimates actually call RentCast.
-                rentcast.get_value_estimate(listing, count_against_user=False)
-                rentcast.get_rent_estimate(listing, count_against_user=False)
-            except Exception as exc:
-                notes.append(f"estimate {listing.id}: {exc}")
-                continue
-            if db.total_billable_calls() > calls_at_start:
-                estimates_updated += 1  # this property had at least one stale estimate
-            if estimates_updated >= budget:  # per-run cost guard
-                _log(progress, f"Hit estimate budget ({budget}); stopping.")
-                break
+        try:
+            for listing in rentcast.load_cached_listings():
+                calls_at_start = db.total_billable_calls()
+                try:
+                    # Each returns instantly from cache if still fresh (no bill);
+                    # only stale estimates actually call RentCast.
+                    rentcast.get_value_estimate(listing, count_against_user=False)
+                    rentcast.get_rent_estimate(listing, count_against_user=False)
+                except Exception as exc:
+                    notes.append(f"estimate {listing.id}: {exc}")
+                    continue
+                if db.total_billable_calls() > calls_at_start:
+                    estimates_updated += 1  # this property had >=1 stale estimate
+                if estimates_updated >= budget:  # per-run cost guard
+                    _log(progress, f"Hit estimate budget ({budget}); stopping.")
+                    break
+        except Exception as exc:
+            notes.append(f"value/rent loop: {exc}")
 
     # 3) Optional photo pre-warm (off by default — images stay lazy).
     if cfg.get("prewarm_photos", False) and status != "error":
@@ -217,21 +237,28 @@ def run_once(*, full: bool = False, progress=None) -> dict:
 
     finished = db.now_iso()
     billable = db.total_billable_calls() - calls_before
+    if notes and status == "ok":
+        status = "ok_with_notes"  # finished, but some sources logged issues
     result = {
         "run_id": run_id, "started_at": started, "finished_at": finished,
         "status": status, "cities": cities, "new_count": summary["new"],
         "updated_count": summary["updated"], "estimates_updated": estimates_updated,
         "billable_calls": billable, "notes": " | ".join(notes)[:1000],
     }
-    db.record_worker_run(result)
+    try:
+        db.record_worker_run(result)
+    except Exception as exc:
+        _log(progress, f"WARNING: could not record run summary: {exc}")
     _log(progress, f"Done. new={summary['new']} updated={summary['updated']} "
                    f"estimates={estimates_updated} billable_calls={billable} "
                    f"status={status}")
+    if notes:
+        _log(progress, "Notes: " + " | ".join(notes)[:1500])
     return result
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="NorCal Deal Finder refresh worker.")
+    parser = argparse.ArgumentParser(description="Underlisted refresh worker.")
     parser.add_argument("--loop", action="store_true",
                         help="Keep running, refreshing every schedule_hours.")
     parser.add_argument("--full", action="store_true",
@@ -239,7 +266,15 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.loop:
-        run_once(full=args.full)
+        try:
+            run_once(full=args.full)
+        except Exception:
+            # Never crash the scheduled job on an unexpected error — print the
+            # full traceback for diagnosis, but exit 0 so the schedule keeps
+            # running and partial data already saved is kept. Details also land
+            # in the worker_runs notes (Admin / Usage page).
+            print("[worker] FATAL — run did not complete cleanly:", flush=True)
+            traceback.print_exc()
         return 0
 
     hours = float(_wcfg().get("schedule_hours", 24))

@@ -138,9 +138,12 @@ def _iter_targets() -> Iterable[tuple[str, str, Optional[str]]]:
     If a city lists zips, we search by zip (more precise). If it has no zips,
     we search the whole city.
     """
-    state = settings.cities.get("state", "CA")
+    default_state = settings.cities.get("state", "CA")
     for target in settings.cities.get("targets", []):
         city = target.get("name")
+        # Each target may set its own "state:"; otherwise fall back to the
+        # file-level default. This is what lets the list span multiple states.
+        state = target.get("state") or default_state
         zips = target.get("zips") or []
         if zips:
             for z in zips:
