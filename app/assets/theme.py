@@ -6,18 +6,32 @@ The app itself stays clean and readable (white surfaces, green accents) — the
 bold full-bleed background art is reserved for the landing/login screens only.
 """
 
-# --- Brand colors ----------------------------------------------------------
-PRIMARY_GREEN = "#1D9E75"   # main accent
-LIGHT_FILL = "#E1F5EE"      # soft green backgrounds
-DEEP_GREEN = "#0F6E56"      # headers, scrim
-INK = "#1F2933"             # main text
-MUTED = "#667085"           # secondary text
+# --- Brand palette: "Warm & trustworthy" -----------------------------------
+# Cream base, warm coral + gold accents, near-black text. Defined in ONE place
+# so every screen stays consistent. (Full color freedom — the old green-only
+# rule is lifted; see .claude/agents/Juliet.md.)
+CORAL = "#FF6B5C"           # primary accent / CTAs
+CORAL_DEEP = "#E2513F"      # pressed / darker coral
+GOLD = "#F2A93B"            # secondary accent / highlights
+CREAM = "#FFFDF8"           # page background
+WARM_FILL = "#FBEFE8"       # soft warm card / section fill
+COCOA = "#2E2A26"           # deep warm dark (hero scrim, footers)
+INK = "#1A1A1A"             # main text (near-black)
+MUTED = "#7A7066"           # secondary text (warm grey)
 SURFACE = "#FFFFFF"
-BORDER = "#E4E7EC"
+BORDER = "#ECE3DA"          # warm hairline border
 
-# Caution colors — reserved ONLY for warnings/bad signals.
-AMBER = "#E08A00"
-RED = "#C0392B"
+# Positive / caution colors — kept meaningful for the deal score & warnings.
+GREEN_GOOD = "#1Fae7a"      # a good deal still reads green (universally trusted)
+AMBER = "#E08A00"           # middling / mild warning
+RED = "#C0392B"             # weak deal / risk warning
+
+# --- Legacy green aliases (other pages still import these) -------------------
+# Kept so Browse Deals / Admin keep working until they're migrated to the warm
+# palette. New work should use the warm names above.
+PRIMARY_GREEN = GREEN_GOOD
+LIGHT_FILL = WARM_FILL
+DEEP_GREEN = COCOA
 
 
 def score_color(score: float) -> str:

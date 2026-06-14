@@ -32,6 +32,8 @@ Thumbs.db
 *.mp4
 *.mov
 *.webm
+# Exception: the small landing-page hero video IS part of the app (must ship).
+!app/static/hero.mp4
 
 # --- Personal / account paperwork — never upload (may contain private info) ---
 *.pdf
