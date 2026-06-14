@@ -1,0 +1,62 @@
+# ------------------------------------------------------------------
+# AFFORDABILITY assumptions — powers the "Can I Afford It?" badge and
+# the Surprise-Cost panel. PURE logic on data we already have:
+# NO RentCast, NO billable API calls.
+#
+# Everything here is an ESTIMATE shown as a labelled RANGE (low–high),
+# never a false-precision single number. Edit freely — these are not
+# selling/payment settings. Tune them as you learn real numbers.
+# ------------------------------------------------------------------
+
+# Property tax — yearly, as a % of the home price. Wide range because it
+# varies a lot by state/county (we don't pull per-county rates here).
+property_tax_pct:
+  low:  0.5
+  high: 2.1
+
+# Homeowners insurance — yearly, as a % of the home price. The HIGH end
+# is bumped automatically when FEMA flags real fire/flood risk (below).
+home_insurance_pct:
+  low:  0.35
+  high: 0.80
+
+# Extra yearly insurance load (percentage points added to BOTH ends)
+# when FEMA risk data flags the home. This is how the insurance-risk
+# warning shows up in real dollars — our moat.
+insurance_risk_bump_pct:
+  high_fire:      0.45
+  moderate_fire:  0.20
+  high_flood:     0.60   # FEMA flood zone — flood insurance is usually required
+
+# PMI (private mortgage insurance) — yearly, as a % of the LOAN amount.
+# Charged on conventional loans when the down payment is under 20%.
+# (FHA has its own MIP; we fold it into this same range for simplicity.)
+pmi_pct:
+  low:  0.4
+  high: 1.2
+pmi_required_below_down_pct: 20   # under 20% down -> PMI applies
+
+# HOA — monthly dollar range. We have no per-home HOA data, so we show a
+# typical range and let the buyer override it with what the listing says.
+hoa_monthly:
+  low:  0
+  high: 350
+
+# Maintenance / upkeep — yearly, as a % of price. A real cost first-time
+# buyers forget; shown in the panel, NOT added to the loan-qualifying math.
+maintenance_pct:
+  low:  0.5
+  high: 1.5
+
+# Affordability verdict thresholds — front-end DTI = housing payment as a
+# % of GROSS monthly income. Standard lender guidance:
+#   green  = comfortable (<= comfortable_pct)
+#   amber  = a stretch    (<= stretch_pct)
+#   red    = over budget   (> stretch_pct)
+# We use the MIDPOINT of the monthly-cost range for the verdict, and also
+# check that money is left over after the payment + their other debts.
+verdict:
+  comfortable_front_dti_pct: 28   # housing alone, % of gross income
+  stretch_front_dti_pct:     36
+  comfortable_total_dti_pct: 36   # housing + their other debts, % of gross
+  stretch_total_dti_pct:     43

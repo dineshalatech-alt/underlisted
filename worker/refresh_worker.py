@@ -33,7 +33,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from config.settings import settings  # noqa: E402
 from src.cache import backend, db  # noqa: E402
 from src.data_sources import (  # noqa: E402
-    rentcast, streetview, foreclosure, risk, market, mortgage_rates, hud_fmr)
+    rentcast, streetview, foreclosure, risk, market, mortgage_rates, hud_fmr,
+    nri, building_permits)
 from src.notify import email_sender  # noqa: E402
 
 
@@ -102,6 +103,16 @@ def run_once(*, full: bool = False, progress=None) -> dict:
         except Exception as exc:
             notes.append(f"foreclosure: {exc}")
 
+    # 1b2) FREE OpenFEMA National Risk Index — county table (refreshes ~yearly).
+    #      Built BEFORE the risk loop so the per-home risk fallback can use it.
+    if cfg.get("update_nri", True) and status != "error":
+        try:
+            n = nri.ensure_fresh(max_age_days=int(cfg.get("nri_max_age_days", 180)))
+            if n:
+                _log(progress, f"Refreshed FEMA NRI county risk data ({n} counties).")
+        except Exception as exc:
+            notes.append(f"nri: {exc}")
+
     # 1c) Risk flags — FREE FEMA fire/flood for cached listings (not billable).
     if cfg.get("update_risk", True) and status != "error":
         budget = int(cfg.get("max_risk_per_run", 300))
@@ -129,6 +140,17 @@ def run_once(*, full: bool = False, progress=None) -> dict:
                 _log(progress, f"Refreshed FHFA price-trend data ({n} ZIPs).")
         except Exception as exc:
             notes.append(f"market: {exc}")
+
+    # 1d1b) Census Building Permits — FREE supply signal ("is this price likely to
+    #       hold"). County annual file, no key, refreshes ~yearly.
+    if cfg.get("update_building_permits", True) and status != "error":
+        try:
+            n = building_permits.ensure_fresh(
+                max_age_days=int(cfg.get("building_permits_max_age_days", 300)))
+            if n:
+                _log(progress, f"Refreshed Census building-permits data ({n} counties).")
+        except Exception as exc:
+            notes.append(f"building_permits: {exc}")
 
     # 1d2) Mortgage rate — FREE Freddie Mac PMMS (weekly 30-yr), powers true monthly cost.
     if cfg.get("update_mortgage_rate", True) and status != "error":

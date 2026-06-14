@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout Report — How a buyer contacts a deal (address &amp; agent)</title>
+<style>
+  :root{
+    --green:#1D9E75; --green-deep:#0F6E56; --fill:#E1F5EE;
+    --amber:#E08A00; --red:#C0392B; --ink:#111; --line:#d9e7e1;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); margin:0; line-height:1.55; background:#fff;}
+  .wrap{max-width:960px; margin:0 auto; padding:32px 22px 80px;}
+  header{border-bottom:4px solid var(--green); padding-bottom:18px; margin-bottom:8px;}
+  .kicker{color:var(--green-deep); font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:13px;}
+  h1{font-size:30px; margin:6px 0 4px;}
+  h2{font-size:21px; color:var(--green-deep); margin-top:38px; border-left:5px solid var(--green); padding-left:12px;}
+  h3{font-size:16px; margin:22px 0 6px;}
+  .meta{color:#555; font-size:13px;}
+  .card{background:var(--fill); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0;}
+  .tldr{background:var(--green); color:#fff; border-radius:12px; padding:18px 20px; margin:18px 0;}
+  .tldr h2{color:#fff; border:0; padding:0; margin:0 0 8px;}
+  .tldr b{color:#fff;}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:14px;}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--green); color:#fff;}
+  tr:nth-child(even) td{background:#f4faf7;}
+  code{background:#eef6f2; padding:1px 6px; border-radius:5px; font-size:13px;}
+  .pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:700;}
+  .rec{background:var(--green); color:#fff;}
+  .maybe{background:var(--amber); color:#fff;}
+  .skip{background:var(--red); color:#fff;}
+  .flag{border-left:5px solid var(--amber); background:#fff8ec; padding:12px 14px; border-radius:8px; margin:14px 0;}
+  .danger{border-left:5px solid var(--red); background:#fdecea; padding:12px 14px; border-radius:8px; margin:14px 0;}
+  ul{margin:8px 0 8px 4px; padding-left:20px;}
+  li{margin:4px 0;}
+  a{color:var(--green-deep);}
+  .src{font-size:13px; color:#555;}
+  .num{font-weight:800; color:var(--green-deep);}
+  footer{margin-top:48px; border-top:1px solid var(--line); padding-top:14px; color:#666; font-size:13px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Scout · Research for Underlisted</div>
+  <h1>How does a buyer actually go act on the deal?</h1>
+  <p class="meta">Finding the address, the contact, and the way to reach them — legally.<br>
+  Prepared by <b>Scout</b> · 2026-06-14 · For <b>Atlas</b> (build) with a note for <b>Serena</b> (positioning)</p>
+</header>
+
+<div class="tldr">
+  <h2>The one-paragraph answer</h2>
+  <p>Good news: <b>we already have what we need, and it's legal.</b> Our existing source
+  <b>RentCast</b> returns the full property <b>address</b> AND a <b>listingAgent</b> and
+  <b>listingOffice</b> block — each with <code>name</code>, <code>phone</code>,
+  <code>email</code>, and <code>website</code>. RentCast's API terms explicitly allow us to
+  <b>display this data to our end users</b> in a paid app, with <b>no attribution required</b>.
+  So the simplest compliant path is: show the agent's name + phone + email right on the deal
+  detail page, with a "Call / Email the listing agent to see this home" button. No scraping,
+  no new account, no new spend. We are <b>not</b> currently mapping those fields — that's the
+  only gap, and it's a small build for Atlas.</p>
+</div>
+
+<h2>1. What contact &amp; address data is legally available to us</h2>
+
+<h3>RentCast (our existing source) — <span class="pill rec">RECOMMEND · already paid for</span></h3>
+<p>This is the headline finding. The RentCast <b>sale listings</b> response includes:</p>
+<table>
+  <tr><th>Field</th><th>What it gives the buyer</th></tr>
+  <tr><td><code>formattedAddress</code></td><td>The full address: <i>Street, Unit, City, State Zip</i>. The buyer can find and drive to the home.</td></tr>
+  <tr><td><code>listingAgent</code> → <code>name</code>, <code>phone</code>, <code>email</code>, <code>website</code></td><td><b>The person to call.</b> The actual listing agent representing the seller.</td></tr>
+  <tr><td><code>listingOffice</code> → <code>name</code>, <code>phone</code>, <code>email</code>, <code>website</code></td><td>The brokerage/office — a fallback contact if the agent line is blank.</td></tr>
+  <tr><td><code>mlsName</code>, <code>mlsNumber</code></td><td>The MLS listing ID — lets a buyer (or their own agent) look the home up officially.</td></tr>
+  <tr><td><code>listingType</code></td><td>Standard / New Construction / Foreclosure / Short Sale — tells the buyer what kind of sale it is.</td></tr>
+</table>
+<div class="card">
+  <b>Why this matters in plain terms:</b> a new data field here is like a phone number printed
+  right on the price tag. The buyer sees the deal, sees who's selling it, and can ring them.
+  We don't have to send them off to Zillow to figure it out.
+</div>
+<p class="flag"><b>Honest caveat (unverified):</b> RentCast pulls from MLS feeds, so the agent/office
+block is present on <b>most</b> for-sale listings but probably <b>not 100%</b> — some records
+may have a blank agent. Plan for that: fall back to <code>listingOffice</code>, then to a
+"find a local agent" link. We can only confirm the real fill-rate once the worker pulls live
+data (RentCast is quota-frozen until <b>July 7</b> — don't run it before then).</p>
+
+<h3>Foreclosure / bank-owned (REO) homes — <span class="pill maybe">MAYBE · weak on contact</span></h3>
+<p>For bank-owned homes the contact question is different. Our (dormant, not-subscribed)
+<b>Foreclosure Data Hub</b> source returns address, owner name, county, sale/auction date,
+bid amount, a Redfin value estimate, and a <b>direct link to the property</b> — but its public
+API docs do <b>not</b> clearly expose an <b>REO agent</b>, bank, or trustee <b>contact</b>.</p>
+<ul>
+  <li>How REO actually works: the bank assigns the property to a local <b>REO listing agent</b>,
+  and you contact <i>that agent</i> (or your own buyer's agent) — you do <b>not</b> cold-call the
+  bank. (Source: RealtyTrac support.)</li>
+  <li>So for foreclosures, the cleanest contact is still the <b>listing agent</b> — which means
+  if/when a foreclosure also appears as an MLS listing, RentCast's <code>listingAgent</code> is
+  again the answer.</li>
+  <li>Foreclosure Data Hub is <b>$49/mo and we are not subscribed</b> (trial expired). I do
+  <b>not</b> recommend paying just to chase a contact field its docs don't even promise.
+  <b>Owner decision if ever wanted</b> — but skip for now.</li>
+</ul>
+
+<h3>Other "how to contact" sources — <span class="pill skip">SKIP / not needed</span></h3>
+<table>
+  <tr><th>Source</th><th>Verdict</th><th>Why</th></tr>
+  <tr><td>Zillow / Redfin / Realtor.com "contact agent" widgets</td><td><span class="pill skip">SKIP — legal risk</span></td><td>Scraping their pages or embedding their contact flow breaks their terms. Hard no. (This is the guardrail.)</td></tr>
+  <tr><td>ATTOM / public county records</td><td><span class="pill skip">SKIP for contact</span></td><td>Give <b>owner</b> name, not the <b>selling</b> agent. Contacting a homeowner who listed with an agent is poor form and edges toward solicitation. Not the buyer's path.</td></tr>
+  <tr><td>"Find an agent" referral networks</td><td><span class="pill maybe">MAYBE (later)</span></td><td>Useful as a <i>fallback</i> when a listing has no agent — and a possible <b>revenue</b> idea for Serena (referral fees). Not needed for v1.</td></tr>
+</table>
+
+<h2>2. What are we ALLOWED to show? (licensing &amp; Fair Housing)</h2>
+
+<div class="card">
+  <b>RentCast API Terms — the green lights:</b>
+  <ul>
+    <li>✅ <b>Display to end users</b> of a commercial app is permitted ("display, resale and
+    distribution of the API Data to third parties").</li>
+    <li>✅ <b>Store it</b> in our cache ("incorporate and store the API Data within your internal
+    systems") — fits our shared-cache model perfectly.</li>
+    <li>✅ <b>No attribution required</b> ("neither use of the RentCast API nor the API Data
+    requires attribution or disclosure").</li>
+  </ul>
+</div>
+
+<div class="flag">
+  <b>The lines we must NOT cross (RentCast Terms):</b>
+  <ul>
+    <li>🚫 No <b>automated</b> outreach. We can <b>show</b> the agent's phone/email so the
+    <i>buyer</i> chooses to contact them. We must <b>not</b> auto-email or bulk-message agents
+    from our system. ("must not send any unsolicited commercial e-mail" / "automated queries".)</li>
+    <li>🚫 No using the data for <b>marketing/solicitation</b> in any state that bans using public
+    info that way. Translation: this is a <b>buyer-facing "here's who to call" feature</b>, not an
+    agent-marketing list.</li>
+    <li>🚫 Don't let third parties scrape the data back out of our app.</li>
+  </ul>
+  <b>Safe design rule:</b> the buyer taps a button → it opens <i>their own</i> phone or email app
+  pre-filled (a <code>tel:</code> or <code>mailto:</code> link). <b>We</b> never send the message;
+  the buyer does. That keeps us clearly on the right side of the "no automated solicitation" line.
+</div>
+
+<div class="danger">
+  <b>⚖️ Fair Housing note (loud, on purpose):</b> showing an address and a listing-agent contact is
+  fine — it's neutral transaction info. The rule we never break is using crime / demographic /
+  "neighborhood quality" / "school" data to <b>score or filter</b> homes. <b>Nothing in this
+  feature touches that.</b> One thing to watch: any pre-filled message template must be plain
+  ("I'd like to see this home") and must never let a buyer filter or ask about the
+  <b>people</b> in an area. Keep templates about the <b>property</b> only.
+</div>
+
+<h2>3. How competitors &amp; normal real-estate sites do it</h2>
+<p>Across Zillow, Trulia, StreetEasy, Redfin and agent sites, there are basically four patterns,
+from heaviest to lightest:</p>
+<table>
+  <tr><th>Pattern</th><th>What it is</th><th>Fit for our beginner / live-in buyer</th></tr>
+  <tr><td><b>"Request a Tour"</b></td><td>Buyer fills a form; platform routes it to an agent (often a <i>paid</i> "premier"/referral agent, not always the listing agent).</td><td>Strongest CTA for ready buyers — but needs a backend + an agent network we don't have. Overkill for v1.</td></tr>
+  <tr><td><b>"Contact Agent" form</b></td><td>A message box that emails the listing agent.</td><td>Good, but building/sending email on the buyer's behalf invites the "automated outreach" risk. Avoid sending it ourselves.</td></tr>
+  <tr><td><b>Show agent + phone/email directly</b></td><td>Display the listing agent's name and number; buyer calls/emails themselves.</td><td><b>Best fit.</b> Simplest, cheapest, zero backend, clearly compliant. This is exactly what RentCast lets us show.</td></tr>
+  <tr><td><b>Link out to the public listing</b></td><td>A button to the home's MLS/listing page.</td><td>Useful as a secondary "see full listing" link — but never a scraped portal. Use the <code>website</code> / MLS number we're licensed for.</td></tr>
+</table>
+<p class="src">Research note: industry guidance says <b>"Request a Tour"</b> converts best for bottom-of-funnel
+buyers, but it assumes an agent-routing backend. For a beginner-simple v1 with no such backend,
+<b>showing the real contact + a one-tap call/email</b> delivers 90% of the value at ~10% of the build.</p>
+
+<h2>4. Plain recommendation — the cheapest compliant path</h2>
+<div class="card">
+  On the deal detail page, under the score, add a small <b>"Go see this home"</b> block:
+  <ol>
+    <li><b>Address</b> (we already get <code>formattedAddress</code>).</li>
+    <li><b>Listing agent:</b> name + brokerage (from <code>listingAgent</code> / <code>listingOffice</code>).</li>
+    <li>Two buttons: <b>📞 Call</b> (a <code>tel:</code> link) and <b>✉️ Email</b> (a
+    <code>mailto:</code> link pre-filled with a plain, property-only message). The buyer's own
+    phone/email app sends it — never ours.</li>
+    <li><b>Fallbacks</b> when the agent block is blank: show the office contact; if that's also
+    blank, show a neutral "Ask a local agent to see this home (MLS #...)" line.</li>
+  </ol>
+  <b>Cost: $0.</b> No new source, no signup, no extra RentCast calls (the agent fields ride along
+  in the listing data we already pull and cache).
+</div>
+
+<h2>Top recommendation for Atlas</h2>
+<div class="tldr">
+  <p><span class="num">①</span> <b>Map the contact fields we're already paying for, and surface
+  them as a one-tap "Call / Email the listing agent" block on the deal page.</b></p>
+  <p>Concretely: in <code>src/data_sources/rentcast.py</code> → <code>raw_to_listing()</code>, read
+  <code>raw["listingAgent"]</code> and <code>raw["listingOffice"]</code> (each has
+  <code>name/phone/email/website</code>); add matching optional fields to the <code>Listing</code>
+  dataclass in <code>src/models.py</code>; render them as <code>tel:</code> / <code>mailto:</code>
+  buttons in <code>app/pages/0_Browse_Deals.py</code>. The buyer sends the message, not us.
+  No scraping, no spend, no new account. (Live fill-rate confirmable only after the
+  <b>July 7</b> RentCast unfreeze.)</p>
+</div>
+
+<h3>Hand-offs</h3>
+<ul>
+  <li><b>Atlas:</b> build the contact block above (small, $0, no RentCast quota cost).</li>
+  <li><b>Serena:</b> two angles — (a) "From deal to doorstep in one tap" is a sharp marketing line;
+  (b) a <b>"find a local agent" referral fallback</b> could later become revenue. Both info-only for now.</li>
+</ul>
+
+<footer>
+  <b>Sources (verified against the source itself where possible):</b>
+  <ul class="src">
+    <li>RentCast — Property Listings Schema (listingAgent/listingOffice sub-fields, formattedAddress): https://developers.rentcast.io/reference/property-listings-schema</li>
+    <li>RentCast — Sept 2024 release notes (new listingAgent / listingOffice / mlsName / mlsNumber / listingType fields): https://developers.rentcast.io/changelog/api-release-2024-09</li>
+    <li>RentCast — API Terms of Use (display permitted, no attribution, no automated solicitation): https://www.rentcast.io/terms-api</li>
+    <li>RentCast — Sale Listings reference: https://developers.rentcast.io/reference/sale-listings</li>
+    <li>Foreclosure Data Hub — API docs (no explicit REO-agent contact field): https://www.foreclosuredatahub.com/api-docs</li>
+    <li>RealtyTrac — how to contact about a bank-owned (REO) home: https://support.realtytrac.com/hc/en-us/articles/200561024</li>
+    <li>Industry CTA patterns ("Request a Tour" vs "Contact Agent") — Zillow touring &amp; agent-site guidance: https://www.zillow.com/buy/touring/ · https://www.agentimage.com/blog/real-estate-website-call-to-action/</li>
+  </ul>
+  Scout · Underlisted research · 2026-06-14
+</footer>
+
+</div>
+</body>
+</html>

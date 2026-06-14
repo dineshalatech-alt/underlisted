@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Underlisted — Research Sweep (Scout) · 2026-06-14</title>
+<style>
+  :root{
+    --green:#1D9E75; --green-deep:#0F6E56; --fill:#E1F5EE;
+    --amber:#E08A00; --red:#C0392B; --ink:#111; --muted:#555; --line:#d9e7e1;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); margin:0; background:#fff; line-height:1.5;}
+  .wrap{max-width:1040px; margin:0 auto; padding:32px 22px 80px;}
+  header{border-bottom:4px solid var(--green); padding-bottom:18px; margin-bottom:8px;}
+  .badge{display:inline-block; background:var(--green); color:#fff; font-weight:700;
+    font-size:12px; letter-spacing:.08em; padding:4px 10px; border-radius:999px;}
+  h1{font-size:26px; margin:12px 0 4px;}
+  h2{font-size:20px; color:var(--green-deep); margin:38px 0 6px; border-left:5px solid var(--green); padding-left:10px;}
+  h3{font-size:15px; margin:22px 0 6px; color:var(--green-deep);}
+  .sub{color:var(--muted); font-size:14px;}
+  p{margin:8px 0;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:13.5px;}
+  th{background:var(--green); color:#fff; text-align:left; padding:8px 9px; font-weight:600;}
+  td{border:1px solid var(--line); padding:8px 9px; vertical-align:top;}
+  tr:nth-child(even) td{background:#f6fbf9;}
+  .pill{display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; white-space:nowrap;}
+  .rec{background:var(--fill); color:var(--green-deep);}
+  .maybe{background:#FCEFD6; color:var(--amber);}
+  .skip{background:#F7DDD9; color:var(--red);}
+  .callout{background:var(--fill); border:1px solid var(--line); border-left:5px solid var(--green);
+    padding:14px 16px; border-radius:8px; margin:16px 0;}
+  .warn{background:#FCEFD6; border-left-color:var(--amber);}
+  .danger{background:#F7DDD9; border-left-color:var(--red);}
+  .top{background:#fff; border:2px solid var(--green); border-radius:10px; padding:16px 18px; margin:14px 0;}
+  .top b{color:var(--green-deep);}
+  ul{margin:6px 0 6px 0; padding-left:20px;}
+  li{margin:4px 0;}
+  a{color:var(--green-deep);}
+  footer{margin-top:50px; border-top:1px solid var(--line); padding-top:14px; font-size:12px; color:var(--muted);}
+  .small{font-size:12px; color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="badge">SCOUT · RESEARCH SWEEP</span>
+  <h1>Underlisted — Fresh Research Sweep</h1>
+  <p class="sub">2026-06-14 · Covers all three hunts: Data sources · Competitors · Marketing places.
+  No money spent, no sign-ups, no scraping. Every claim links to its source.</p>
+</header>
+
+<div class="callout">
+  <b>The one-minute version.</b> While RentCast is frozen (resets July 7), the best free wins are
+  <b>FEMA NRI direct via OpenFEMA</b> (no key, public domain — sharpens our risk moat),
+  <b>Census Building Permits</b> (free, shows new-supply pressure on prices), and the
+  <b>USFS Wildfire Risk to Communities</b> dataset (free, the strongest free wildfire layer).
+  On competitors, the one to watch is <b>Property Deal Finder</b> — a free zip-code "underpriced homes"
+  tool that's our closest look-alike, but it's investor-flavored and has no insurance-risk or
+  affordability angle. On marketing, <b>r/FirstTimeHomeBuyer (~909K)</b> is the richest pond, but it
+  bans self-promo — so we win there by being helpful, not by posting links.
+</div>
+
+<!-- ============================ DATA ============================ -->
+<h2>1 · Data sources — free / low-cost first</h2>
+<p class="sub">Goal: richer, more trustworthy home data without spending while RentCast is paused.
+The most important column is <b>License / ToS</b> — is it legal for us to use this way.</p>
+
+<table>
+  <tr>
+    <th>Source</th><th>Data type</th><th>Coverage</th><th>Freshness</th>
+    <th>Cost</th><th>License / ToS (the key check)</th><th>API?</th><th>Verdict</th>
+  </tr>
+  <tr>
+    <td><b>OpenFEMA — National Risk Index</b><br><span class="small">fema.gov/about/openfema/api</span></td>
+    <td>Fire, flood, quake + 18 hazards (risk score)</td>
+    <td>Nationwide, county + census-tract</td>
+    <td>Periodic gov releases</td>
+    <td><b>Free</b>, no key, no subscription</td>
+    <td><b>Best-in-class.</b> No registration; U.S. Government public data. We already use FEMA NRI —
+        this is the <i>official direct API</i> (vs. however we currently pull it), so no legal risk and
+        more stable.</td>
+    <td>Yes — real REST API + docs</td>
+    <td><span class="pill rec">Recommend</span></td>
+  </tr>
+  <tr>
+    <td><b>USFS Wildfire Risk to Communities</b><br><span class="small">wildfirerisk.org</span></td>
+    <td>Wildfire hazard potential, burn probability, risk-to-homes</td>
+    <td>Nationwide, 30m pixel + community/county</td>
+    <td>Periodic (multi-year model updates)</td>
+    <td><b>Free</b></td>
+    <td>U.S. Forest Service data, public. <b>Catch:</b> file/GIS downloads + image services, <b>no clean
+        JSON API</b>. License terms aren't stated on the download page — Forest Service Research Data
+        Archive should be checked before relying on it. Treat as <b>unverified license</b> until confirmed.</td>
+    <td>Partial — GIS/image only, no JSON</td>
+    <td><span class="pill maybe">Maybe</span></td>
+  </tr>
+  <tr>
+    <td><b>Census — Building Permits Survey (BPS)</b><br><span class="small">census.gov/data/developers</span></td>
+    <td>New housing permits (new-supply signal → price pressure)</td>
+    <td>Nationwide, national/state/local</td>
+    <td>Monthly</td>
+    <td><b>Free</b> (API key required, free)</td>
+    <td><b>Commercial use OK.</b> Must show the notice "This product uses the Census Bureau Data API but
+        is not endorsed or certified by the Census Bureau" and not imply endorsement. Clean, friendly terms.</td>
+    <td>Yes — real REST API</td>
+    <td><span class="pill rec">Recommend</span></td>
+  </tr>
+  <tr>
+    <td><b>Census — ACS (American Community Survey)</b><br><span class="small">census.gov/data/developers</span></td>
+    <td>Income, housing, demographics (display-only)</td>
+    <td>Nationwide</td>
+    <td>Yearly</td>
+    <td><b>Free</b> (free API key)</td>
+    <td>Same friendly Census terms as BPS. <b>Fair-Housing flag:</b> demographics here are
+        <b>INFO-ONLY</b> — must NEVER feed the Deal Score or any filter. Income context for affordability
+        is fine as display; demographics are not.</td>
+    <td>Yes</td>
+    <td><span class="pill maybe">Maybe</span></td>
+  </tr>
+  <tr>
+    <td><b>FRED (St. Louis Fed)</b><br><span class="small">fred.stlouisfed.org</span></td>
+    <td>Mortgage rates, economic series</td>
+    <td>Nationwide</td>
+    <td>Daily/weekly</td>
+    <td><b>Free</b> (free key)</td>
+    <td><b>New restriction worth flagging:</b> FRED's terms now <b>prohibit using FRED content to develop
+        or train any software/ML system, incl. LLMs.</b> We already get the live mortgage rate free from
+        Freddie Mac (no key), so FRED adds little and carries new term risk. <b>Don't bother.</b></td>
+    <td>Yes</td>
+    <td><span class="pill skip">Skip</span></td>
+  </tr>
+  <tr>
+    <td><b>RealEstateAPI.com</b><br><span class="small">realestateapi.com</span></td>
+    <td>Listings, property records, AVM, rent</td>
+    <td>Nationwide (150M+)</td>
+    <td>Frequent</td>
+    <td><b>7-day free trial</b>, then paid (no confirmed permanent free tier)</td>
+    <td><b>Unverified terms.</b> A possible RentCast alternative, but it's a <b>free trial that can
+        auto-convert</b> — do NOT sign up to "test" without owner OK. Pricing not confirmed from source.</td>
+    <td>Yes — modern API</td>
+    <td><span class="pill maybe">Maybe</span></td>
+  </tr>
+  <tr>
+    <td><b>PropMix Public Records API</b><br><span class="small">pubrec.propmix.io</span></td>
+    <td>Property records (tax/deed/owner)</td>
+    <td>Nationwide (155M)</td>
+    <td>Periodic</td>
+    <td>Paid (price not published)</td>
+    <td>Possible cheaper ATTOM alternative for deep records, but <b>no public pricing and unverified
+        terms</b> — report only, decide later.</td>
+    <td>Yes</td>
+    <td><span class="pill maybe">Maybe</span></td>
+  </tr>
+</table>
+
+<div class="callout warn">
+  <b>Why these matter, in plain words.</b> A data source is just a new helper that stocks better shelves.
+  OpenFEMA + USFS make our <i>insurance-risk warning</i> (a core moat) more credible. Census Building
+  Permits tells us where lots of new homes are being built — useful context for "is this price likely to
+  hold." None of these cost a cent, and all are usable while RentCast is frozen because they're not
+  listings feeds — they <i>enrich</i> homes we already have.
+</div>
+
+<!-- ============================ COMPETITORS ============================ -->
+<h2>2 · Competitors — what's new, and where we still win</h2>
+<p class="sub">Known already: DealScanner, PropertyDealFinder. New/notable this sweep below.</p>
+
+<table>
+  <tr>
+    <th>Tool</th><th>What it does</th><th>Audience</th><th>Pricing</th>
+    <th>Their angle</th><th>Their weakness (our opening)</th>
+  </tr>
+  <tr>
+    <td><b>Property Deal Finder</b><br><span class="small">propertydealfinder.com</span></td>
+    <td>Type a city/zip → shows homes listed below two AVM models; shows $/sqft, cap rate, rent est.</td>
+    <td>Mixed — leans beginner investor</td>
+    <td><b>Free</b> (promo code for more searches)</td>
+    <td>Solo data-scientist build; "spot deals fast, not replace your judgment"</td>
+    <td><b>Closest look-alike to us.</b> But: no <b>insurance-risk</b> warning, no <b>"Can I Afford It?"</b>
+        affordability, investor metrics (cap rate) over owner-occupant plain English. We out-simplify and
+        out-trust it.</td>
+  </tr>
+  <tr>
+    <td><b>DealWorthIt</b><br><span class="small">dealworthit.com</span></td>
+    <td>AI deal analysis on 150M+ properties: underwriting, ROI/IRR/equity multiple</td>
+    <td><b>Investors only</b> (wholesalers, flippers, syndicators)</td>
+    <td><b>$59 / $99 / $299</b> per month</td>
+    <td>Speed + automated underwriting for pros</td>
+    <td>Not for home buyers at all. No deal-score-for-living, no insurance risk, no affordability.
+        Pricey. Confirms the gap we sit in.</td>
+  </tr>
+  <tr>
+    <td><b>DealScanner</b> (known)<br><span class="small">dealscanner.io</span></td>
+    <td>Instant ARV, rent, rehab, max offer</td>
+    <td>Fix-&-flip / BRRRR investors</td>
+    <td>Paid</td>
+    <td>Flip math, fast</td>
+    <td>Pure investor flip tool. Zero overlap with the live-in buyer we serve.</td>
+  </tr>
+  <tr>
+    <td><b>Property Deals Insight</b><br><span class="small">propertydealsinsight.com</span></td>
+    <td>AI finds discounted / off-market deals "in seconds"</td>
+    <td>Investors</td>
+    <td>Paid (unconfirmed)</td>
+    <td>Off-market sourcing</td>
+    <td>Off-market/wholesaler focus, not retail buyers. No affordability or insurance lens.</td>
+  </tr>
+</table>
+
+<div class="top">
+  <b>Where our moat still wins (every competitor this sweep):</b>
+  <ul>
+    <li><b>Audience:</b> they all serve <i>investors</i>; we serve the person who'll <b>live</b> in the home.</li>
+    <li><b>Insurance-risk warning:</b> none of them flag fire/flood insurance cost. We do — and FEMA/USFS make it stronger.</li>
+    <li><b>"Can I Afford It?":</b> none answer "can <i>you</i> afford <i>this</i> home" with cash-needed + monthly-left. This is our build-next moat.</li>
+    <li><b>Plain English:</b> they show cap rate/IRR; we show a green score and what it means.</li>
+  </ul>
+  <span class="small">Watch item for Serena: Property Deal Finder is free and gaining word-of-mouth on Reddit/Blind. It's the one whose <i>positioning</i> overlaps ours most — keep an eye on it.</span>
+</div>
+
+<!-- ============================ MARKETING ============================ -->
+<h2>3 · Marketing places — where our buyers gather</h2>
+<p class="sub">Audience size + the all-important posting rules. We win by being helpful, never spammy.</p>
+
+<table>
+  <tr>
+    <th>Place</th><th>Who's there</th><th>Size</th><th>Self-promo rules</th><th>How we'd actually win there</th>
+  </tr>
+  <tr>
+    <td><b>r/FirstTimeHomeBuyer</b></td>
+    <td>First-time buyers — our exact primary audience</td>
+    <td>~909K members</td>
+    <td><b>Strict — no self-promotion / link drops.</b> Mods remove it.</td>
+    <td>Be the genuinely helpful regular: answer "is this a good deal?" / "what will insurance cost?"
+        threads with real value. Brand grows by reputation, not links.</td>
+  </tr>
+  <tr>
+    <td><b>r/RealEstate</b></td>
+    <td>Buyers + sellers + agents, broad</td>
+    <td>Very large (millions)</td>
+    <td>No self-promo; heavily modded</td>
+    <td>Helpful answers only; occasional data-insight posts (e.g. "most overpriced metros") can do well if no link.</td>
+  </tr>
+  <tr>
+    <td><b>BiggerPockets — First-Time Home Buyer forum</b></td>
+    <td>Beginners (buyer + beginner investor = our secondary too)</td>
+    <td>~2M forum members</td>
+    <td>Promo restricted; value-first culture</td>
+    <td>Long-form helpful answers + profile presence. Strong for the beginner-investor wedge.</td>
+  </tr>
+  <tr>
+    <td><b>BiggerPockets — Real Estate Rookie (FB group + podcast)</b></td>
+    <td>Total beginners</td>
+    <td>Large, active</td>
+    <td>Group rules vary; no spam</td>
+    <td>Engage in group; a podcast guest spot/mention is high-trust reach.</td>
+  </tr>
+  <tr>
+    <td><b>Team Blind (real estate / personal finance)</b></td>
+    <td>Tech workers buying first homes (high income, data-savvy)</td>
+    <td>Large</td>
+    <td>Tolerates "I built a tool" posts more than Reddit (Property Deal Finder launched here)</td>
+    <td>An honest "I built this to spot underpriced homes + insurance risk" post fits the culture. Good launch pad.</td>
+  </tr>
+  <tr>
+    <td><b>HousingWire / first-time-buyer newsletters</b></td>
+    <td>Industry + engaged buyers</td>
+    <td>Newsletter reach</td>
+    <td>Editorial / paid placement</td>
+    <td>Pitch a data story (e.g. "10 metros where homes are most underpriced") for a mention — earned media.</td>
+  </tr>
+</table>
+
+<div class="callout danger">
+  <b>The honest warning on Reddit.</b> r/FirstTimeHomeBuyer is the biggest, perfect-fit pond — but it
+  <b>bans self-promotion</b>. Dropping a link gets removed and can get the account banned, which hurts the
+  brand. The play is patience: be the helpful regular who answers deal/insurance questions. Reputation,
+  not links. Team Blind is the friendlier place for an honest "I built this" launch post.
+</div>
+
+<!-- ============================ TOP PICKS ============================ -->
+<h2>Top recommendation for each area</h2>
+
+<div class="top">
+  <b>🟢 DATA — top pick: wire FEMA NRI via the official OpenFEMA API + add Census Building Permits.</b><br>
+  Both free, both with clean/clear terms, both usable right now while RentCast is frozen because they
+  enrich homes rather than fetch listings. OpenFEMA hardens our insurance-risk moat; Building Permits adds
+  honest "is this price likely to hold" context. <i>Hand to <b>Atlas</b> — same fetch→map→cache pattern as rentcast.py.</i>
+</div>
+
+<div class="top">
+  <b>🟢 COMPETITORS — top pick: watch Property Deal Finder; build the "Can I Afford It?" moat faster.</b><br>
+  It's our closest free look-alike, but it has no insurance-risk and no affordability answer. The
+  affordability badge (already approved, needs no RentCast) is exactly what no competitor offers.
+  <i>Hand to <b>Serena</b> (positioning) and confirms <b>Atlas</b>'s build-next.</i>
+</div>
+
+<div class="top">
+  <b>🟢 MARKETING — top pick: become the helpful regular in r/FirstTimeHomeBuyer; soft-launch on Team Blind.</b><br>
+  Biggest perfect-fit audience (~909K) — but no-promo, so win by helping. Team Blind welcomes an honest
+  "I built this" post (it's where Property Deal Finder got traction). <i>Hand to <b>Serena</b>.</i>
+</div>
+
+<!-- ============================ SOURCES ============================ -->
+<h2>Sources</h2>
+<ul class="small">
+  <li><a href="https://www.fema.gov/about/openfema/api">OpenFEMA API (free, no key)</a></li>
+  <li><a href="https://www.fema.gov/about/openfema/terms-conditions">OpenFEMA Terms & Conditions</a></li>
+  <li><a href="https://www.fema.gov/flood-maps/products-tools/national-risk-index">FEMA National Risk Index</a></li>
+  <li><a href="https://wildfirerisk.org/download/">USFS Wildfire Risk to Communities — download</a></li>
+  <li><a href="https://www.census.gov/data/developers/about/terms-of-service.html">Census Data API — Terms of Service</a></li>
+  <li><a href="https://www.census.gov/data/developers/data-sets/acs-5year.html">Census ACS 5-Year API</a></li>
+  <li><a href="https://www.census.gov/permits">Census Building Permits Survey</a></li>
+  <li><a href="https://www.realestateapi.com/">RealEstateAPI.com</a></li>
+  <li><a href="https://pubrec.propmix.io/">PropMix Public Records API</a></li>
+  <li><a href="https://www.propertydealfinder.com/">Property Deal Finder</a></li>
+  <li><a href="https://dealworthit.com/">DealWorthIt (pricing $59/$99/$299)</a></li>
+  <li><a href="https://www.dealscanner.io/">DealScanner</a></li>
+  <li><a href="https://www.propertydealsinsight.com/find-analyse-profitable-property-deals-in-seconds-ai-powered-deal-finder/">Property Deals Insight</a></li>
+  <li><a href="https://thehiveindex.com/communities/r-firsttimehomebuyer/">r/FirstTimeHomeBuyer (~909K)</a></li>
+  <li><a href="https://www.biggerpockets.com/forums/903">BiggerPockets — First-Time Home Buyer forum</a></li>
+  <li><a href="https://www.housingwire.com/articles/real-estate-newsletters/">HousingWire — real estate newsletters</a></li>
+  <li><a href="https://www.teamblind.com/post/i-built-a-tool-that-finds-underpriced-properties-by-zip-code-thoughts-urkynfp6">Team Blind — Property Deal Finder launch post</a></li>
+</ul>
+
+<footer>
+  Prepared by <b>Scout</b> (research) for Underlisted · 2026-06-14 · No money spent, no sign-ups, no scraping.
+  Brand green #1D9E75. Companion register: <b>research/data_sources/DATA_SOURCE_REGISTER.xlsx</b>.
+  Items marked "unverified" could not be confirmed from the source itself — confirm before relying on them.
+</footer>
+
+</div>
+</body>
+</html>

@@ -5,6 +5,26 @@
  a{color:#0F6E56}
  .hero{background:linear-gradient(135deg,#0F6E56,#1D9E75);color:#fff;border-radius:18px;padding:26px 22px}
  .hero h1{margin:.2rem 0;font-size:1.8rem} .hero p{color:#EAFBF4;margin:.2rem 0}
+ /* Video hero: the owner's animation as a full-bleed background with a warm
+    gradient scrim so the headline + CTA stay crisp over any video frame. */
+ .hero-video{position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(135deg,#0F6E56,#1D9E75);
+   color:#fff;min-height:360px;display:flex;align-items:flex-end;
+   box-shadow:0 18px 50px rgba(15,110,86,.28)}
+ .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+ .hero-video .scrim{position:absolute;inset:0;z-index:1;
+   background:linear-gradient(180deg,rgba(15,110,86,.10) 0%,rgba(15,110,86,.30) 45%,rgba(11,42,33,.82) 100%)}
+ .hero-video .hero-content{position:relative;z-index:2;padding:30px 26px;max-width:640px}
+ .hero-video h1{margin:.1rem 0;font-size:2.3rem;line-height:1.12;
+   text-shadow:0 2px 18px rgba(0,0,0,.35)}
+ .hero-video p{color:#F1FBF7;margin:.5rem 0 0;font-size:1.08rem;
+   text-shadow:0 1px 10px rgba(0,0,0,.35)}
+ .hero-video .cta{margin-top:16px;font-size:1.05rem;padding:13px 22px;
+   box-shadow:0 8px 22px rgba(29,158,117,.5)}
+ @media (max-width:640px){
+   .hero-video{min-height:300px}
+   .hero-video h1{font-size:1.7rem}
+   .hero-video .hero-content{padding:22px 18px}
+ }
  .card{background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:14px;margin:12px 0;display:flex;gap:14px;align-items:center}
  .gauge{width:54px;height:54px;border-radius:12px;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex:0 0 auto}
  .price{font-size:1.25rem;font-weight:800;color:#0F6E56}
@@ -20,4 +40,33 @@
  .waitlist input[type=email]{flex:1;min-width:220px;padding:12px;border:1px solid #0F6E56;border-radius:10px;font-size:1rem}
  .waitlist button{background:#1D9E75;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer}
  .foot{color:#9AA4AC;font-size:.8rem;margin:24px 0;text-align:center}
-</style></head><body><div class='wrap'><div class='hero'><h1>Find under-priced U.S. homes</h1><p>Browse the best home deals by city — scored 0–100, with fire/flood insurance risk and the cash you'd really need.</p><a class='cta' href='#early-access'>Get early access →</a></div><p style='margin:6px 0'><a href='report-underpriced.html'>See the most underpriced homes right now →</a></p><h3>Deals by city</h3><div class='grid'><a href='deals-in-atlanta.html'>Best deals in Atlanta <span class='muted'>(1 homes)</span></a><a href='deals-in-cleveland.html'>Best deals in Cleveland <span class='muted'>(1 homes)</span></a><a href='deals-in-sacramento.html'>Best deals in Sacramento <span class='muted'>(8 homes)</span></a></div><div class='waitlist' id='early-access'><h3>🔑 Get early access</h3><p>Be first in line when we open up — and lock in <b>$12.99/mo for a year</b> (the price is rising to $44.99 soon). No spam, just your invite.</p><form name='waitlist' method='POST' data-netlify='true' netlify-honeypot='bot-field' action='/thanks.html'><input type='hidden' name='form-name' value='waitlist'/><p style='display:none'><label>Leave blank: <input name='bot-field'/></label></p><input type='email' name='email' placeholder='you@email.com' required/><button type='submit'>Join the waitlist →</button></form></div><p class='foot'>Estimates only — a screening tool, not advice. Fair Housing: scoring never uses demographic or neighborhood-quality signals.</p></div></body></html>
+ /* Top nav — same on every page so people can always find "Learn the basics". */
+ .nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:6px 2px 14px}
+ .nav .brand{font-weight:800;font-size:1.15rem;color:#0F6E56;text-decoration:none;margin-right:auto}
+ .nav a{text-decoration:none;color:#1F2933;font-weight:600;font-size:.96rem}
+ .nav a:hover{color:#0F6E56}
+ .nav a.here{color:#0F6E56;border-bottom:2px solid #1D9E75;padding-bottom:2px}
+ /* Learn page — warm, friendly teaching cards. */
+ .learn-intro{background:#FFF8EE;border:1px solid #F3E2C4;border-radius:16px;padding:20px 22px;margin:8px 0 18px}
+ .learn-intro h1{margin:.1rem 0 .4rem;font-size:1.85rem;color:#0F6E56}
+ .learn-intro p{margin:.3rem 0;color:#1F2933;font-size:1.05rem;line-height:1.5}
+ .toc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+ .toc a{display:inline-block;background:#fff;border:1px solid #E4E7EC;border-radius:999px;
+   padding:7px 13px;font-size:.88rem;font-weight:600;color:#0F6E56;text-decoration:none}
+ .toc a:hover{background:#E1F5EE;border-color:#C7EBDD}
+ .term{background:#fff;border:1px solid #E4E7EC;border-left:5px solid #1D9E75;border-radius:14px;
+   padding:16px 18px;margin:12px 0;scroll-margin-top:14px}
+ .term h2{margin:.1rem 0 .5rem;font-size:1.22rem;color:#1F2933;display:flex;align-items:center;gap:9px}
+ .term .ic{font-size:1.3rem;line-height:1}
+ .term p{margin:.35rem 0;color:#1F2933;line-height:1.55;font-size:1.02rem}
+ .term .eg{background:#F6FBF9;border:1px dashed #BFE6D6;border-radius:10px;padding:9px 12px;
+   margin:.6rem 0 .1rem;color:#33524A;font-size:.97rem}
+ .term .eg b{color:#0F6E56}
+ .term.warnterm{border-left-color:#E08A00}
+ .term.warnterm .eg{background:#FFF8EE;border-color:#F3D9A8;color:#6b5320}
+ .term.warnterm .eg b{color:#E08A00}
+ .scorekey{display:flex;gap:8px;flex-wrap:wrap;margin:.5rem 0 .2rem}
+ .scorekey span{display:inline-flex;align-items:center;gap:7px;border-radius:999px;
+   padding:5px 12px;font-weight:700;font-size:.9rem;color:#fff}
+ .scorekey .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.85);display:inline-block}
+</style></head><body><div class='wrap'><nav class='nav'><a class='brand' href='index.html'>Underlisted</a><a href='index.html' class='here'>Deals</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html'>Learn the basics</a><a href='index.html#early-access'>Get early access</a></nav><div class='hero-video'><video autoplay muted loop playsinline preload='auto' aria-label='Underlisted — finding under-priced U.S. homes'><source src='assets/hero.mp4' type='video/mp4'></video><div class='scrim'></div><div class='hero-content'><h1>Find under-priced U.S. homes</h1><p>Every home gets a plain-English deal score (0–100) — with fire/flood insurance risk and the cash you'd really need. No spreadsheets.</p><a class='cta' href='#early-access'>Get early access →</a></div></div><p style='margin:6px 0'><a href='report-underpriced.html'>See the most underpriced homes right now →</a></p><p style='margin:6px 0'><a href='learn.html'>New to all this? Learn the basics in plain English (free) →</a></p><h3>Deals by city</h3><div class='grid'><a href='deals-in-atlanta.html'>Best deals in Atlanta <span class='muted'>(1 homes)</span></a><a href='deals-in-cleveland.html'>Best deals in Cleveland <span class='muted'>(1 homes)</span></a><a href='deals-in-sacramento.html'>Best deals in Sacramento <span class='muted'>(8 homes)</span></a></div><div class='waitlist' id='early-access'><h3>🔑 Get early access</h3><p>Be first in line when we open up — and lock in <b>$12.99/mo for a year</b> (the price is rising to $44.99 soon). No spam, just your invite.</p><form name='waitlist' method='POST' data-netlify='true' netlify-honeypot='bot-field' action='/thanks.html'><input type='hidden' name='form-name' value='waitlist'/><p style='display:none'><label>Leave blank: <input name='bot-field'/></label></p><input type='email' name='email' placeholder='you@email.com' required/><button type='submit'>Join the waitlist →</button></form></div><p class='foot'>Estimates only — a screening tool, not advice. Fair Housing: scoring never uses demographic or neighborhood-quality signals.</p></div></body></html>

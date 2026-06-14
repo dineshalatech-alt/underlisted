@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "DM Sans", system-ui, sans-serif;
+    background: #FBF7F2; color: #2B211B; padding: 22px 26px;
+  }
+  .top { text-align: center; margin-bottom: 14px; }
+  .center-pill {
+    display: inline-block; padding: 12px 34px; border-radius: 999px;
+    background: linear-gradient(135deg, #E07A3F 0%, #D4A017 100%);
+    color: #fff; font-size: 30px; font-weight: 800; letter-spacing: 1px;
+    box-shadow: 0 6px 18px rgba(224,122,63,.35);
+  }
+  .tag { margin-top: 8px; font-size: 14px; color: #6B5B4F; font-style: italic; }
+  .flow {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin: 14px 0 18px; flex-wrap: wrap;
+  }
+  .flow .pill {
+    background: #fff; border: 2px solid #E7D9C9; border-radius: 10px;
+    padding: 7px 14px; font-weight: 700; font-size: 13px; color: #4A3A2E;
+    box-shadow: 0 2px 5px rgba(0,0,0,.05);
+  }
+  .flow .arr { color: #C08A4A; font-size: 20px; font-weight: 800; }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; align-items: start;
+  }
+  .card {
+    background: var(--tint); border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(0,0,0,.06);
+    border-top: 6px solid var(--accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  }
+  .card header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px 4px;
+  }
+  .ttl { font-size: 15px; font-weight: 800; color: #2B211B; }
+  .ic { font-size: 17px; }
+  .badge {
+    background: var(--accent); color: #fff; font-size: 11px; font-weight: 800;
+    padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .sub {
+    padding: 0 14px 8px; font-size: 12px; color: #7A6A5C;
+    font-style: italic; font-weight: 600;
+  }
+  ul { list-style: none; padding: 0 14px 14px; }
+  li {
+    display: flex; gap: 8px; align-items: flex-start;
+    background: #fff; border-radius: 8px; padding: 8px 10px;
+    margin-top: 6px; font-size: 12.5px; line-height: 1.35;
+    border-left: 3px solid #ccc;
+  }
+  li.done { border-left-color: #2E9E6B; }
+  li.wait { border-left-color: #E08A00; }
+  li.idea { border-left-color: #9B6BB0; background: #FBF6FF; }
+  .mk { font-size: 13px; }
+  .tx { color: #3A2E25; }
+
+  .legend {
+    margin-top: 16px; display: flex; justify-content: center; gap: 22px;
+    font-size: 12.5px; color: #5A4A3E; font-weight: 600;
+  }
+  .legend span b { font-weight: 800; }
+</style></head>
+<body>
+  <div class="top">
+    <div class="center-pill">🏡 UNDERLISTED</div>
+    <div class="tag">We tell you which U.S. homes are actually good deals — and why.</div>
+  </div>
+  <div class="flow"><span class="pill">FUEL  (homes in)</span><span class="arr">→</span><span class="pill">MAGIC  (we score them)</span><span class="arr">→</span><span class="pill">FRONT DOOR  (customer sees)</span><span class="arr">→</span><span class="pill">MONEY  (they subscribe)</span></div>
+  <div class="grid">
+      <section class="card" style="--accent:#E07A3F; --tint:#FCEDE3;">
+        <header>
+          <div class="ttl"><span class="ic">⛽</span> A.  Where the homes come from</div>
+          <div class="badge">5/7 built</div>
+        </header>
+        <div class="sub">the FUEL — no homes, nothing to show</div>
+        <ul><li class="wait"><span class="mk">⏳</span><span class="tx">RentCast — the PAID source of real listings (price + value + rent). The ONE paid thing.</span></li><li class="wait"><span class="mk">⏳</span><span class="tx">RentCast is EMPTY now (quota maxed) — refills FREE on July 7, or pay to unlock sooner.</span></li><li class="done"><span class="mk">✅</span><span class="tx">FEMA fire / flood risk — FREE (powers the insurance warning)</span></li><li class="done"><span class="mk">✅</span><span class="tx">Census Building Permits — FREE (will the price hold?)</span></li><li class="done"><span class="mk">✅</span><span class="tx">FHFA price trend — FREE (is the area going up or down?)</span></li><li class="done"><span class="mk">✅</span><span class="tx">Freddie Mac live mortgage rate — FREE (today's real rate)</span></li><li class="done"><span class="mk">✅</span><span class="tx">HUD Fair Market Rents — FREE (backup rent estimate)</span></li></ul>
+      </section>
+      <section class="card" style="--accent:#D4A017; --tint:#FBF3D9;">
+        <header>
+          <div class="ttl"><span class="ic">✨</span> B.  What we DO with the homes</div>
+          <div class="badge">5/5 built</div>
+        </header>
+        <div class="sub">the MAGIC / our moat — all FREE math on top</div>
+        <ul><li class="done"><span class="mk">✅</span><span class="tx">Deal Score 0–100 (green = good deal)</span></li><li class="done"><span class="mk">✅</span><span class="tx">Insurance-risk warning (fire / flood) — never blank now</span></li><li class="done"><span class="mk">✅</span><span class="tx">"Can I afford it?" badge (income/cash/debts → green/amber/red + money left each month)</span></li><li class="done"><span class="mk">✅</span><span class="tx">Surprise-cost panel (tax, insurance, PMI, HOA) as honest ranges</span></li><li class="done"><span class="mk">✅</span><span class="tx">Plain "why this score" sentence</span></li></ul>
+      </section>
+      <section class="card" style="--accent:#3FA796; --tint:#E2F3EF;">
+        <header>
+          <div class="ttl"><span class="ic">🚪</span> C.  What the customer sees & does</div>
+          <div class="badge">3/5 built</div>
+        </header>
+        <div class="sub">the FRONT DOOR</div>
+        <ul><li class="done"><span class="mk">✅</span><span class="tx">The app (Streamlit) — LIVE</span></li><li class="done"><span class="mk">✅</span><span class="tx">The public website (SEO site) — LIVE</span></li><li class="done"><span class="mk">✅</span><span class="tx">Waitlist email capture — LIVE</span></li><li class="idea"><span class="mk">💡</span><span class="tx">How a buyer contacts the seller/bank & finds the address to go see the home</span></li><li class="idea"><span class="mk">💡</span><span class="tx">Free "What does this mean?" learn-in-plain-English section</span></li></ul>
+      </section>
+      <section class="card" style="--accent:#9B6BB0; --tint:#F1E7F5;">
+        <header>
+          <div class="ttl"><span class="ic">💳</span> D.  How they pay</div>
+          <div class="badge">1/2 built</div>
+        </header>
+        <div class="sub">the MONEY</div>
+        <ul><li class="wait"><span class="mk">⏳</span><span class="tx">Payhip subscribe button — BUILT, dormant until a link is pasted in</span></li><li class="done"><span class="mk">✅</span><span class="tx">Founding price $18.99 / month</span></li></ul>
+      </section>
+      <section class="card" style="--accent:#C0653C; --tint:#F8E8DF;">
+        <header>
+          <div class="ttl"><span class="ic">🚦</span> E.  Status / what blocks go-live</div>
+          <div class="badge">2/4 built</div>
+        </header>
+        <div class="sub">where we are right now</div>
+        <ul><li class="done"><span class="mk">✅</span><span class="tx">DONE: affordability moat + 2 free data sources</span></li><li class="done"><span class="mk">✅</span><span class="tx">DONE: live app, live website, live email alerts</span></li><li class="wait"><span class="mk">⏳</span><span class="tx">BLOCKED until July 7: fill database with real nationwide homes (needs RentCast)</span></li><li class="wait"><span class="mk">⏳</span><span class="tx">THEN: switch payment on and go live</span></li></ul>
+      </section></div>
+  <div class="legend">
+    <span><b>✅ Done</b> — built &amp; working</span>
+    <span><b>⏳ Waiting</b> — blocked / not switched on yet</span>
+    <span><b>💡 New idea</b> — being researched</span>
+  </div>
+</body></html>

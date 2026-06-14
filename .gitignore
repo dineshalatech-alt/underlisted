@@ -37,3 +37,6 @@ Thumbs.db
 
 # --- Personal / account paperwork — never upload (may contain private info) ---
 *.pdf
+
+# Local Netlify folder
+.netlify

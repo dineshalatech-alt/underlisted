@@ -55,6 +55,11 @@ _SCHEMA = [
         search_id TEXT, listing_id TEXT, address TEXT, score INTEGER, matched_at TEXT,
         notified INTEGER DEFAULT 0,
         PRIMARY KEY (search_id, listing_id))""",
+    # Per-user affordability inputs (income/cash/debts) so the "Can I Afford It?"
+    # badge remembers them between visits. ONE row per user. Personal money figures
+    # — never logged or printed anywhere; stored only so the convenience works.
+    """CREATE TABLE IF NOT EXISTS user_prefs (
+        user_id TEXT PRIMARY KEY, payload TEXT, updated_at TEXT)""",
 ]
 
 # Columns added after the tables first shipped. ALTER ... ADD COLUMN works on both
@@ -276,6 +281,35 @@ def get_meta(key: str) -> str | None:
     with connect() as conn:
         row = conn.execute("SELECT value FROM meta WHERE key = ?", (key,)).fetchone()
         return row["value"] if row else None
+
+
+# --- Per-user affordability prefs (income/cash/debts) -----------------------
+# PRIVACY: these are personal money figures. We store them ONLY so the
+# "Can I Afford It?" badge remembers them. We never log or print the values.
+
+def save_user_prefs(user_id: str, prefs: dict) -> None:
+    """Save a user's affordability inputs (a small dict). Overwrites the row."""
+    with connect() as conn:
+        conn.execute(
+            "INSERT INTO user_prefs (user_id, payload, updated_at) VALUES (?, ?, ?) "
+            "ON CONFLICT(user_id) DO UPDATE SET payload=excluded.payload, "
+            "updated_at=excluded.updated_at",
+            (user_id, json.dumps(prefs), now_iso()),
+        )
+
+
+def get_user_prefs(user_id: str) -> dict:
+    """Return the user's saved affordability inputs, or {} if none."""
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT payload FROM user_prefs WHERE user_id = ?", (user_id,)
+        ).fetchone()
+    if not row or not row["payload"]:
+        return {}
+    try:
+        return json.loads(row["payload"])
+    except (ValueError, TypeError):
+        return {}
 
 
 # --- Listings + price-drop detection ---------------------------------------

@@ -4,6 +4,133 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## FREE "Learn the basics" glossary page on the website — 2026-06-14 (Juliet)
+
+- **Owner's ask:** "just like I don't understand what you say, customers won't — explain it
+  like teaching a kid." Built a free, friendly, plain-English glossary page. Teaching page,
+  NOT a sales page (no waitlist form on it).
+- **New page: `site/learn.html`** — explains all 12 terms we actually show buyers, each in
+  1–3 short sentences with a tiny example: Deal Score (with a green/amber/red key),
+  underpriced/undervalued, estimated value, insurance-risk (fire/flood), true monthly cost,
+  PMI, HOA, property tax, cash to close / down payment, "Can I afford it?" (green/amber/red),
+  days on market, mortgage rate. Everyday words; any jargon is defined right there.
+- **Edited the GENERATOR, not the output** so it survives rebuilds (`tools/gen_site.py`):
+  added `LEARN_TERMS` content, `learn_page_body()`, a shared `nav_html()` top nav (Deals ·
+  Most underpriced · **Learn the basics** · Get early access) now on every page, warm teaching
+  CSS (`.learn-intro`, `.toc` jump-pills, `.term` cards, amber `.warnterm` for the insurance
+  card, `.scorekey`), and a `waitlist=`/`here=` flag on `page()`. Linked Learn from the index
+  hub too.
+- **On-brand & legible:** matches the site's green/cream look; insurance card uses the caution
+  amber so risk reads as a gentle warning, not alarm. Big readable text, generous spacing,
+  tap-to-jump table of contents. Footer Fair-Housing/disclaimer line carries through.
+- **SEO bonus:** ranks for "what is a deal score / PMI / HOA / cash to close" style searches —
+  free search entry points.
+- **Verify:** `py_compile` OK; rebuilt site (7 pages incl. `learn.html`); Playwright
+  screenshots `.tmp/learn_top.png` + `.tmp/learn_full.png` confirm the look. No billable API
+  calls (generator reads `app/sample_data.py` only).
+- **To view:** open `site/learn.html` in a browser (double-click), or it goes live on the next
+  Netlify deploy (drag the `site/` folder onto Netlify → Deploys).
+- **Files changed:** `tools/gen_site.py`; regenerated `site/*.html` (new `site/learn.html`,
+  plus index/report/city pages picked up the shared nav). PROGRESS.md (this entry).
+
+---
+
+## Two FREE data sources added (NRI hardening + Census permits) — 2026-06-14 (Atlas)
+
+- **Built two free, no-billing enrichment sources Scout flagged** — usable NOW while RentCast is
+  quota-frozen until July 7. Both follow the existing source pattern (fetch → tiny local file →
+  app reads with NO network on page load), both degrade gracefully, neither touches RentCast.
+- **`src/data_sources/nri.py` — OpenFEMA National Risk Index (county level).** FREE, no key,
+  public-domain. The NRI isn't in OpenFEMA's REST API (that covers disaster/NFIP/grant data only),
+  so I used FEMA's published **NRI Counties feature layer** — the official direct NRI feed, same
+  dataset `risk.py` already queries point-by-point. Pulls all ~3,232 counties once into
+  `data/nri_counties.json` (wildfire / flood [worse of coastal+inland] / earthquake / overall
+  ratings). **Hardens the insurance-risk moat:** `risk.py` now fills any BLANK from a per-point
+  tract query with the county rating, so the fire/flood warning is never empty (rural gaps,
+  off-coast coords, or a brief tract-service outage). County FIPS resolved free via the FCC Area
+  API (lat/lon → FIPS), cached forever. Never overwrites a more-specific tract value.
+- **`src/data_sources/building_permits.py` — Census Building Permits (supply signal).** FREE,
+  public-domain, commercial use OK **with the required attribution notice** (baked in:
+  "not endorsed or certified by the U.S. Census Bureau"). Downloads the BPS **county annual file**
+  (no key) once into `data/building_permits.json`; gives a plain "is this price likely to hold"
+  note (lots of new building → fresh supply can cap prices; little building → supply supports
+  prices). **No key needed** to work; an optional free `CENSUS_API_KEY` (noted in `.env.example`)
+  only unlocks the live Census API later. Owner does NOT have to do anything for this to run.
+- **Census API gotcha logged:** the keyed Census REST API returns HTTP **200 with an HTML
+  "Missing Key" body** (not a 4xx) — a trap if you only check the status code. The keyless flat
+  file avoids it entirely, so we shipped that as the default.
+- **Wired into the worker** (`worker/refresh_worker.py`): NRI refresh runs *before* the risk loop;
+  building-permits next to the market refresh. Both `ensure_fresh()` (skip if recent), both
+  wrapped so a hiccup is noted but never fails the run. Config flags: `update_nri`,
+  `update_building_permits` (+ max-age days), all default on.
+- **Tests:** `tests/test_free_sources.py` — 9 pure-logic tests (parsing real-shaped BPS/NRI data,
+  supply categorisation, the "fill blanks, never overwrite" risk merge, and graceful no-data
+  degradation). **9/9 pass; affordability suite still 10/10.**
+- **Live smoke test (no billable calls):** NRI counties layer returned clean ratings; Census BPS
+  pulled the **2025** annual file = 3,029 counties (LA County 22,250 units → correct note +
+  attribution). `data/building_permits.json` is committed like the other `data/*.json` files so
+  the cloud app gets the signal without waiting for a worker run.
+- **Files:** new `src/data_sources/nri.py`, `src/data_sources/building_permits.py`,
+  `tests/test_free_sources.py`; edited `src/data_sources/risk.py`, `worker/refresh_worker.py`,
+  `config/settings.py` (+`census_api_key`/`has_census`), `.env.example`.
+- **Also:** ran Scout's `.tmp/update_register.py` — appended 7 rows to the Data Sources tab of
+  `research/data_sources/DATA_SOURCE_REGISTER.xlsx` (Competitors/Marketing tabs live in a
+  different register, so those warnings are expected).
+- **Owner to do:** nothing required. *Optional later:* grab a free Census key
+  (https://api.census.gov/data/key_signup.html) → paste into `.env` / Streamlit Secrets as
+  `CENSUS_API_KEY` if we ever want the live Census API. Not needed today.
+
+## Video hero on the public website — 2026-06-14 (Juliet)
+
+- **Owner asked to make the Kling animation the centerpiece of the landing page** ("it tells
+  everything"). Done: the website index hero is now the animated U.S.-map video.
+- **Edited the GENERATOR, not the output** (`tools/gen_site.py`) so it survives rebuilds:
+  - New `.hero-video` CSS — full-bleed `<video>` with `object-fit:cover`, rounded 22px corners,
+    a deep-teal→ink gradient **scrim** over it so the white headline + green CTA stay legible on
+    any frame, soft shadow, and a mobile breakpoint (≤640px).
+  - Index hero markup now renders `<video autoplay muted loop playsinline preload='auto'>` →
+    `assets/hero.mp4`, with the headline + "Get early access →" CTA overlaid. Gradient still shows
+    as the background/fallback if the video can't load.
+  - New `copy_assets` step copies the root mp4 to `site/assets/hero.mp4` on every build.
+- **Asset:** `site/assets/hero.mp4` (~12 MB, from `Smoothly_animate_from_the_firs_Kling_30__78676.mp4`).
+- **Verified** with Playwright screenshots at desktop (980px) and mobile (390px) — both read clean.
+- **Untouched:** waitlist/Netlify form, all selling/pricing copy, city + report heroes (still calm text).
+- **Owner to do:** re-deploy by dragging the `site/` folder onto Netlify → Deploys (ships the ~12 MB video).
+
+## "Can I Afford It?" moat BUILT — 2026-06-14 (Atlas)
+
+- **Owner approved the #1 RESUME-HERE item.** Built the affordability moat — the differentiator
+  no competitor offers the plain-English first-time buyer. **Zero RentCast / zero billable calls**
+  (pure arithmetic on the list price + config + the FREE FEMA risk flags we already cache).
+- **New `config/affordability.yaml`** — all editable assumptions as honest low–high RANGES: property
+  tax %, home-insurance %, PMI %, HOA $, maintenance %, plus FEMA fire/flood **insurance-risk bumps**
+  and the green/amber/red DTI thresholds. No magic numbers in code. (Not selling/payment logic.)
+- **New `src/affordability/afford.py`** — two pure functions:
+  - `monthly_costs()` → the TRUE monthly cost of THIS home, broken into the surprise costs buyers
+    forget (tax, insurance, PMI-when-down<20%, HOA, upkeep), **each a labelled range, never false
+    precision**. Insurance HIGH end is **bumped when FEMA flags fire/flood** — the moat in real $.
+  - `verdict()` → buyer enters income/cash/debts → **green / amber / red** + "you'd have ~$X–$Y left
+    each month", judged on the midpoint of the housing range vs. standard lender DTI. A cash-to-close
+    gap downgrades from green. Personal inputs are arguments only — never logged/printed.
+- **`src/cache/db.py`** — added a small **`user_prefs`** table (one row/user) + `save_user_prefs` /
+  `get_user_prefs` so the badge remembers income/cash/debts between visits. PRIVACY: values are never
+  logged or printed; saving is opt-in via a checkbox.
+- **`app/pages/0_Browse_Deals.py`** — in the detail view, a new **"Can I afford it?"** section:
+  Surprise-Cost panel (true monthly cost rows + "what each cost is"), the **personal yes/maybe/no
+  badge** (3 inputs, remembered on opt-in), and a **plain one-line "why this score"** banner above
+  the existing factor breakdown. Reuses the occupancy/loan/credit selectors already on the page.
+- **`config/settings.py`** — loads `affordability.yaml` into `settings.affordability`.
+- **New `tests/test_affordability.py`** — 10 pure-logic tests (ranges ordered, PMI gating, FEMA
+  insurance bump, green/amber/red verdicts, cash-gap downgrade, debts lower leftover). **All pass.**
+- ✅ Verified: `py_compile` clean on all changed files; 10/10 tests pass; `user_prefs` round-trips in
+  the local DB; **Streamlit AppTest** drives the feed AND the detail view with **0 exceptions** and
+  confirms "Can I afford it?", "True monthly cost", and the plain-English why-line all render.
+  **0 billable calls.** Payment/Payhip/landing logic untouched; no saved data format broken.
+- **Owner action to verify visually:** run the app and open any home → scroll to "Can I afford it?"
+  Type a monthly income to see the green/amber/red badge. (Local run command in the next-action note.)
+
+---
+
 ## Landing → "Why Underlisted" content section added — 2026-06-14 (Juliet)
 
 - **Owner wanted our reasons-to-choose-us on the landing**, clean/simple/organized, with the

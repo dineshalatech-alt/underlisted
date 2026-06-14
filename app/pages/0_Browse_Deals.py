@@ -21,6 +21,8 @@ from config.settings import settings  # noqa: E402
 from src import metrics  # noqa: E402
 from src.data_sources import rentcast, market  # noqa: E402
 from src.financing import cash_needed  # noqa: E402
+from src.affordability import afford  # noqa: E402
+from src.cache import db  # noqa: E402
 from app.assets.theme import (APP_CSS, DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL,  # noqa: E402
                               MUTED, AMBER, RED, score_color)
 from app.icons import TABLER_CSS, ic  # noqa: E402
@@ -53,6 +55,17 @@ FEED_CSS = f"""
   .photo {{ height:200px; border-radius:14px; background:{LIGHT_FILL};
             display:flex; align-items:center; justify-content:center; }}
   .cashbig {{ font-size:1.9rem; font-weight:850; color:{DEEP_GREEN}; }}
+  .afford {{ border-radius:14px; padding:14px 16px; margin:6px 0 4px; }}
+  .afford .verdict {{ font-size:1.25rem; font-weight:850; }}
+  .afford .sub {{ font-size:1.0rem; margin-top:2px; }}
+  .costrow {{ display:flex; justify-content:space-between; align-items:baseline;
+              padding:7px 0; border-bottom:1px solid #EEE8DF; }}
+  .costrow .lbl {{ font-weight:700; color:#1F2933; }}
+  .costrow .amt {{ font-weight:800; color:{DEEP_GREEN}; white-space:nowrap; }}
+  .costtot {{ display:flex; justify-content:space-between; align-items:baseline;
+              padding:10px 0 2px; font-size:1.15rem; }}
+  .costtot .lbl {{ font-weight:850; }}
+  .costtot .amt {{ font-weight:850; color:{DEEP_GREEN}; }}
 </style>
 """
 st.markdown(APP_CSS + TABLER_CSS + FEED_CSS, unsafe_allow_html=True)
@@ -86,6 +99,29 @@ def _why_bar(score) -> str:
     segs = "".join(f"<div style='width:{f.points/tot*100:.1f}%;"
                    f"background:{FACTOR_COLORS.get(f.key, MUTED)}'></div>" for f in used)
     return f"<div class='whybar'>{segs}</div>"
+
+
+def _why_in_plain_english(score) -> str:
+    """One plain sentence: the single biggest reason behind the score."""
+    used = [f for f in score.used_factors if f.points > 0]
+    if not used:
+        return ("We don't have enough data on this home yet to score it well — "
+                "treat the number as a rough first look.")
+    top = max(used, key=lambda f: f.points)
+    lead = {
+        "value_discount": "Mostly because it's listed below its estimated value",
+        "rent_yield": "Mostly because the rent it could earn is strong for the price",
+        "days_on_market": "Mostly because it's sat on the market a while "
+                          "(more room to negotiate)",
+        "risk": "Helped by low fire/flood risk here",
+    }.get(top.key, f"Mostly from: {top.label}")
+    if score.total >= score.threshold:
+        verdict = "this looks like a good deal."
+    elif score.total >= 45:
+        verdict = "it's worth a look, but not a standout."
+    else:
+        verdict = "it's a below-average deal at this price."
+    return f"{lead} — {verdict}"
 
 
 def _photo_placeholder() -> str:
@@ -194,6 +230,111 @@ def _risk_badges(risk) -> str:
     return " ".join(pills)
 
 
+# --- "Can I Afford It?" — the affordability moat (zero API calls) ----------
+_BAND_STYLE = {
+    "green": (PRIMARY_GREEN, LIGHT_FILL, "check"),
+    "amber": (AMBER, "#FBE9C7", "shield"),
+    "red":   (RED, "#FBE9E4", "shield"),
+}
+
+
+def _money_range(r) -> str:
+    """A labelled low–high range like '$1,800–$2,300/mo' (never false precision)."""
+    if abs(r.high - r.low) < 1:
+        return f"{money(r.low)}/mo"
+    return f"{money(r.low)}–{money(r.high)}/mo"
+
+
+def _verdict_badge(v) -> str:
+    color, bg, icon = _BAND_STYLE.get(v.band, _BAND_STYLE["amber"])
+    return (f"<div class='afford' style='background:{bg};border:1px solid {color}33'>"
+            f"<div class='verdict' style='color:{color}'>{ic(icon,22,color)} "
+            f"{v.headline}</div>"
+            f"<div class='sub' style='color:#475467'>"
+            + " ".join(v.reasons) + "</div></div>")
+
+
+def _cost_rows(mc) -> str:
+    """Surprise-cost panel rows: P&I + each labelled range. Honest ranges only."""
+    rows = [f"<div class='costrow'><span class='lbl'>Loan payment "
+            f"(principal + interest)</span>"
+            f"<span class='amt'>{money(mc.principal_interest)}/mo</span></div>"]
+    for it in mc.items:
+        if not it.counts_in_payment:
+            continue
+        rows.append(f"<div class='costrow'><span class='lbl'>{it.label}</span>"
+                    f"<span class='amt'>{_money_range(it.monthly)}</span></div>")
+    hp = mc.housing_payment
+    rows.append(f"<div class='costtot'><span class='lbl'>True monthly cost</span>"
+                f"<span class='amt'>{_money_range(hp)}</span></div>")
+    return "".join(rows)
+
+
+def _render_afford(l, occupancy, loan_type, band, risk) -> None:
+    """The 'Can I Afford It?' moat: true monthly cost + personal yes/no badge.
+
+    Pure logic — NO API calls. Personal inputs are kept out of logs; we only
+    save them (opt-in) to the per-user prefs row so they persist between visits.
+    """
+    price = l.list_price or 0
+    st.markdown(f"#### {ic('wallet',22,DEEP_GREEN)} Can I afford it?",
+                unsafe_allow_html=True)
+
+    # --- Surprise-Cost panel: the true monthly cost, honest ranges ---
+    hoa_known = st.toggle("I know this home's HOA dues", key=f"hoatog_{l.id}")
+    hoa_val = None
+    if hoa_known:
+        hoa_val = st.number_input("HOA dues ($/month)", min_value=0, max_value=5000,
+                                  value=0, step=25, key=f"hoa_{l.id}")
+    mc = afford.monthly_costs(price, occupancy=occupancy, loan_type=loan_type,
+                              credit_band=band, risk=risk, hoa_monthly=hoa_val)
+    st.markdown(_cost_rows(mc), unsafe_allow_html=True)
+    st.caption("The surprise costs first-time buyers forget — each shown as an honest "
+               "low–high range, not a single pretend number.")
+    with st.expander("What each cost is"):
+        for it in mc.items:
+            st.markdown(f"**{it.label}** — {it.note}")
+        st.caption("Upkeep & repairs aren't part of the lender's payment, but they're "
+                   "real money — budget for them too.")
+
+    # --- Personal affordability badge: green / amber / red ---
+    prefs = db.get_user_prefs(settings.current_user_id) or {}
+    st.markdown("**Your numbers** — get a personal yes / maybe / no for THIS home.")
+    a, b, c = st.columns(3)
+    income = a.number_input("Your gross monthly income ($)", min_value=0,
+                            max_value=200000, step=250,
+                            value=int(prefs.get("gross_monthly_income", 0) or 0),
+                            key=f"inc_{l.id}",
+                            help="Before taxes. Add a co-buyer's income too.")
+    cash = b.number_input("Cash you have for buying ($)", min_value=0,
+                          max_value=5000000, step=1000,
+                          value=int(prefs.get("cash_available", 0) or 0),
+                          key=f"cash_{l.id}",
+                          help="Savings you can put toward down payment + closing.")
+    debts = c.number_input("Other monthly debts ($)", min_value=0,
+                           max_value=100000, step=50,
+                           value=int(prefs.get("monthly_debts", 0) or 0),
+                           key=f"debt_{l.id}",
+                           help="Car, student loans, credit cards, etc. NOT this home.")
+
+    if income > 0:
+        v = afford.verdict(price, gross_monthly_income=income,
+                           cash_available=(cash if cash > 0 else None),
+                           monthly_debts=debts, occupancy=occupancy,
+                           loan_type=loan_type, credit_band=band, risk=risk,
+                           hoa_monthly=hoa_val)
+        st.markdown(_verdict_badge(v), unsafe_allow_html=True)
+        st.caption("A rough screen, not a loan decision. Lenders look at your full "
+                   "picture — talk to one before you commit.")
+        if st.checkbox("Remember my numbers on this device", key=f"save_{l.id}"):
+            # Stored to persist convenience; never logged or printed.
+            db.save_user_prefs(settings.current_user_id, {
+                "gross_monthly_income": income, "cash_available": cash,
+                "monthly_debts": debts})
+    else:
+        st.info("Enter your monthly income above to see if this home fits your budget.")
+
+
 # ===========================================================================
 # DETAIL
 # ===========================================================================
@@ -263,6 +404,13 @@ def render_detail(row) -> None:
         st.write("A 0–100 rating of how good a deal this looks — mostly how far "
                  "below its estimated value it's listed, plus rent yield. Higher "
                  "= better. It's a screening guide, not a guarantee.")
+    # Plain-English, one-line "why this score" — the biggest reason in words.
+    plain = _why_in_plain_english(score)
+    if plain:
+        st.markdown(f"<div style='background:{LIGHT_FILL};color:{DEEP_GREEN};"
+                    f"padding:10px 14px;border-radius:10px;font-weight:600;"
+                    f"margin:4px 0 8px'>{ic('info',16,DEEP_GREEN)} {plain}</div>",
+                    unsafe_allow_html=True)
     st.markdown(f"##### Why it scored {score.total}")
     st.markdown(_why_bar(score), unsafe_allow_html=True)
     for f in score.factors:
@@ -364,6 +512,9 @@ def render_detail(row) -> None:
                      help="Rough yearly return after assumed expenses.")
         st.caption("DTI note: lenders also check your debt-to-income ratio — your "
                    "monthly debts vs. income. Ask a lender for your number.")
+
+    st.divider()
+    _render_afford(l, occupancy, loan_type, band, row.get("risk"))
 
     st.divider()
     st.caption("All figures are ESTIMATES to help you screen homes — not advice, an "

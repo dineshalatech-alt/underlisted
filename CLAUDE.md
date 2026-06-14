@@ -25,10 +25,11 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 
 ---
 
-## 2. Current status (2026-06-14)
+## 2. Current status (2026-06-14, updated)
 
 | Piece | Status |
 |---|---|
+| 🧮 **"Can I Afford It?" moat** (afford badge + Surprise-Cost panel + plain "why this score") | ✅ **BUILT** — `src/affordability/afford.py` (pure logic, **0 billable calls**), `config/affordability.yaml`, `user_prefs` table in `db.py`, wired into `0_Browse_Deals.py` detail view. 10/10 tests pass; AppTest clean. Buyer enters income/cash/debts → green/amber/red + "$X left/mo"; true monthly cost as honest ranges; insurance bumps on FEMA fire/flood. |
 | 🌐 Public SEO site + **waitlist email capture** (Netlify Forms) | ✅ Live |
 | 🏷️ Own domain **underlistedhomes.com** (A `@`→75.2.60.5, CNAME `www`→netlify) | ✅ Connected (HTTPS finishing) |
 | 📧 **Email alerts** (Resend) | ✅ Live (test-sender only until a domain is verified in Resend) |
@@ -39,7 +40,7 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 | 🗄️ Hosted **Postgres** (Supabase) + `DATABASE_URL` | ✅ **LIVE** — connected via **Session pooler** (`postgres.nemvzwcxlhyjsjaappkt@aws-1-us-east-1.pooler.supabase.com:5432`). `DATABASE_URL` in Streamlit Secrets; Admin/Usage shows backend = **PostgreSQL**. Fixed a Postgres transaction-abort bug (migrations now run each in their own transaction — `src/cache/db.py:connect()`). DB connected but **empty** until the worker runs. |
 | 🔁 Auto-refresh **worker** (GitHub Actions cron) | ✅ **Code complete** (`.github/workflows/refresh.yml` + `worker/refresh_worker.py`, daily/manual). ⏳ Not switched on yet — needs GitHub Actions Secrets, and **RentCast quota is maxed → worker PAUSED until July 7 reset** (don't run before then = overage). Fills shared Postgres when on. |
 | 💳 **Payment button** | ✅ **Built** — config-driven Payhip "Subscribe" button, dormant until a link is pasted into `config/cache.yaml: checkout_url`. Founding price **$18.99/mo** (landing). Never change selling logic without asking. |
-| 🗂️ **Data sources** (mostly free) | ✅ Live: RentCast (listings/value/rent), FEMA risk, FHFA trend, **live mortgage rate** (Freddie Mac, no key), **HUD Fair Market Rents** (free fallback rent). Nationwide = **12 states**. Paid options (ATTOM/HouseCanary/First Street) await owner OK — see `research/data_sources/`. |
+| 🗂️ **Data sources** (mostly free) | ✅ Live: RentCast (listings/value/rent), FEMA risk, FHFA trend, **live mortgage rate** (Freddie Mac, no key), **HUD Fair Market Rents** (free fallback rent). **+ NEW free, no-billing (2026-06-14):** **OpenFEMA National Risk Index — county layer** (`src/data_sources/nri.py`; fills any blank in per-point FEMA risk so the insurance warning is never empty) and **Census Building Permits** (`src/data_sources/building_permits.py`; "is this price likely to hold" supply note, no key, attribution baked in; optional free `CENSUS_API_KEY` unlocks the live API). Both degrade gracefully; both wired into the worker. Nationwide = **12 states**. Paid options (ATTOM/HouseCanary/First Street) await owner OK — see `research/data_sources/`. |
 | 🧭 **Strategy / moat** | ✅ Set: *for buyers who'll LIVE in the home, not flip it* + insurance-risk + **"Can I Afford It?"** = the moat to build next. See `develop/`. |
 | 🎨 **Design** | Landing is **dark-luxe** (black + DM Sans + gold) with a **"Why Underlisted"** section; warm palette still on other pages. Owned by **Juliet**. |
 
@@ -47,13 +48,15 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 
 ## 3. The plan / next steps (in order)
 
-1. **Build the "Can I Afford It?" moat** ← **RESUME HERE.** Owner approved. Personal affordability
-   badge (enter income/cash/debts → green/amber/red + "you'd have $X left/month") + a **Surprise-Cost**
-   panel (insurance range, property tax, PMI, HOA) + a plain "why this score". Highest-leverage
-   differentiator and needs **NO RentCast** (logic on data we already have). Files Atlas flagged:
-   `src/cache/db.py` (small user-prefs table), `app/pages/0_Browse_Deals.py` (badges), the deal-score
-   module. Show estimates as labelled ranges (trust); keep personal inputs out of logs.
-2. **RentCast upgrade** — quota maxed; **paused until July 7 reset** (or upgrade sooner: Foundation
+1. ✅ **"Can I Afford It?" moat — DONE (2026-06-14).** Personal green/amber/red badge (income/cash/debts
+   → verdict + "$X–$Y left/month") + Surprise-Cost panel (tax, insurance, PMI, HOA, upkeep as honest
+   ranges; insurance bumps on FEMA fire/flood) + a plain one-line "why this score". **0 billable calls.**
+   `src/affordability/afford.py`, `config/affordability.yaml`, `user_prefs` table + helpers in
+   `src/cache/db.py`, wired into `app/pages/0_Browse_Deals.py` detail view. `tests/test_affordability.py`
+   (10/10 pass). **Next polish (later):** per-county tax rate (free Census/state data) to tighten the
+   tax range; mirror a teaser of the badge into the free `2_Check_A_Deal.py` funnel.
+2. **RentCast upgrade** ← **RESUME HERE for paid go-live.** Quota maxed; **paused until July 7 reset**
+   (or upgrade sooner: Foundation
    $74/1,000 req, Growth $199/5,000). Then I run ONE controlled worker test to fill the DB with real
    nationwide homes. The #1 paid step. **Don't run the worker before this is sorted (overage).**
 3. **Go-live gate** — after RentCast: add GitHub Actions Secrets + run the worker; create the Payhip
@@ -90,7 +93,9 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
 - `src/cache/backend.py` (SQLite/Postgres switch) · `src/cache/db.py` (schema, cache,
   listings, saved_searches/alert_log, usage).
 - `src/data_sources/` — `rentcast.py` (listings/value/rent, billable), `foreclosure.py`
-  (bank-owned, dormant until key), `risk.py` (FREE FEMA fire/flood/quake), `market.py`
+  (bank-owned, dormant until key), `risk.py` (FREE FEMA fire/flood/quake; now backfilled by
+  the county NRI), `nri.py` (FREE OpenFEMA National Risk Index county table — hardens risk),
+  `building_permits.py` (FREE Census Building Permits supply signal, no key), `market.py`
   (FREE FHFA ZIP price trend), `streetview.py` (photos, 403 parked).
 - `src/notify/email_sender.py` — Resend sender + alert digest.
 - `worker/refresh_worker.py` — background refresh: listings → foreclosure → risk → market →
@@ -131,7 +136,9 @@ Hook: *"Lock in $12.99/mo for a year — the price is rising to $44.99 soon."*
   Red `#C0392B` for warnings only. Logo: `app/assets/logo.png`.
 - **Fair Housing:** scoring/filtering must NEVER use demographic or "neighborhood-quality"
   signals. Crime/demographic data is info-only, never scored.
-- **Data sources:** licensed APIs only — never scrape Zillow/Redfin/Realtor/competitors.
+- **Data sources:** licensed APIs and **public / legally-permitted sources** are OK
+  (e.g. government & open-data pages, including via a scraper like Firecrawl). Do **not**
+  scrape competitor listing sites (Zillow/Redfin/Realtor) — their Terms of Service forbid it.
 - **Windows/PowerShell:** run Python via `.venv/Scripts/python.exe`. Hooks/scripts must be
   cross-platform.
 - **Don't break saved data formats** or touch selling/payment/landing logic without asking.

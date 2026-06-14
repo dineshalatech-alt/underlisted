@@ -21,6 +21,7 @@ import requests
 
 from config.settings import settings
 from src.cache import db
+from src.data_sources import nri
 from src.models import Listing, RiskFlags
 
 # FEMA NFHL — layer 28 = Flood Hazard Zones (S_FLD_HAZ_AR), field FLD_ZONE.
@@ -29,6 +30,9 @@ NFHL_URL = ("https://hazards.fema.gov/arcgis/rest/services/public/NFHL/"
 # FEMA National Risk Index — census tracts; WFIR_RISKR = wildfire risk rating.
 NRI_URL = ("https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/"
            "National_Risk_Index_Census_Tracts/FeatureServer/0/query")
+# FCC Area API — free, no key: a lat/lon -> its county FIPS (for the NRI county
+# fallback below). The result never changes for a point, so we cache it forever.
+FCC_AREA_URL = "https://geo.fcc.gov/api/census/area"
 TIMEOUT = 25
 
 
@@ -97,12 +101,67 @@ def _note(fire_cat: str, flood_zone: Optional[str], flood_cat: str,
     elif fire_cat == "Moderate":
         notes.append("Some wildfire risk — check the insurance cost.")
     if flood_cat == "High":
-        notes.append(f"In a FEMA flood zone ({flood_zone}) — flood insurance is likely "
-                     "required and adds to the monthly cost.")
+        if flood_zone:
+            notes.append(f"In a FEMA flood zone ({flood_zone}) — flood insurance is "
+                         "likely required and adds to the monthly cost.")
+        else:
+            notes.append("High flood risk for this county (FEMA) — budget for flood "
+                         "insurance; it adds to the monthly cost.")
+    elif flood_cat == "Moderate":
+        notes.append("Some flood risk for this county (FEMA) — check the flood-"
+                     "insurance cost.")
     if quake_cat == "High":
         notes.append("High earthquake risk — earthquake insurance is usually a separate, "
                      "pricey policy.")
     return " ".join(notes) or None
+
+
+def _county_fips(lat: float, lon: float) -> Optional[str]:
+    """The 5-digit county FIPS for a point (FREE FCC lookup), cached forever."""
+    ck = f"fips:{round(float(lat), 4)},{round(float(lon), 4)}"
+    cached = db.cache_get(ck)  # no TTL — a coordinate's county never changes
+    if cached is not None:
+        return cached or None
+    try:
+        resp = requests.get(FCC_AREA_URL, params={"lat": lat, "lon": lon,
+                            "format": "json"}, timeout=TIMEOUT)
+        resp.raise_for_status()
+        results = resp.json().get("results", []) or []
+        fips = (results[0].get("county_fips") if results else None) or ""
+    except Exception:
+        return None  # FCC down -> just skip the county fallback, never crash
+    db.cache_put(ck, "fips", fips)
+    return fips or None
+
+
+def _merge_county_fallback(raw: dict, lat: float, lon: float) -> dict:
+    """
+    Fill any MISSING NRI rating in `raw` from the FREE county-level NRI table.
+    The per-point tract query is preferred; this only fills the blanks so a
+    buyer's insurance-risk warning is never empty. No-op if county data isn't
+    built yet or we can't resolve the county. Never overwrites a tract value.
+    """
+    if not nri.has_data():
+        return raw
+    if raw.get("wildfire") and raw.get("flood_zone") and raw.get("overall"):
+        return raw  # tract layer already gave us everything we need
+    fips = _county_fips(lat, lon)
+    if not fips:
+        return raw
+    c = nri.county_risk(fips)
+    if not c:
+        return raw
+    if not raw.get("wildfire") and c.get("wildfire"):
+        raw["wildfire"] = c["wildfire"]
+    if not raw.get("earthquake") and c.get("earthquake"):
+        raw["earthquake"] = c["earthquake"]
+    if not raw.get("overall") and c.get("overall"):
+        raw["overall"] = c["overall"]
+    # Flood: the tract FLD_ZONE (e.g. "AE") is more specific; only when it's
+    # missing do we fall back to the county flood RATING (e.g. "Relatively High").
+    if not raw.get("flood_zone") and c.get("flood"):
+        raw["county_flood"] = c["flood"]
+    return raw
 
 
 def get_risk(listing: Listing, *, cache_only: bool = False) -> RiskFlags:
@@ -129,17 +188,22 @@ def get_risk(listing: Listing, *, cache_only: bool = False) -> RiskFlags:
         except Exception:
             zone = None
         try:
-            nri = _nri(lat, lon)
+            nri_pt = _nri(lat, lon)
         except Exception:
-            nri = {}
-        raw = {"flood_zone": zone, "wildfire": nri.get("wildfire"),
-               "earthquake": nri.get("earthquake"), "overall": nri.get("overall")}
+            nri_pt = {}
+        raw = {"flood_zone": zone, "wildfire": nri_pt.get("wildfire"),
+               "earthquake": nri_pt.get("earthquake"), "overall": nri_pt.get("overall")}
+        # FREE county-level NRI fills any blanks the per-point query left.
+        raw = _merge_county_fallback(raw, lat, lon)
         db.cache_put(ck, "risk", raw)
 
     fire_cat = _norm_fire(raw.get("wildfire"))
     quake_cat = _norm_fire(raw.get("earthquake"))
     flood_zone = raw.get("flood_zone")
     flood_cat = _flood_cat(flood_zone)
+    # No specific FEMA flood zone? Use the county flood RATING as a softer signal.
+    if flood_zone is None and raw.get("county_flood"):
+        flood_cat = _norm_fire(raw["county_flood"])
     return RiskFlags(fire_zone=fire_cat, flood_zone=flood_cat, quake_zone=quake_cat,
                      overall_risk=raw.get("overall"),
                      insurance_note=_note(fire_cat, flood_zone, flood_cat, quake_cat))

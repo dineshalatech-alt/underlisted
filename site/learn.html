@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Learn the basics — home-buying words in plain English | Underlisted</title><meta name='description' content='A free, plain-English glossary for first-time home buyers: deal score, underpriced, estimated value, true monthly cost, PMI, HOA, property tax, cash to close, days on market, mortgage rate and insurance risk — explained simply.'>
+<style>
+ body{margin:0;background:#F2F4F5;color:#1F2933;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+ .wrap{max-width:900px;margin:0 auto;padding:22px}
+ a{color:#0F6E56}
+ .hero{background:linear-gradient(135deg,#0F6E56,#1D9E75);color:#fff;border-radius:18px;padding:26px 22px}
+ .hero h1{margin:.2rem 0;font-size:1.8rem} .hero p{color:#EAFBF4;margin:.2rem 0}
+ /* Video hero: the owner's animation as a full-bleed background with a warm
+    gradient scrim so the headline + CTA stay crisp over any video frame. */
+ .hero-video{position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(135deg,#0F6E56,#1D9E75);
+   color:#fff;min-height:360px;display:flex;align-items:flex-end;
+   box-shadow:0 18px 50px rgba(15,110,86,.28)}
+ .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+ .hero-video .scrim{position:absolute;inset:0;z-index:1;
+   background:linear-gradient(180deg,rgba(15,110,86,.10) 0%,rgba(15,110,86,.30) 45%,rgba(11,42,33,.82) 100%)}
+ .hero-video .hero-content{position:relative;z-index:2;padding:30px 26px;max-width:640px}
+ .hero-video h1{margin:.1rem 0;font-size:2.3rem;line-height:1.12;
+   text-shadow:0 2px 18px rgba(0,0,0,.35)}
+ .hero-video p{color:#F1FBF7;margin:.5rem 0 0;font-size:1.08rem;
+   text-shadow:0 1px 10px rgba(0,0,0,.35)}
+ .hero-video .cta{margin-top:16px;font-size:1.05rem;padding:13px 22px;
+   box-shadow:0 8px 22px rgba(29,158,117,.5)}
+ @media (max-width:640px){
+   .hero-video{min-height:300px}
+   .hero-video h1{font-size:1.7rem}
+   .hero-video .hero-content{padding:22px 18px}
+ }
+ .card{background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:14px;margin:12px 0;display:flex;gap:14px;align-items:center}
+ .gauge{width:54px;height:54px;border-radius:12px;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex:0 0 auto}
+ .price{font-size:1.25rem;font-weight:800;color:#0F6E56}
+ .muted{color:#667085;font-size:.9rem}
+ .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:700;margin-right:6px}
+ .good{background:#E1F5EE;color:#0F6E56} .warn{background:#FBE9E4;color:#C0392B}
+ .cta{display:inline-block;background:#1D9E75;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-weight:700;margin-top:8px}
+ .grid a{display:block;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:14px;margin:8px 0;text-decoration:none;color:#1F2933;font-weight:700}
+ .waitlist{background:#E1F5EE;border:1px solid #C7EBDD;border-radius:16px;padding:20px;margin:18px 0;text-align:center}
+ .waitlist h3{margin:.2rem 0;color:#0F6E56;font-size:1.25rem}
+ .waitlist p{color:#1F2933;margin:.3rem 0 .9rem}
+ .waitlist form{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+ .waitlist input[type=email]{flex:1;min-width:220px;padding:12px;border:1px solid #0F6E56;border-radius:10px;font-size:1rem}
+ .waitlist button{background:#1D9E75;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer}
+ .foot{color:#9AA4AC;font-size:.8rem;margin:24px 0;text-align:center}
+ /* Top nav — same on every page so people can always find "Learn the basics". */
+ .nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:6px 2px 14px}
+ .nav .brand{font-weight:800;font-size:1.15rem;color:#0F6E56;text-decoration:none;margin-right:auto}
+ .nav a{text-decoration:none;color:#1F2933;font-weight:600;font-size:.96rem}
+ .nav a:hover{color:#0F6E56}
+ .nav a.here{color:#0F6E56;border-bottom:2px solid #1D9E75;padding-bottom:2px}
+ /* Learn page — warm, friendly teaching cards. */
+ .learn-intro{background:#FFF8EE;border:1px solid #F3E2C4;border-radius:16px;padding:20px 22px;margin:8px 0 18px}
+ .learn-intro h1{margin:.1rem 0 .4rem;font-size:1.85rem;color:#0F6E56}
+ .learn-intro p{margin:.3rem 0;color:#1F2933;font-size:1.05rem;line-height:1.5}
+ .toc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+ .toc a{display:inline-block;background:#fff;border:1px solid #E4E7EC;border-radius:999px;
+   padding:7px 13px;font-size:.88rem;font-weight:600;color:#0F6E56;text-decoration:none}
+ .toc a:hover{background:#E1F5EE;border-color:#C7EBDD}
+ .term{background:#fff;border:1px solid #E4E7EC;border-left:5px solid #1D9E75;border-radius:14px;
+   padding:16px 18px;margin:12px 0;scroll-margin-top:14px}
+ .term h2{margin:.1rem 0 .5rem;font-size:1.22rem;color:#1F2933;display:flex;align-items:center;gap:9px}
+ .term .ic{font-size:1.3rem;line-height:1}
+ .term p{margin:.35rem 0;color:#1F2933;line-height:1.55;font-size:1.02rem}
+ .term .eg{background:#F6FBF9;border:1px dashed #BFE6D6;border-radius:10px;padding:9px 12px;
+   margin:.6rem 0 .1rem;color:#33524A;font-size:.97rem}
+ .term .eg b{color:#0F6E56}
+ .term.warnterm{border-left-color:#E08A00}
+ .term.warnterm .eg{background:#FFF8EE;border-color:#F3D9A8;color:#6b5320}
+ .term.warnterm .eg b{color:#E08A00}
+ .scorekey{display:flex;gap:8px;flex-wrap:wrap;margin:.5rem 0 .2rem}
+ .scorekey span{display:inline-flex;align-items:center;gap:7px;border-radius:999px;
+   padding:5px 12px;font-weight:700;font-size:.9rem;color:#fff}
+ .scorekey .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.85);display:inline-block}
+</style></head><body><div class='wrap'><nav class='nav'><a class='brand' href='index.html'>Underlisted</a><a href='index.html'>Deals</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html' class='here'>Learn the basics</a><a href='index.html#early-access'>Get early access</a></nav><div class='learn-intro'><h1>Learn the basics — in plain English</h1><p>Buying a home comes with a lot of confusing words. Here's every term we show you, explained simply — like we're chatting at the kitchen table. No jargon, no pressure. This page is free.</p><p style='color:#7a6a4a;font-size:.95rem'>Tap a word to jump to it 👇</p><div class='toc'><a href='#deal-score'>Deal Score</a><a href='#underpriced'>Underpriced</a><a href='#estimated-value'>Estimated value</a><a href='#insurance-risk'>Insurance risk</a><a href='#true-monthly-cost'>True monthly cost</a><a href='#pmi'>PMI</a><a href='#hoa'>HOA</a><a href='#property-tax'>Property tax</a><a href='#cash-to-close'>Cash to close</a><a href='#afford'>Can I afford it?</a><a href='#days-on-market'>Days on market</a><a href='#mortgage-rate'>Mortgage rate</a></div></div><div class='term' id='deal-score'><h2><span class='ic'>🎯</span>Deal Score (0–100)</h2><p>This is one simple number that tells you, at a glance, how good a home looks as a deal. Higher is better.</p><p>We color it so you don't have to think: <b>green = looks like a good deal</b>, <b>amber = okay, look closer</b>, <b>red = probably not a great deal</b>.</p><div class='eg'><div class='scorekey'><span style='background:#1D9E75'><span class='dot'></span>70–100 Good</span><span style='background:#E08A00'><span class='dot'></span>45–69 Okay</span><span style='background:#C0392B'><span class='dot'></span>0–44 Weak</span></div></div></div><div class='term' id='underpriced'><h2><span class='ic'>🏷️</span>Underpriced / undervalued</h2><p>It means the home is being sold for <b>less than what it's probably worth</b>. That's the kind of home we hunt for.</p><p>Think of it like finding a $100 jacket on sale for $70 — same jacket, smaller price.</p><div class='eg'><b>Example:</b> a home is listed at $270,000, but homes just like it are worth about $300,000. It's underpriced by roughly $30,000.</div></div><div class='term' id='estimated-value'><h2><span class='ic'>📏</span>Estimated value</h2><p>This is <b>our best guess of what the home is really worth</b>, based on what similar nearby homes are worth.</p><p>It's an estimate, not a promise — but it gives you a fair yardstick to compare the asking price against.</p><div class='eg'><b>Example:</b> if our estimated value is $300,000 and the seller is asking $270,000, the price looks like a bargain.</div></div><div class='term warnterm' id='insurance-risk'><h2><span class='ic'>🔥</span>Insurance-risk warning (fire / flood)</h2><p>Some areas catch fire or flood more often. Insurance companies know this, so they <b>charge a lot more</b> to insure a home there — sometimes hundreds extra every month.</p><p>We flag it early so a 'cheap' home doesn't surprise you with a giant insurance bill later.</p><div class='eg'><b>Example:</b> two homes cost the same, but one sits in a flood zone. That one can cost much more to insure every single month.</div></div><div class='term' id='true-monthly-cost'><h2><span class='ic'>💸</span>True monthly cost</h2><p>Most websites only show the loan payment. But owning a home costs more than that. We add it <b>all</b> up so you see the real number.</p><p>True monthly cost = mortgage <b>+</b> property tax <b>+</b> insurance <b>+</b> PMI (if any) <b>+</b> HOA (if any) <b>+</b> a little for upkeep.</p><div class='eg'><b>Example:</b> the loan is $1,500/mo, but with tax, insurance and the rest it's really about $2,050/mo. That's the number you actually pay.</div></div><div class='term' id='pmi'><h2><span class='ic'>🛡️</span>PMI (private mortgage insurance)</h2><p>PMI is an <b>extra monthly fee you pay when your down payment is under 20%</b>. It protects the lender, not you.</p><p>The good news: once you've paid down enough of the loan, PMI usually goes away.</p><div class='eg'><b>Example:</b> you put down 10% instead of 20%, so you pay maybe $100–$200 a month extra in PMI until you build up more ownership.</div></div><div class='term' id='hoa'><h2><span class='ic'>🏘️</span>HOA (homeowners association) fee</h2><p>Some homes — especially condos and homes in planned neighborhoods — charge a <b>monthly fee for shared upkeep</b>: things like lawns, pools, hallways, or trash.</p><p>Not every home has one. When a home does, we include it in the true monthly cost.</p><div class='eg'><b>Example:</b> a condo might charge $250/mo in HOA fees to keep the building and grounds nice.</div></div><div class='term' id='property-tax'><h2><span class='ic'>🧾</span>Property tax</h2><p>This is a <b>yearly tax you pay on a home</b> to your local government. It usually helps pay for schools, roads and services.</p><p>We spread it across the year so it shows up in your monthly cost, where you'll actually feel it.</p><div class='eg'><b>Example:</b> a $3,600 yearly property tax is about $300 added to each month.</div></div><div class='term' id='cash-to-close'><h2><span class='ic'>💵</span>Cash to close / down payment</h2><p>This is the <b>real cash you need up front</b> to buy the home — before you move in.</p><p>It's mainly your down payment (your share of the price) plus closing costs (one-time fees for paperwork, the loan and so on).</p><div class='eg'><b>Example:</b> on a $300,000 home, a 10% down payment is $30,000, plus a few thousand in closing costs — so you'd need roughly $35,000 in hand.</div></div><div class='term' id='afford'><h2><span class='ic'>✅</span>Can I afford it? (green / amber / red)</h2><p>You tell us your income, your savings and your monthly debts. We check whether a home <b>fits YOUR money</b> — and answer in plain colors.</p><p><b>Green = comfortably yes</b>, <b>amber = tight, be careful</b>, <b>red = a stretch right now</b>. We also show how much you'd have left over each month.</p><div class='eg'><b>Example:</b> 'Green — you'd have about $600 left every month after the home is paid for.' Your numbers stay private.</div></div><div class='term' id='days-on-market'><h2><span class='ic'>📅</span>Days on market</h2><p>This is simply <b>how long the home has been for sale</b>.</p><p>A home that's sat for a long time can mean the seller is more willing to <b>negotiate</b> — which can be your chance to ask for a better price.</p><div class='eg'><b>Example:</b> a home listed 4 days ago may sell fast; one listed 120 days ago might have room to bargain.</div></div><div class='term' id='mortgage-rate'><h2><span class='ic'>📈</span>Mortgage rate</h2><p>A mortgage is the loan you use to buy a home. The <b>mortgage rate is the interest you pay to borrow</b> that money, shown as a percentage.</p><p>Even a small change in the rate can move your monthly payment by a lot — so it's worth watching.</p><div class='eg'><b>Example:</b> on a $300,000 loan, going from 6% to 7% can add roughly $200 to your monthly payment.</div></div><p style='margin:18px 2px;color:#667085'>That's the whole glossary. When you see any of these inside Underlisted, you'll know exactly what it means. <a href='index.html'>← Back to the deals</a></p><p class='foot'>Estimates only — a screening tool, not advice. Fair Housing: scoring never uses demographic or neighborhood-quality signals.</p></div></body></html>
