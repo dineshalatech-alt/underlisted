@@ -12,7 +12,7 @@
 # link here — it looks like  https://payhip.com/b/XXXXX  — to switch ON the
 # green "Subscribe" button on the landing page. Leave it as "" (blank) and the
 # page shows the free preview button only. This is the ONLY place to change it.
-checkout_url: ""
+checkout_url: "https://payhip.com/order?link=9iJRa&pricing_plan=w9B35rAZWR"
 
 # How long cached data stays "fresh" before we'd re-fetch it.
 ttl:
@@ -35,9 +35,9 @@ sync:
 # schedule so users only ever READ from cache. No user/page-load triggers it.
 worker:
   schedule_hours:           24       # how often the looping worker refreshes
-  max_listings_per_city:   200       # per-run cap per city/zip (cost guard)
+  max_listings_per_city:    40       # per-run cap per city/zip (cost guard) — conservative for controlled go-live test
   update_value_rent:      true       # also refresh stale value/rent estimates
-  max_estimates_per_run:    50       # cap value+rent calls per run (cost guard)
+  max_estimates_per_run:    40       # cap value+rent calls per run (cost guard) — conservative for controlled go-live test
   prewarm_photos:        false       # keep images lazy by default…
   prewarm_top_n:             0       # …unless >0: pre-fetch photos for N newest homes
   sync_foreclosure:       true       # also pull bank-owned/foreclosure listings
