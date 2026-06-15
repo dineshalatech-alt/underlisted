@@ -4,6 +4,23 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## PUBLISHED the current build + owner set the priority order — 2026-06-14 (Atlas)
+
+- **Owner's priority order (locked):** 1) **today = build & publish**, 2) **upgrade the website**,
+  3) **marketing**, 4) **teaching materials / more calculators — LATER, when we grow.**
+- **Published** (cheap, no paid steps): committed all recent work (`bfc0b45`) and **pushed to
+  GitHub → Streamlit app auto-redeploys** with Investor Tools, in-app tooltips, and the ATTOM
+  value "second opinion". **Deployed `site/` to Netlify** (`netlify deploy --prod`); verified the
+  new investor terms are LIVE on https://underlistedhomes.com/learn.html. Secrets safe (.env
+  ignored, .env.example blank); 55 pure-logic tests green before push.
+- **Still owner-only (NOT done — no Opus cost):** the paid go-live gate — **RentCast upgrade**
+  (quota maxed → ~Jul 7) and **Stripe/Payhip** (paste link into `config/cache.yaml: checkout_url`).
+  These are the real "fully live with payments" steps; they're your clicks, not code.
+- **Usage note:** today (06-14) is the heaviest day so far (~$204 via ccusage). Keeping spend lean.
+- **Next session:** website upgrade (Juliet) — then marketing (Serena). Teaching shelved.
+
+---
+
 ## ATTOM wired into the product (3 blends) + contact path hardened — 2026-06-14 (Atlas)
 
 The owner said "wire all of it in." Done — cost-safely, with one clear limit found.

@@ -28,6 +28,11 @@ This is the project's single "don't lose an idea" list. It does two jobs:
 
 ---
 
+## 🧭 Owner's priority order (set 2026-06-14)
+
+**1) Build & publish (done today) → 2) Upgrade the website → 3) Marketing → 4) Teaching materials /
+more calculators (LATER, when we grow).** Theo ranks within this order.
+
 ## 🗺️ Roadmap (Theo-ranked)
 
 | # | Idea | For whom | Owner | Cost | Status | Priority | Note |
