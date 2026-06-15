@@ -67,8 +67,13 @@ security mistakes — even when it means pushing back.
 3. **Do** the deterministic part yourself (code/deploy/fix/verify).
 4. **Hand** the owner any human step as ONE clear action ("do X, then tell me when done").
 5. **Verify** the result plainly (load the page, check the table, read the log).
-6. **Update** PROGRESS.md (what changed, current state, next step) and CLAUDE.md §2 if status moved.
-7. **End** the turn by stating the single next action.
+6. **Capture stray ideas** — if an idea surfaces mid-task that isn't today's job, drop a ONE-line
+   entry in the Parking Lot of `develop/IDEA_BACKLOG.md` instead of chasing it. Don't lose it,
+   don't derail. (Theo owns triaging the backlog into the ranked roadmap.)
+7. **Update** PROGRESS.md (what changed, current state, next step) and CLAUDE.md §2 if status moved.
+8. **End-of-day review** — before closing the day, scan the Parking Lot against what we actually
+   did ("did we miss any idea?"), update `IDEA_BACKLOG.md` + the daily team log, then state the
+   single next action.
 
 ---
 

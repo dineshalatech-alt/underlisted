@@ -62,8 +62,32 @@ def _scaled(value: float, zero_at: float, full_at: float) -> float:
     return _clamp01((value - zero_at) / (full_at - zero_at))
 
 
+def blended_avm(value: Optional[ValueEstimate],
+                attom: Optional[ValueEstimate]) -> tuple[Optional[float], str]:
+    """Combine RentCast's AVM with ATTOM's into one trusted value figure.
+
+    Two independent estimates that AGREE are more trustworthy than one, so when
+    both are present we use their average. When only one is present we use it;
+    when neither is present we return None and the score rescales as before.
+
+    Returns (value, source_label) where source_label is plain English for the UI
+    ("average of two estimates" / "one estimate"). This is the SINGLE place the
+    blend is decided, so the deal detail and the Deal Score never disagree.
+    """
+    rc = value.avm if value else None
+    at = attom.avm if attom else None
+    if rc and at:
+        return (rc + at) / 2.0, "average of two independent estimates"
+    if rc:
+        return rc, "one estimate"
+    if at:
+        return at, "one estimate"
+    return None, "no estimate"
+
+
 def compute(listing: Listing, value: Optional[ValueEstimate],
-            rent: Optional[RentEstimate], risk: Optional[RiskFlags] = None) -> Score:
+            rent: Optional[RentEstimate], risk: Optional[RiskFlags] = None,
+            attom: Optional[ValueEstimate] = None) -> Score:
     sc = settings.scoring
     w = sc.get("weights", {})
     s = sc.get("scales", {})
@@ -74,16 +98,20 @@ def compute(listing: Listing, value: Optional[ValueEstimate],
     price = listing.list_price
 
     # --- 1) Below estimated value (the big one) ---------------------------
+    # Use a BLENDED value: when ATTOM's independent AVM is also available we
+    # average the two (two estimates that agree are more trustworthy). When
+    # ATTOM is absent this is exactly the old RentCast-only behaviour.
     w_vd = float(w.get("value_discount", 50))
-    avm = value.avm if value else None
+    avm, blend_src = blended_avm(value, attom)
     if price and avm:
         vd_pct = (avm - price) / avm * 100  # + = below value (good)
         norm = _scaled(vd_pct,
                        float(s.get("value_discount_zero_points_at_pct", 0)),
                        float(s.get("value_discount_full_points_at_pct", 12)))
         side = "below" if vd_pct >= 0 else "above"
+        extra = " · two independent estimates agree" if "average" in blend_src else ""
         factors.append(Factor("value_discount", "Below estimated value",
-                              f"Listed {abs(vd_pct):.0f}% {side} estimated value",
+                              f"Listed {abs(vd_pct):.0f}% {side} estimated value{extra}",
                               w_vd * norm, w_vd, True))
     else:
         factors.append(Factor("value_discount", "Below estimated value",

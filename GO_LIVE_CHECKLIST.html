@@ -23,87 +23,176 @@
   code{background:#f2f7f4;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13.5px;}
   .key{background:#f2f7f4;border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-family:Consolas,monospace;font-size:13px;margin:6px 0;}
   .gate{background:#fff6ea;border:1px solid var(--amber);border-left:5px solid var(--amber);padding:14px 18px;border-radius:10px;margin:14px 0;}
+  .money{background:#fdeeee;border:1px solid var(--red);border-left:5px solid var(--red);padding:14px 18px;border-radius:10px;margin:14px 0;}
+  .money b{color:var(--red);}
   table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px;}
   th{background:var(--green);color:#fff;text-align:left;padding:8px 11px;}
-  td{border-bottom:1px solid var(--line);padding:8px 11px;}
+  td{border-bottom:1px solid var(--line);padding:8px 11px;vertical-align:top;}
   tr:nth-child(even) td{background:var(--fill);}
+  .chk{list-style:none;padding-left:0;}
+  .chk li{padding:8px 0 8px 34px;position:relative;border-bottom:1px dashed var(--line);}
+  .chk li::before{content:"\2610";position:absolute;left:0;top:6px;font-size:22px;color:var(--green);line-height:1;}
+  .owner{display:inline-block;background:#fdeeee;color:var(--red);border:1px solid var(--red);border-radius:20px;padding:1px 10px;font-size:12px;font-weight:700;margin-left:6px;}
   footer{color:var(--muted);font-size:12.5px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
 </style>
 </head>
 <body>
 <header><div class="in">
   <h1>Go-Live Checklist — Worker + Payment</h1>
-  <p>Closing the gate so the app shows real homes and can take payment · 2026-06-13</p>
+  <p>The exact, in-order steps to fill the app with real homes and switch on payment · updated 2026-06-14</p>
 </div></header>
 <div class="wrap">
 
 <div class="done">
-  <b>The code is finished.</b> The refresh worker, its daily schedule, and the Payhip "Subscribe" button are all built and committed. Everything below is account / dashboard steps — no coding. Do them in order.
+  <b>The code is finished and cost-guarded.</b> The refresh worker, its daily schedule, and the Payhip "Subscribe" button are all built and committed. Everything below is account / dashboard clicks — no coding. Do them strictly in order, top to bottom.
 </div>
 
-<h2>Part A — Turn the worker ON (fills the app with real homes)</h2>
+<h2>The whole picture in one line</h2>
+<p>Think of the app as a <b>shop</b>. The <b>worker</b> is the stock-clerk who fills the shelves
+(the database) with real homes. Customers just walk in and read the shelves — they never trigger
+a costly trip to the supplier. Today we hire the clerk for the first time. We do it <b>small and
+careful</b> first, check the shelves filled correctly, then open the doors wide.</p>
+
+<!-- ================= THE CHECKLIST ================= -->
+<h2>The checklist (tick these in order)</h2>
+<ul class="chk">
+  <li><b>Step 1 — Confirm the RentCast upgrade is active.</b> Log in to RentCast → check your plan shows the new paid tier and your request quota has gone up. Do not continue until this reads "active". <span class="owner">Owner</span></li>
+  <li><b>Step 2 — Add the GitHub Actions Secrets</b> (full list + clicks in Part A below). <span class="owner">Owner</span></li>
+  <li><b>Step 3 — Run ONE small controlled worker test</b> (the safe-first-run recipe in Part B). We deliberately keep this first run to a handful of homes so it costs almost nothing.</li>
+  <li><b>Step 4 — Verify the database filled with real homes</b> (Part C).</li>
+  <li><b>Step 5 — Open coverage to the full nationwide city list</b> and let the daily schedule take over (Part D).</li>
+  <li><b>Step 6 — Create the Payhip $18.99 product + paste the link</b> (Part E — your money call). <span class="owner">Owner</span></li>
+  <li><b>Step 7 — Flip payment ON and test one real checkout</b> (Part E). <span class="owner">Owner</span></li>
+</ul>
+
+<!-- ================= PART A ================= -->
+<h2>Part A — Add the GitHub Actions Secrets</h2>
+<p>These are like keys kept in a locked drawer. The worker takes them out only while it runs, and
+they are never written into any file. You paste them once. <b>This is a human step — only you can
+log in to GitHub and do it.</b></p>
+
+<div class="step">
+  <h3><span class="num">A1</span> Open the secrets page</h3>
+  <p>In a browser, go to your repo:<br>
+  <code>github.com/dineshalatech-alt/underlisted</code><br>
+  Then click: <b>Settings</b> (top menu) → in the left sidebar <b>Secrets and variables</b> →
+  <b>Actions</b> → the green <b>New repository secret</b> button.</p>
+</div>
+
+<div class="step">
+  <h3><span class="num">A2</span> Add each secret below</h3>
+  <p>For each row: type the <b>Name</b> exactly as shown (capitals, underscores), paste the <b>Value</b>,
+  click <b>Add secret</b>, then repeat for the next one.</p>
+  <table>
+    <tr><th>Secret name (type exactly)</th><th>Required?</th><th>Where you get the value</th></tr>
+    <tr><td><code>DATABASE_URL</code></td><td><b>Required</b></td><td>The <i>same</i> Supabase connection string the app already uses. It is in your <b>Streamlit Cloud</b> app → Settings → Secrets, on the <code>DATABASE_URL</code> line. Copy that exact value. (It starts with <code>postgresql://postgres.nemvz...</code>)</td></tr>
+    <tr><td><code>RENTCAST_API_KEY</code></td><td><b>Required</b></td><td>Your RentCast dashboard → API key. The same key that's in your local <code>.env</code> file.</td></tr>
+    <tr><td><code>RESEND_API_KEY</code></td><td>Optional</td><td>Resend dashboard → API Keys. Only needed for alert emails. Same value as in your <code>.env</code>. Skip for now if you like.</td></tr>
+    <tr><td><code>ALERT_FROM_EMAIL</code></td><td>Optional</td><td>The "from" address for alert emails (e.g. <code>onboarding@resend.dev</code> for now). Skip if skipping Resend.</td></tr>
+    <tr><td><code>STREETVIEW_API_KEY</code></td><td>Optional</td><td>Google Street View key. Only used if photo pre-warm is turned on (it is OFF by default), so you can safely skip this.</td></tr>
+  </table>
+  <p style="margin-bottom:0"><b>Minimum to go:</b> just the two <b>Required</b> ones (<code>DATABASE_URL</code> and <code>RENTCAST_API_KEY</code>) are enough for the worker to fill the shop.</p>
+</div>
+
+<!-- ================= PART B ================= -->
+<h2>Part B — The ONE small controlled worker test</h2>
 
 <div class="gate">
-  <b>⏳ Wait until July 7 (or upgrade RentCast first).</b> Our free RentCast quota is used up for this
-  billing period (resets <b>July 7, 2026</b>). The worker's first run makes RentCast calls — so don't
-  turn it on before the reset, or you may hit overage. Either <b>wait until July 7</b>, or upgrade
-  RentCast (Foundation $74/mo) first. Customers are unaffected meanwhile (the app reads cached data).
+  <b>Why small first?</b> The worker normally pulls many cities. The first time, we shrink it to a
+  couple of neighborhoods so it makes only a <b>handful of supplier calls</b> — just enough to prove
+  the pipe works (worker → database → app). Once we see real homes land, we open it up wide (Part D).
+  This costs next to nothing and protects your new quota.
 </div>
 
 <div class="step">
-  <h3><span class="num">1</span> Add the secrets to GitHub</h3>
-  <p>Go to your repo → <b>Settings → Secrets and variables → Actions → New repository secret</b>. Add each of these (name on the left, your real value on the right):</p>
-  <div class="key">DATABASE_URL &nbsp;= &nbsp;(the same Supabase string the app uses)</div>
-  <div class="key">RENTCAST_API_KEY &nbsp;= &nbsp;(your RentCast key)</div>
-  <div class="key">RESEND_API_KEY &nbsp;= &nbsp;(optional — for alert emails)</div>
-  <div class="key">ALERT_FROM_EMAIL &nbsp;= &nbsp;(optional — the "from" address)</div>
-  <p style="margin-bottom:0">These live ONLY in GitHub's secret box — never typed into a file. The worker reads them at run time.</p>
+  <h3><span class="num">B1</span> Tell me to set the "small-batch" safe mode</h3>
+  <p>This is <b>my job</b> (a tiny config tweak, no cost). On your word I will, in <code>config/cache.yaml</code>,
+  temporarily set:</p>
+  <div class="key">max_estimates_per_run: 0&nbsp;&nbsp;# skip all value/rent billing on the first run</div>
+  <p>and shrink <code>config/cities.yaml</code> to <b>one city with two ZIPs</b> (e.g. Sacramento
+  <code>95820, 95823</code>). That makes the first run cost about <b>2 supplier calls total</b> — the
+  cheapest possible proof. I commit + push it; nothing bills yet.</p>
 </div>
 
 <div class="step">
-  <h3><span class="num">2</span> Run it once by hand</h3>
-  <p>Repo → <b>Actions</b> tab → <b>"Refresh listings cache"</b> → <b>Run workflow</b>. Watch it go green (takes a few minutes). After that it runs <b>automatically every day at ~9:00 UTC</b>.</p>
+  <h3><span class="num">B2</span> Run the worker once, by hand</h3>
+  <p>In your repo: <b>Actions</b> tab (top menu) → click <b>"Refresh listings cache"</b> in the left
+  list → click the <b>Run workflow</b> button on the right → confirm <b>Run workflow</b>. It runs on
+  GitHub's computers (not yours) and turns <b>green</b> in a few minutes.</p>
+  <p style="margin-bottom:0">There is also a manual local option (only if you ever want it):
+  <code>.venv\Scripts\python.exe -m worker.refresh_worker</code> in PowerShell — but the GitHub button
+  is the recommended way and needs nothing installed on your laptop.</p>
+</div>
+
+<!-- ================= PART C ================= -->
+<h2>Part C — Verify the database filled with real homes</h2>
+<div class="step">
+  <h3><span class="num">C1</span> Check the Admin / Usage page</h3>
+  <p>Open the live app → open the <b>Admin / Usage</b> page. Confirm:</p>
+  <ul>
+    <li>Backend reads <b>PostgreSQL</b> (not SQLite).</li>
+    <li>The <b>listing count is above zero</b> — and shows real addresses, not sample data.</li>
+    <li>The latest <b>worker run shows "ok"</b> with a small <b>billable_calls</b> number (should be tiny on this first small run).</li>
+  </ul>
+</div>
+<div class="step">
+  <h3><span class="num">C2</span> Eyeball Browse Deals</h3>
+  <p>Open <b>Browse Deals</b> and confirm real homes appear for the test city with sensible Deal Scores.
+  If you see real listings here, the whole pipe works. 🎉</p>
+</div>
+
+<!-- ================= PART D ================= -->
+<h2>Part D — Open coverage to the full USA</h2>
+<div class="step">
+  <h3><span class="num">D1</span> Tell me to restore the full city list</h3>
+  <p>Once the small test is verified, on your word I put back the full nationwide city list
+  (~16 metros across TX, OH, IN, MO, TN, AL, FL, GA, NC, PA, OK plus the California ZIPs) and
+  restore <code>max_estimates_per_run</code>. That full daily run makes on the order of <b>30–130
+  supplier calls</b> — well within a paid tier. From then on the worker refreshes
+  <b>automatically every day at ~9:00 UTC</b>; you don't touch anything.</p>
+</div>
+
+<!-- ================= PART E ================= -->
+<h2>Part E — Turn payment ON ($18.99/mo founding)</h2>
+<div class="money">
+  <b>This whole section is YOUR call.</b> It involves money and selling. I will not create products,
+  change pricing, or flip the button on without you doing these steps yourself.
 </div>
 
 <div class="step">
-  <h3><span class="num">3</span> Confirm real homes appeared</h3>
-  <p>Open the live app → it should now show real listings. Or open <b>Admin / Usage</b> → backend should read <b>PostgreSQL</b> and the listing count should be above zero.</p>
-</div>
-
-<div class="gate">
-  <b>Heads-up on coverage:</b> right now the worker only pulls <b>6 Northern California cities</b> (Sacramento, Stockton, Modesto, Vallejo, Antioch, Oakland). So the app will show real homes <i>there</i>. To cover more of the USA we need a small code tweak (the city list currently allows only one state) — see the decision at the bottom.
-</div>
-
-<h2>Part B — Turn payment ON ($12.99/mo)</h2>
-
-<div class="step">
-  <h3><span class="num">1</span> Create the product on Payhip</h3>
-  <p>Sign up at <b>payhip.com</b> → create a <b>Subscription</b> product → price it <b>$12.99/month</b> (you can add the "$12.99 for 12 months, then $29.99" framing in the description). Payhip handles the card payment and gives you a link like <code>https://payhip.com/b/XXXXX</code>.</p>
+  <h3><span class="num">E1</span> Create the product on Payhip <span class="owner">Owner</span></h3>
+  <p>Sign in at <b>payhip.com</b> → create a <b>Subscription</b> product → price it
+  <b>$18.99/month</b> (founding price). Payhip handles the card payment and gives you a link like
+  <code>https://payhip.com/b/XXXXX</code>.</p>
 </div>
 
 <div class="step">
-  <h3><span class="num">2</span> Paste the link into one file</h3>
-  <p>Open <code>config/cache.yaml</code>, line 15, and put your link between the quotes:</p>
+  <h3><span class="num">E2</span> Paste the link into one file <span class="owner">Owner</span></h3>
+  <p>Open <code>config/cache.yaml</code> (line 15) and put your link between the quotes:</p>
   <div class="key">checkout_url: "https://payhip.com/b/XXXXX"</div>
-  <p style="margin-bottom:0">Save, commit, push. The green <b>Subscribe</b> button on the landing page switches ON automatically. (Leave it blank and only the free preview shows — that's the current state.)</p>
+  <p style="margin-bottom:0">Save, commit, push. The green <b>Subscribe</b> button switches ON
+  automatically. (Leave it blank and only the free preview shows — that's the current safe state.)
+  I can do the commit/push for you once you've decided — just say so.</p>
 </div>
 
 <div class="step">
-  <h3><span class="num">3</span> Test a real checkout</h3>
-  <p>Click your own Subscribe button → make sure the Payhip checkout opens and completes. Once a test payment goes through, the gate is fully closed and you're ready to market.</p>
+  <h3><span class="num">E3</span> Test one real checkout <span class="owner">Owner</span></h3>
+  <p>Click your own <b>Subscribe</b> button → confirm the Payhip checkout opens and completes.
+  Once a test payment goes through, the gate is fully closed and you're ready to market.</p>
 </div>
 
-<h2>What I can vs. can't do for you</h2>
+<!-- ================= WHO DOES WHAT ================= -->
+<h2>Who does what</h2>
 <table>
   <tr><th>Task</th><th>Who</th></tr>
-  <tr><td>Write/fix the worker + button code</td><td>✅ Me (done)</td></tr>
-  <tr><td>Expand the city coverage (multi-state)</td><td>✅ Me (on your OK)</td></tr>
-  <tr><td>Build the in-house video pipeline</td><td>✅ Me (after homes are live)</td></tr>
-  <tr><td>Add GitHub secrets / run the Action</td><td>👤 You (your login)</td></tr>
-  <tr><td>Create the Payhip product + get the link</td><td>👤 You (your account)</td></tr>
+  <tr><td>Write / fix / cost-guard the worker + button code</td><td>✅ Me (done)</td></tr>
+  <tr><td>Set the small-batch safe mode for the first run, then restore full coverage</td><td>✅ Me (on your OK)</td></tr>
+  <tr><td>Confirm RentCast upgrade is active</td><td>👤 You</td></tr>
+  <tr><td>Add the GitHub Secrets + click "Run workflow"</td><td>👤 You (your login)</td></tr>
+  <tr><td>Create the Payhip product, paste the link, test checkout</td><td>👤 You (your money call)</td></tr>
 </table>
 
-<footer>Underlisted · underlistedhomes.com · Go-live checklist · 2026-06-13</footer>
+<footer>Underlisted · underlistedhomes.com · Go-live checklist · updated 2026-06-14 · Atlas</footer>
 </div>
 </body>
 </html>

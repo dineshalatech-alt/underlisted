@@ -15,6 +15,9 @@ foreclosures are shown so the feature is visible — still zero API calls.
 
 from __future__ import annotations
 
+from config.settings import settings
+from src.cache import db
+from src.data_sources import attom as attom_src
 from src.data_sources import foreclosure, rentcast, risk
 from src.models import Listing, RentEstimate, RiskFlags, ValueEstimate
 from src.scoring import deal_score
@@ -86,6 +89,57 @@ def _foreclosure_row(listing: Listing, *, demo: bool) -> dict:
     return dict(listing=listing, value=val, rent=0, rent_sample=False,
                 value_sample=False, score=score, sample=demo, risk=RiskFlags(),
                 foreclosure=True, demo_foreclosure=demo)
+
+
+def attom_second_opinion(row: dict) -> dict:
+    """Lazily fetch ATTOM's independent AVM + last sale for ONE opened home and
+    re-score with the blended value. Called from the detail view ONLY — never for
+    the feed — so we make at most a couple of ATTOM calls when a buyer actually
+    opens a property, and only if ATTOM is configured.
+
+    Cost-safe by design:
+      * If no ATTOM key, or this is a sample/demo/foreclosure row, do nothing.
+      * Cache-first: a repeat view of the same home is a free cache hit.
+      * Honors the per-user monthly cap (a fresh call counts; over the cap we fall
+        back to cache_only so we never bill past the limit).
+
+    Returns the row augmented with: attom_value, attom_last_sale (both optional),
+    and a re-blended score when ATTOM added a second opinion. Safe to call every
+    render — it short-circuits on cache hits.
+    """
+    if not getattr(settings, "has_attom", False):
+        return row
+    if row.get("sample") or row.get("foreclosure"):
+        return row  # sample/demo/foreclosure homes don't get billable ATTOM calls
+
+    listing = row["listing"]
+    # Respect the per-user soft cap: over the cap, serve cache only (no new bill).
+    # Mirrors how RentCast lookups are gated — same cap, same accounting.
+    try:
+        used = db.user_lookup_count(settings.current_user_id)
+        cache_only = used >= settings.monthly_lookup_cap
+    except Exception:
+        cache_only = False
+
+    try:
+        attom_val = attom_src.get_value_estimate(listing, cache_only=cache_only)
+    except Exception:
+        attom_val = ValueEstimate()
+    try:
+        last_sale = attom_src.get_last_sale(listing, cache_only=cache_only)
+    except Exception:
+        last_sale = None
+
+    row = dict(row)
+    if attom_val and attom_val.avm:
+        row["attom_value"] = attom_val
+        # Re-score with the blended (RentCast + ATTOM) value.
+        row["score"] = deal_score.compute(
+            listing, row["value"], RentEstimate(monthly_rent=row.get("rent") or None),
+            row.get("risk"), attom=attom_val)
+    if last_sale:
+        row["attom_last_sale"] = last_sale
+    return row
 
 
 def display_rows() -> tuple[list[dict], bool]:

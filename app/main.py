@@ -43,13 +43,37 @@ st.markdown(TABLER_CSS + f"""
       font-family:'DM Sans', system-ui, -apple-system, "Segoe UI", sans-serif !important;
       -webkit-font-smoothing:antialiased;
   }}
-  /* Black base + a faint engraved dollar-bill pattern in gold */
+  /* ---- Decorative gold-coin cursor (inline SVG, ~30px, hotspot centered) ----
+     A small embossed gold coin: radial gold face, milled rim, raised "$".
+     Applied app-wide as the default. Clickable things keep the same coin but
+     we DON'T override text inputs/areas -> they keep a real text caret so
+     typing/targeting stays usable. Falls back to auto if data URI unsupported. */
   .stApp {{
-      background-color:#000;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='130' viewBox='0 0 260 130'%3E%3Cg fill='none' stroke='%23E8B948' stroke-opacity='0.10' stroke-width='1.4'%3E%3Crect x='10' y='10' width='240' height='110' rx='10'/%3E%3Crect x='17' y='17' width='226' height='96' rx='8'/%3E%3Cellipse cx='130' cy='65' rx='44' ry='30'/%3E%3Ccircle cx='40' cy='65' r='16'/%3E%3Ccircle cx='220' cy='65' r='16'/%3E%3C/g%3E%3Cg fill='%23E8B948' fill-opacity='0.12' font-family='Georgia,serif' font-weight='bold' text-anchor='middle'%3E%3Ctext x='130' y='77' font-size='34'%3E%24%3C/text%3E%3Ctext x='40' y='71' font-size='18'%3E%24%3C/text%3E%3Ctext x='220' y='71' font-size='18'%3E%24%3C/text%3E%3C/g%3E%3C/svg%3E");
-      background-size: 240px 120px;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23FFF6C8'/%3E%3Cstop offset='28%25' stop-color='%23F4DE8A'/%3E%3Cstop offset='55%25' stop-color='%23E8B948'/%3E%3Cstop offset='80%25' stop-color='%23D9A93A'/%3E%3Cstop offset='100%25' stop-color='%23B8860B'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='15' cy='15' r='13.5' fill='url(%23g)' stroke='%23B8860B' stroke-width='1.5'/%3E%3Ccircle cx='15' cy='15' r='10.5' fill='none' stroke='%237A5407' stroke-opacity='0.35' stroke-width='0.8' stroke-dasharray='1.4 1.4'/%3E%3Ctext x='15' y='20' font-family='Georgia,serif' font-size='15' font-weight='bold' fill='%237A5407' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E") 15 15, auto;
   }}
-  /* Off-white text on black */
+  /* Clickable controls keep the coin (signals "spend / act") */
+  .stApp a, .stApp button, .stButton > button, .stLinkButton > a,
+  .stDownloadButton > button, .stApp [role="button"], .stApp summary,
+  label, .stCheckbox, .stRadio {{
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='32%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23FFF6C8'/%3E%3Cstop offset='28%25' stop-color='%23F4DE8A'/%3E%3Cstop offset='55%25' stop-color='%23E8B948'/%3E%3Cstop offset='80%25' stop-color='%23D9A93A'/%3E%3Cstop offset='100%25' stop-color='%23B8860B'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='15' cy='15' r='13.5' fill='url(%23g)' stroke='%23B8860B' stroke-width='1.5'/%3E%3Ccircle cx='15' cy='15' r='10.5' fill='none' stroke='%237A5407' stroke-opacity='0.35' stroke-width='0.8' stroke-dasharray='1.4 1.4'/%3E%3Ctext x='15' y='20' font-family='Georgia,serif' font-size='15' font-weight='bold' fill='%237A5407' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E") 15 15, pointer !important;
+  }}
+  /* Text fields keep a real caret so they stay easy to target/type in */
+  .stApp input[type="text"], .stApp input[type="number"], .stApp input[type="email"],
+  .stApp input[type="search"], .stApp input[type="password"], .stApp textarea {{
+      cursor: text !important;
+  }}
+  /* Deep luxury-green base on a soft radial vignette (lighter emerald center ->
+     darker toward edges) for depth. Currency-pattern overlays removed — the
+     background is now clean green so content reads calm and premium. */
+  .stApp {{
+      background-color:#0B3D2E;
+      background-image:
+        radial-gradient(140% 120% at 50% 18%, #0F4A37 0%, #0B3D2E 46%, #082C20 100%);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+  }}
+  /* Off-white text on green */
   .stApp, .stApp p, .stApp li, .stApp span, .stMarkdown {{ color:#F5F5F7; }}
   [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] *, small {{ color:#9A9AA0 !important; }}
   .block-container {{ padding-top: 1.2rem; }}
@@ -67,9 +91,9 @@ st.markdown(TABLER_CSS + f"""
   }}
   .hero .scrim {{
       position:absolute; inset:0; z-index:-1;
-      background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.92) 100%);
+      background: linear-gradient(180deg, rgba(6,34,25,.32) 0%, rgba(7,40,29,.58) 55%, rgba(5,28,20,.94) 100%);
   }}
-  .hero {{ border:1px solid rgba(232,185,72,.22); }}
+  .hero {{ border:1px solid rgba(232,185,72,.30); }}
   .hero .logo-badge {{
       display:inline-flex; align-items:center; justify-content:center;
       width:72px; height:72px; border-radius:20px; margin-bottom:8px;
@@ -85,13 +109,13 @@ st.markdown(TABLER_CSS + f"""
       border-radius:999px; font-weight:700; margin-top:18px; font-size:1.05rem;
       backdrop-filter:blur(3px); }}
 
-  /* ---- Feature cards (dark glass) ---- */
-  .feat {{ background:linear-gradient(180deg,#16140F 0%,#0E0D0A 100%);
-      border:1px solid rgba(232,185,72,.18); border-radius:18px;
-      padding:22px; height:100%; box-shadow:0 10px 26px rgba(0,0,0,.5);
+  /* ---- Feature cards (dark-emerald glass) ---- */
+  .feat {{ background:linear-gradient(180deg,#0E4A37 0%,#082C20 100%);
+      border:1px solid rgba(232,185,72,.22); border-radius:18px;
+      padding:22px; height:100%; box-shadow:0 10px 26px rgba(0,0,0,.45);
       transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }}
-  .feat:hover {{ transform:translateY(-3px); border-color:rgba(232,185,72,.45);
-      box-shadow:0 16px 34px rgba(0,0,0,.6); }}
+  .feat:hover {{ transform:translateY(-3px); border-color:rgba(232,185,72,.50);
+      box-shadow:0 16px 34px rgba(0,0,0,.55); }}
   .feat h3 {{ margin:.5rem 0 .3rem; font-size:1.15rem; color:#F5F5F7; }}
   .feat .muted {{ font-size:.98rem; color:#A1A1A6; }}
 
@@ -100,8 +124,8 @@ st.markdown(TABLER_CSS + f"""
   .frameband {{
       margin: 6px auto 4px; max-width: 40rem; text-align:center;
       padding: 22px 26px; border-radius:16px;
-      background: linear-gradient(180deg, rgba(232,185,72,.06) 0%, rgba(232,185,72,.02) 100%);
-      border:1px solid rgba(232,185,72,.20);
+      background: linear-gradient(180deg, rgba(232,185,72,.10) 0%, rgba(8,44,32,.30) 100%);
+      border:1px solid rgba(232,185,72,.26);
   }}
   .frameband p {{ font-size:1.12rem; line-height:1.6; color:#E8E8EC; margin:0; }}
   .frameband b {{ color:#F4DE8A; font-weight:800; }}
@@ -122,9 +146,9 @@ st.markdown(TABLER_CSS + f"""
   .contrast {{
       margin: 8px auto; max-width: 42rem; text-align:center;
       padding: 30px 26px; border-radius:20px;
-      background: linear-gradient(180deg,#16140F 0%,#0B0A07 100%);
-      border:1px solid rgba(232,185,72,.30);
-      box-shadow:0 16px 40px rgba(0,0,0,.55);
+      background: linear-gradient(180deg,#0E4A37 0%,#072419 100%);
+      border:1px solid rgba(232,185,72,.34);
+      box-shadow:0 16px 40px rgba(0,0,0,.5);
   }}
   .contrast .dim {{ color:#8C8C92; font-size:1.18rem; font-weight:600; line-height:1.5; }}
   .contrast .lead {{ color:#F5F5F7; font-size:1.42rem; font-weight:850; line-height:1.4;
@@ -156,6 +180,27 @@ st.markdown(TABLER_CSS + f"""
   .stButton > button:hover, .stLinkButton > a:hover, .stDownloadButton > button:hover {{
       filter:brightness(1.06); transform:translateY(-1px); border-color:#B8860B !important;
   }}
+  /* Primary CTA = "act now": gold face kept, wrapped in a premium red urgency
+     ring + soft pulsing glow so it reads as the urgent action. Visual only —
+     no text/behavior/pricing change. */
+  .stButton > button[kind="primary"], .stLinkButton > a[kind="primary"] {{
+      border:2px solid #D7263D !important;
+      box-shadow:0 8px 20px rgba(201,154,46,.35),
+                 0 0 0 4px rgba(215,38,61,.20),
+                 0 10px 28px rgba(165,20,39,.45) !important;
+      animation: ctaglow 2.8s ease-in-out infinite;
+  }}
+  .stButton > button[kind="primary"]:hover, .stLinkButton > a[kind="primary"]:hover {{
+      border-color:#A51427 !important;
+  }}
+  @keyframes ctaglow {{
+      0%,100% {{ box-shadow:0 8px 20px rgba(201,154,46,.35),
+                            0 0 0 4px rgba(215,38,61,.18),
+                            0 10px 28px rgba(165,20,39,.38); }}
+      50%     {{ box-shadow:0 8px 20px rgba(201,154,46,.35),
+                            0 0 0 5px rgba(215,38,61,.34),
+                            0 12px 34px rgba(215,38,61,.55); }}
+  }}
   .stApp h1, .stApp h2, .stApp h3 {{ color:#F5F5F7; letter-spacing:-.3px; }}
 
   /* ---- Gold foil text + shimmer sweep ---- */
@@ -167,6 +212,52 @@ st.markdown(TABLER_CSS + f"""
       animation: gshine 4.5s linear infinite; font-weight:850;
   }}
   @keyframes gshine {{ to {{ background-position: 200% center; }} }}
+
+  /* ---- Urgency / scarcity: a premium red on top of the green+gold ----
+     Truthful scarcity only (limited early access + founding price). Red is an
+     ACCENT, never the page. Strong-but-luxe red #D7263D / deeper #A51427. */
+  .urgency {{
+      display:inline-flex; align-items:center; gap:8px;
+      margin-top:16px; padding:9px 18px; border-radius:999px;
+      font-weight:800; font-size:.98rem; letter-spacing:.2px; color:#FFF1F2;
+      background:linear-gradient(135deg,#D7263D 0%,#A51427 100%);
+      border:1px solid rgba(255,210,214,.45);
+      box-shadow:0 8px 22px rgba(165,20,39,.40), inset 0 1px 0 rgba(255,255,255,.25);
+      animation: urgpulse 2.8s ease-in-out infinite;
+  }}
+  .urgency .dotred {{
+      width:9px; height:9px; border-radius:50%; background:#FFE2E5;
+      box-shadow:0 0 0 0 rgba(255,226,229,.7);
+      animation: urgblink 2.8s ease-in-out infinite;
+  }}
+  @keyframes urgpulse {{
+      0%,100% {{ box-shadow:0 8px 22px rgba(165,20,39,.40), inset 0 1px 0 rgba(255,255,255,.25); }}
+      50%     {{ box-shadow:0 8px 30px rgba(215,38,61,.70), inset 0 1px 0 rgba(255,255,255,.25); }}
+  }}
+  @keyframes urgblink {{
+      0%,100% {{ opacity:.55; box-shadow:0 0 0 0 rgba(255,226,229,.0); }}
+      50%     {{ opacity:1;   box-shadow:0 0 0 4px rgba(255,226,229,.25); }}
+  }}
+  /* A thin red scarcity ribbon used near the founding-member card */
+  .scarcity-ribbon {{
+      text-align:center; margin: 0 auto 10px; max-width: 42rem;
+      font-weight:800; font-size:.95rem; letter-spacing:.3px; color:#FFD7DC;
+      padding:8px 16px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(215,38,61,.20) 0%, rgba(165,20,39,.12) 100%);
+      border:1px solid rgba(215,38,61,.55);
+  }}
+
+  /* Respect reduced-motion: hold everything still, no sweeps/pulses */
+  @media (prefers-reduced-motion: reduce) {{
+      .gold-foil, .urgency, .urgency .dotred,
+      .stButton > button[kind="primary"], .stLinkButton > a[kind="primary"] {{
+          animation: none !important;
+      }}
+  }}
+  /* Mobile: let content breathe */
+  @media (max-width: 640px) {{
+      .urgency {{ font-size:.9rem; padding:8px 14px; }}
+  }}
 
   /* ---- "Founding member" banknote / dollar-bill motif ---- */
   .note {{
@@ -219,6 +310,7 @@ st.markdown(f"""
      and value, and exactly how much cash you'd need — in plain English.</p>
   <div class="pricepill">⭐ Early-bird: <s style="opacity:.65">$99.99</s>&nbsp; <b>$18.99</b>/mo · cancel anytime</div>
   <!-- pricing (landing only): anchor $99.99/mo struck -> early-bird $18.99/mo -->
+  <div><span class="urgency"><span class="dotred"></span>⏳ Early access is limited — founding price ends before it rises to $44.99/mo</span></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -353,6 +445,11 @@ st.markdown(
     unsafe_allow_html=True)
 
 st.write("")
+# Red scarcity ribbon above the founding-member card (truthful: founding price
+# rising to $44.99, limited early access — no fake counters/timers).
+st.markdown("""
+<div class="scarcity-ribbon">🔒 Founding price won't last — it's set to rise to $44.99/mo. Lock yours in now.</div>
+""", unsafe_allow_html=True)
 st.markdown(f"""
 <div class="note">
   <div class="seal tl">$</div>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Idea Backlog & Roadmap — Underlisted</title>
+<style>
+  :root{ --green:#1D9E75; --deep:#0F6E56; --fill:#E1F5EE; --ink:#1a1a1a;
+         --amber:#E08A00; --red:#C0392B; --muted:#6b6b6b; --line:#e6e6e6; }
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--ink);
+       background:#fafaf7;margin:0;padding:32px 20px;line-height:1.55}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{color:var(--deep);font-size:1.9rem;margin:.2rem 0 .2rem}
+  .owner{color:var(--muted);margin:0 0 18px;font-size:.98rem}
+  .owner b{color:var(--deep)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+  .card h2{margin:.1rem 0 .6rem;font-size:1.2rem;color:var(--deep)}
+  .jobs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.jobs{grid-template-columns:1fr}}
+  .pill{display:inline-block;background:var(--fill);color:var(--deep);font-weight:700;
+        border-radius:999px;padding:2px 10px;font-size:.82rem}
+  .habit li{margin:5px 0}
+  .park{background:#FFF8EE;border:1px dashed #F3D9A8;border-radius:12px;padding:14px 16px;color:#6b5320}
+  table{border-collapse:collapse;width:100%;font-size:.94rem;margin-top:6px}
+  th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+  th{background:var(--fill);color:var(--deep);font-size:.85rem;text-transform:uppercase;letter-spacing:.02em}
+  tr:hover td{background:#fcfcfa}
+  .s-next{color:var(--deep);font-weight:700}
+  .s-idea{color:var(--muted);font-weight:700}
+  .s-parked{color:var(--amber);font-weight:700}
+  .p-high{color:var(--red);font-weight:800}
+  .p-med{color:var(--amber);font-weight:800}
+  .p-low{color:var(--muted);font-weight:700}
+  .done li{margin:5px 0}
+  .free{color:var(--green);font-weight:700}
+  .paid{color:var(--amber);font-weight:700}
+  .foot{color:var(--muted);font-size:.85rem;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💡 Idea Backlog &amp; Roadmap — Underlisted</h1>
+  <p class="owner"><b>Owner:</b> Theo (Head of Product &amp; Roadmap) &nbsp;·&nbsp;
+     <b>Everyone can read &amp; add</b> &nbsp;·&nbsp; Updated each working day.</p>
+
+  <div class="card">
+    <p>This is the project's single <b>"don't lose an idea"</b> list. It does two jobs:</p>
+    <div class="jobs">
+      <div><span class="pill">1 · Parking Lot</span>
+        <p>The moment anyone (the owner OR any teammate) has an idea while we're busy on
+        something else, drop it in <b>one line</b>. Don't stop the current task. Don't polish it.
+        Just park it so it isn't lost.</p></div>
+      <div><span class="pill">2 · Roadmap</span>
+        <p>Theo reviews the Parking Lot, and the good ideas graduate into the ranked roadmap —
+        with who it's for, the cost, and a priority.</p></div>
+    </div>
+    <h2 style="margin-top:14px">How we use it (the habit)</h2>
+    <ul class="habit">
+      <li><b>Capture anytime:</b> see an idea → add a Parking Lot line → keep working.</li>
+      <li><b>Theo triages:</b> moves parked ideas into the Roadmap, or marks them <i>Parked/Skip</i>
+          with a one-line reason. Nothing is ever silently deleted.</li>
+      <li><b>End-of-day review (Atlas):</b> at day's close, Atlas scans the Parking Lot against what
+          we actually did — "did we miss anything?" — then updates this file + the daily team log.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>🅿️ Parking Lot <span style="font-weight:400;color:var(--muted);font-size:.9rem">— raw ideas, add yours here</span></h2>
+    <div class="park">Empty for now. Add a line like:
+      <i>"Idea: add a 'school-free' crime info layer (info-only) — raised by Dinesha."</i></div>
+  </div>
+
+  <div class="card">
+    <h2>🗺️ Roadmap (Theo-ranked)</h2>
+    <table>
+      <tr><th>#</th><th>Idea</th><th>For whom</th><th>Owner</th><th>Cost</th><th>Status</th><th>Priority</th><th>Note</th></tr>
+      <tr><td>1</td><td>RentCast upgrade → one controlled worker run to fill the DB with real homes</td><td>All buyers</td><td>Atlas/Penny</td><td class="paid">paid · ~Jul 7</td><td class="s-next">Next</td><td class="p-high">High</td><td>The #1 paid go-live step. Don't run before quota resets (overage).</td></tr>
+      <tr><td>2</td><td>Finish Stripe/Payhip → switch the $18.99 Subscribe button on</td><td>Business</td><td>Atlas</td><td>—</td><td class="s-next">Next</td><td class="p-high">High</td><td>Paste link into <code>config/cache.yaml: checkout_url</code>.</td></tr>
+      <tr><td>3</td><td>Mirror the "Why Underlisted" section to the static site</td><td>Prospects</td><td>Juliet</td><td class="free">free</td><td class="s-next">Next</td><td class="p-med">Med</td><td>App + site should match.</td></tr>
+      <tr><td>4</td><td>Mirror a teaser of the investor calculators to the site (SEO)</td><td>Beginner investors</td><td>Serena/Quill</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-med">Med</td><td>High-intent search traffic.</td></tr>
+      <tr><td>5</td><td>8 SEO articles on the calculator terms (cap rate, 1% rule, ARV, 70% rule…)</td><td>Beginner investors</td><td>Quill/Serena</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-med">Med</td><td>Titles drafted by Quill.</td></tr>
+      <tr><td>6</td><td>Real <b>comps</b> (recently-sold prices) + a comps calculator</td><td>Investors &amp; buyers</td><td>Theo→Forge</td><td class="paid">paid (ATTOM)</td><td class="s-parked">Parked</td><td class="p-low">Low</td><td>Needs paid sold-price data. Revisit when ATTOM is approved.</td></tr>
+      <tr><td>7</td><td>Wire <b>ATTOM</b> (AVM + sold history) into scoring/detail/worker</td><td>All buyers</td><td>Theo→Forge</td><td class="paid">trial · ~Jul 14</td><td class="s-idea">Idea</td><td class="p-med">Med</td><td>Decide HOW to blend it before the trial ends.</td></tr>
+      <tr><td>8</td><td>Per-county property-tax rate (free Census/state) to tighten the afford range</td><td>Buyers</td><td>Forge</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-low">Low</td><td>Makes "true monthly cost" sharper.</td></tr>
+      <tr><td>9</td><td>Teaser of the "Can I Afford It?" badge in the free Check-A-Deal funnel</td><td>First-time buyers</td><td>Forge</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-low">Low</td><td>Pulls funnel users toward the moat.</td></tr>
+      <tr><td>10</td><td>Verify a domain in Resend so alert emails reach real customers</td><td>All buyers</td><td>Atlas</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-med">Med</td><td>Today only the owner gets test emails.</td></tr>
+      <tr><td>11</td><td>Free enrichment keys (FRED / Census / Walk Score)</td><td>Buyers</td><td>Forge</td><td class="free">free</td><td class="s-idea">Idea</td><td class="p-low">Low</td><td>Nice-to-have data upgrades.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>✅ Recently shipped</h2>
+    <ul class="done">
+      <li><b>Free Investor Tools</b> — rental cash-flow + fix-&amp;-flip/ARV calculators (Theo spec → Forge build → Vera test). 2026-06-14.</li>
+      <li><b>7 investor terms</b> in the shared glossary → in-app tooltips + public learn page; Investor Tools links to the 1-minute guide. 2026-06-14.</li>
+      <li><b>In-app "What does this mean?" tooltips</b> across the deal screen. 2026-06-14.</li>
+      <li><b>"Can I Afford It?" moat</b> — afford badge + surprise-cost panel. 2026-06-14.</li>
+    </ul>
+  </div>
+
+  <p class="foot">Source: <code>develop/IDEA_BACKLOG.md</code> (edit there; this readable copy mirrors it).
+     Status keys: Idea · Next · Building · Done · Parked (later/gated) · Skip (decided no).</p>
+</div>
+</body>
+</html>

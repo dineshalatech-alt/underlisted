@@ -68,6 +68,7 @@ class Settings:
 
     # API keys (empty string if not set yet — the app warns instead of crashing).
     rentcast_api_key: str = ""
+    attom_api_key: str = ""  # optional: ATTOM property data + sold-price comps (free trial)
     foreclosure_api_key: str = ""
     hud_fmr_token: str = ""
     streetview_api_key: str = ""
@@ -86,6 +87,7 @@ class Settings:
     financing: dict = field(default_factory=dict)
     cache: dict = field(default_factory=dict)
     affordability: dict = field(default_factory=dict)
+    investing: dict = field(default_factory=dict)
 
     # Which user is "active". Becomes the real account id once auth is added;
     # for now everything is attributed to the single local user.
@@ -95,6 +97,10 @@ class Settings:
     @property
     def has_rentcast(self) -> bool:
         return bool(self.rentcast_api_key)
+
+    @property
+    def has_attom(self) -> bool:
+        return bool(self.attom_api_key)
 
     @property
     def has_foreclosure(self) -> bool:
@@ -198,6 +204,7 @@ def get_settings() -> Settings:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     return Settings(
         rentcast_api_key=_secret("RENTCAST_API_KEY"),
+        attom_api_key=_secret("ATTOM_API_KEY"),
         foreclosure_api_key=_secret("FORECLOSURE_API_KEY"),
         hud_fmr_token=_secret("HUD_FMR_TOKEN"),
         streetview_api_key=_secret("STREETVIEW_API_KEY"),
@@ -212,6 +219,7 @@ def get_settings() -> Settings:
         financing=_read_yaml("financing.yaml"),
         cache=_read_yaml("cache.yaml"),
         affordability=_read_yaml("affordability.yaml"),
+        investing=_read_yaml("investing.yaml"),
     )
 
 

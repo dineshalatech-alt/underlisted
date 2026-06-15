@@ -146,6 +146,80 @@ TERMS: list = [
         "<b>Example:</b> on a $300,000 loan, going from 6% to 7% can add roughly "
         "$200 to your monthly payment.",
     ),
+
+    # --- Investor terms (for the free Investor Tools calculators) ----------
+    # These power the "Buy & Hold" and "Fix & Flip" calculators. Examples are
+    # kept in step with src/investing/calculators.py + config/investing.yaml so
+    # the teaching and the tool always agree.
+    Term(
+        "cash-flow", "💰", "Rental cash flow", "Rental cash flow",
+        ["If you rent a home out, cash flow is <b>the money left in your pocket "
+         "each month</b> after every cost is paid — the loan, taxes, insurance, "
+         "upkeep, empty months, and a manager if you use one.",
+         "Positive is good (the home pays you). Negative means <b>you pay to own "
+         "it</b> every month."],
+        "<b>Example:</b> rent is $2,400/mo, and all the costs add up to about "
+        "$2,250. Your cash flow is roughly <b>+$150 a month</b>.",
+    ),
+    Term(
+        "cap-rate", "📊", "Cap rate", "Cap rate",
+        ["Cap rate shows <b>how hard the home works as a rental, before any loan</b>. "
+         "It's the yearly rent (minus running costs, but <i>not</i> the mortgage) "
+         "divided by the price.",
+         "It lets you compare two rentals on equal footing, no matter how each one "
+         "is paid for."],
+        "<b>Example:</b> a $300,000 home nets about $18,000 a year after running "
+        "costs. $18,000 ÷ $300,000 = a <b>6% cap rate</b>.",
+    ),
+    Term(
+        "cash-on-cash", "💹", "Cash-on-cash return", "Cash-on-cash return",
+        ["This is <b>how much your actual cash earns in a year</b> — your yearly "
+         "cash flow divided by the cash you put in (down payment + closing costs).",
+         "Unlike cap rate, this one <b>counts your loan</b>, so it reflects what you "
+         "really pocket on the money you spent."],
+        "<b>Example:</b> you put in about $75,000 and pocket roughly $1,800 of cash "
+        "flow that year. $1,800 ÷ $75,000 ≈ a <b>2.4% cash-on-cash return</b>.",
+    ),
+    Term(
+        "one-percent-rule", "📐", "The 1% rule", "The 1% rule",
+        ["A fast back-of-napkin check: a rental usually needs <b>monthly rent of at "
+         "least 1% of the price</b> to have a shot at positive cash flow.",
+         "It's a <b>yellow flag, not a hard no</b> — pricier areas often miss it but "
+         "can still be fine. Always check the real cash flow."],
+        "<b>Example:</b> a $200,000 home should rent for about <b>$2,000/mo</b> to "
+        "pass the 1% rule.",
+    ),
+    Term(
+        "arv", "🏚️", "After-repair value (ARV)", "After-repair value (ARV)",
+        ["ARV is <b>what a home will be worth once it's fixed up</b>. You estimate it "
+         "from recently <i>sold</i>, already-renovated homes nearby — not from asking "
+         "prices.",
+         "It's the most important number in a flip: every other figure leans on it, "
+         "so be conservative."],
+        "<b>Example:</b> you buy a fixer for $150,000 and put $40,000 into it. "
+        "Similar renovated homes nearby sell for about $250,000 — that's your "
+        "<b>ARV</b>.",
+    ),
+    Term(
+        "seventy-rule", "⚖️", "The 70% rule", "The 70% rule (flipping)",
+        ["A safety rule for flippers: <b>don't pay more than 70% of the after-repair "
+         "value, minus your repair budget</b>. That cushion is meant to cover "
+         "surprises and still leave a profit.",
+         "Pay more than this and your margin gets thin — one nasty surprise can wipe "
+         "out the profit."],
+        "<b>Example:</b> ARV is $250,000. 70% of that is $175,000, minus $40,000 of "
+        "repairs = a <b>max offer of about $135,000</b>.",
+    ),
+    Term(
+        "flip-costs", "🧰", "Holding & selling costs", "Holding & selling costs",
+        ["Two costs beginners forget in a flip. <b>Holding costs</b> are what you pay "
+         "to own it while you work — taxes, insurance, utilities, loan interest. "
+         "<b>Selling costs</b> are the agent and closing fees when you sell.",
+         "Together they can eat thousands, so we always subtract them before showing "
+         "a profit."],
+        "<b>Example:</b> holding a $150,000 home for 5 months runs about $3,750; "
+        "selling a $250,000 home costs roughly $20,000 in fees.",
+    ),
 ]
 
 # Quick lookup by key.

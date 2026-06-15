@@ -4,6 +4,226 @@ A running log of what we've built, the current state, and what's next.
 
 ---
 
+## ATTOM wired into the product (3 blends) + contact path hardened — 2026-06-14 (Atlas)
+
+The owner said "wire all of it in." Done — cost-safely, with one clear limit found.
+
+- **Theo (spec):** ATTOM is a *second opinion* and a *truth-check*, never a hard
+  dependency. RentCast stays primary. Everything degrades to today's behaviour when
+  ATTOM is missing / empty / no-key. Zero new calls on the feed/cards; ATTOM is fetched
+  only when a buyer OPENS a specific home, cached shared (weekly TTL), and behind the
+  per-user monthly cap.
+
+- **Blend 1 — Deal detail (Forge):** opening a home now lazily fetches ATTOM's
+  independent AVM + last recorded sale. The detail view shows a **"Second opinion on
+  value $X (range …) · ATTOM, an independent source"** line and a **"Last sold for $X in
+  YYYY · public sale record"** line, under the existing estimated-value block. New helper
+  `attom_second_opinion(row)` in `app/sample_data.py` does the lazy, cache-first,
+  cap-aware fetch (skips sample/demo/foreclosure rows = 0 billable calls there) and
+  re-scores with the blend. Wired at the top of `render_detail` in
+  `app/pages/0_Browse_Deals.py`.
+
+- **Blend 2 — Deal Score (Forge):** new `blended_avm(value, attom)` in
+  `src/scoring/deal_score.py` = **average of RentCast + ATTOM AVMs when both present**,
+  either alone otherwise, None when neither. `compute(...)` gained an optional
+  `attom=` keyword; the value-discount factor now uses the blended value and notes "two
+  independent estimates agree." Rescale is unchanged, so **old scores don't break** when
+  ATTOM is absent (proved by tests). Last-sold is shown as a sanity line, NOT fed into the
+  score (avoids stale-sale distortion).
+
+- **Blend 3 — Investor Tools comps (Theo ruling: DEFER):** I spent **2 live trial calls**
+  probing ATTOM's area sales-trend endpoint (`/salestrend/snapshot`) — it returns **404 on
+  the free trial**, and ATTOM has **no per-property "comps" endpoint** on this tier (a real
+  comps/AVM-analytics feed is a separate PAID product). So I did NOT build fake comps.
+  Instead added a free, zero-call tip in Fix & Flip pointing users to the real last-sale +
+  independent value now shown in Browse Deals. **Owner decision needed** if we ever want
+  true automated ARV comps (paid ATTOM tier or another sold-comp source).
+
+- **JOB 2 — contact path hardened (Forge + Portia):** the **"Call / Email the listing
+  agent"** block is now **prominent** — moved UP to sit right under value/score (before the
+  long cash math), instead of buried at the very bottom. Same safe fallback (agent →
+  brokerage office → neutral "Ask a local agent · MLS #"); the BUYER always initiates.
+  **Portia's ruling on ATTOM owner-contact: DO NOT wire it.** ATTOM owner names come from
+  public tax/assessor records under terms that restrict re-display of owner PII for
+  solicitation; surfacing a "contact the owner" path invites DNC/anti-solicitation and
+  agency-bypass problems. We keep the agent/office/neutral fallback only.
+
+- **Cost spent this session:** **2 ATTOM trial calls total** (both to confirm the
+  salestrend endpoint isn't in the trial). **0 RentCast calls. Worker NOT run.** All ATTOM
+  product calls are lazy + cached + capped, same rules as RentCast.
+
+- **Vera (tests, all green):** new `tests/test_attom_blend.py` (**8/8**) locks the blend +
+  rescale-safety. Full suite: attom **14/14**, attom-blend **8/8**, agent-contact **7/7**,
+  affordability **10/10**, investing **12/12**, glossary **9**, free-sources **9/9**.
+  AppTest: Browse Deals + Investor Tools load with **no exception**; clicking "See details"
+  enters the detail view cleanly (Back button + plan radio + agent heading + score all
+  present).
+
+- **Files changed:** `src/scoring/deal_score.py` (blended_avm + attom keyword),
+  `app/sample_data.py` (attom_second_opinion helper + imports), `app/pages/0_Browse_Deals.py`
+  (second-opinion/last-sold lines + moved contact block up), `app/pages/4_Investor_Tools.py`
+  (ARV tip), `tests/test_attom_blend.py` (new). **Untouched:** payment/selling/landing
+  logic, saved data formats, the worker.
+
+- **Owner must decide next:** (1) whether to pay for a real ATTOM comps tier for automated
+  ARV — otherwise comps stay manual; (2) nothing else blocks — ATTOM blends are live in the
+  app and verified.
+
+---
+
+## Investor terms in glossary + in-app tooltips + Idea Backlog system — 2026-06-14 (Atlas/Theo/Quill/Forge)
+
+- **Education wired in (Quill content → Forge build):** added the **7 investor terms** (cash-flow,
+  cap-rate, cash-on-cash, one-percent-rule, arv, seventy-rule, flip-costs) to the shared
+  `src/glossary.py` — examples kept in step with `calculators.py` + `investing.yaml`. Rebuilt the
+  site → they now appear on the public **learn.html** AND as in-app **"What does this mean?"**
+  tooltips on the Investor Tools page. Added a top "Read the 1-minute guide →" link. Glossary tests
+  still 9/9; Investor Tools AppTest clean. Quill's full guide lives at
+  `content/investor-terms-explained.html` (+ `.md`).
+- **Idea Backlog & Roadmap (new system):** owner worried ideas get lost mid-task. Built ONE living
+  list — `develop/IDEA_BACKLOG.md` + readable `.html` — with a **Parking Lot** (anyone drops a
+  one-line idea, no derailing) and a **Theo-ranked Roadmap**. Baked the habit into **PROCEED.md §5**
+  (capture mid-task + Atlas end-of-day review vs. the daily log). Owner = **Theo**.
+- **Records:** memory `idea-backlog.md` added; `product-agent-theo.md` points at the backlog.
+- **Next (owner's call):** Roadmap #4/#5 — mirror a calculators teaser to `site/` + the 8 SEO
+  articles (Serena/Quill). Still gated: RentCast upgrade + Stripe/Payhip (the paid go-live steps).
+
+---
+
+## ATTOM Data source — AVM + real sold-price history (free trial connected) — 2026-06-14 (Serena)
+
+- **Why:** RentCast gives list price + an AVM, but ATTOM adds an **independent AVM** and, most
+  valuably, **real sale history** (what a home actually sold for and when) — the sold-price data
+  needed to sharpen the Deal Score and unlock genuine "comps" in the Investor Tools.
+- **Owner action:** created a **free 30-day ATTOM developer account**, key saved as
+  `ATTOM_API_KEY` in `.env` (verified readable via `config.settings._secret`, value never printed).
+  Added a documented blank line to `.env.example`.
+- **What I built:**
+  - **`src/data_sources/attom.py`** — mirrors `rentcast.py`'s shape: `_get()` (auth header
+    `apikey`, records usage, clear errors), `_address_pair()` (street + "City, ST"),
+    address-keyed shared cache (weekly TTL, `cache_only` honors the per-user cap),
+    `get_value_estimate()` → `ValueEstimate` (AVM + low/high), `get_last_sale()` → latest
+    recorded sale {amount, date}, and a safe `ping()` connectivity check. Handles ATTOM's quirk
+    of returning **HTTP 400 + "SuccessWithoutResult"** for no-data addresses as an *empty result*,
+    not an error. Optional/additive: if the key is missing the app behaves exactly as before.
+  - **`config/settings.py`** — `attom_api_key` field + `has_attom` property + reads `ATTOM_API_KEY`.
+  - **`tests/test_attom.py`** — 14/14 pure-logic tests (address parsing, cache keys, numeric
+    coercion incl. 0→None, AVM mapping, latest-sale extraction). No network in tests.
+- **Live trial verified (a few trial calls):** AVM works (sample home → **$631,059**) and
+  **sale history works** (same home last sold **$710,000 on 2023-10-23**). Both endpoints are
+  included in the free trial. Auth (no 401) and endpoint access (no 403) confirmed.
+- **NOT yet wired into the product** (deliberate — next decision): the module is ready but the app
+  scoring / deal detail / worker don't call ATTOM yet. Next step is to decide HOW to blend ATTOM's
+  AVM + last-sold into the Deal Score and detail view, and whether the worker should pre-fetch it
+  (costs trial calls). No paid commitment made; trial only.
+- **Untouched:** payment/selling/landing logic, saved data formats, RentCast flow.
+
+---
+
+## New team member: Theo (Product) + investor-tools attribution fixed — 2026-06-14 (Atlas)
+
+- **Why:** the PropStream review showed a gap — Scout *finds* opportunities and Forge *builds*,
+  but nobody owned the middle: turning a finding into a prioritized feature spec. The owner asked
+  whether we need a product-development teammate. **Yes** — built one (kept it narrow; education
+  stays with Quill, who already owns it).
+- **Built:** **Theo — Head of Product & Roadmap** (`.claude/agents/Theo.md`). Flow is now
+  **Scout finds → Theo decides & specs → Forge builds → Vera tests → Quill educates**. Theo specs
+  and prioritizes; he does NOT write code or spend money; protects the beginner-simple moat.
+- **Attribution corrected (the "findings to the right member" ask):** the **PropStream competitor
+  review = Scout** (research); the **decision to ship the two free calculators = Theo** (product);
+  the **code build = Forge**; **tests = Vera**; the **customer tutorials = Quill** (now in progress).
+- **Records updated:** team memory (`underlisted-team.md` → 12 divisions, + new
+  `product-agent-theo.md`), `MEMORY.md`, and `TEAM_AND_DIVISIONS.html` roster.
+- **In progress:** Quill is writing plain-English tutorials on every calculator/term (cash flow,
+  cap rate, cash-on-cash, 1% rule, ARV, 70% rule + the existing buyer terms) to educate customers.
+
+---
+
+## Go-live PREP for the RentCast upgrade (worker test staged) — 2026-06-14 (Atlas)
+
+- **Why:** owner is buying a **RentCast upgrade today**. This was PREP ONLY — no RentCast calls,
+  worker NOT run (upgrade not yet confirmed; running early risks overage).
+- **Worker verified ready + cost-guarded.** `worker/refresh_worker.py` + `.github/workflows/refresh.yml`:
+  - Manual trigger exists (`workflow_dispatch`) → repo **Actions → "Refresh listings cache" → Run workflow**.
+  - Cost guards in `config/cache.yaml: worker`: `max_listings_per_city` (1 call/area, returns up to 500),
+    `max_estimates_per_run: 50` (caps value+rent billing), `update_value_rent` toggle, photos OFF.
+    Per-property shared cache + weekly TTL means re-runs don't re-bill fresh data.
+  - **Cost shape of a full first run:** ~1 billable listing call **per target**. Current `config/cities.yaml`
+    has ~18 CA ZIP-targets + ~16 whole-city targets = **~34 listing calls**, plus up to **50 properties × 2
+    = ~100 value/rent calls** = worst case **~134 calls**. All within a paid tier, but more than needed
+    just to prove the pipe.
+- **Smallest safe first run (documented, NOT yet applied):** set `max_estimates_per_run: 0` (skip all
+  value/rent billing) and shrink `config/cities.yaml` to **one city + two ZIPs** → **~2 billable calls
+  total** to prove worker → Postgres → app works. Then restore full list (Atlas does this on owner's OK).
+- **Secrets list owner must add to GitHub** (Settings → Secrets and variables → Actions): **required**
+  `DATABASE_URL` (same Supabase string as the Streamlit app), `RENTCAST_API_KEY` (RentCast dashboard / .env);
+  **optional** `RESEND_API_KEY`, `ALERT_FROM_EMAIL`, `STREETVIEW_API_KEY`.
+- **Updated `GO_LIVE_CHECKLIST.html`** (not duplicated): plain-English, warm/green, real checkboxes,
+  corrected to **$18.99 founding price** and **nationwide** coverage, with the small-first-run recipe,
+  secret-by-secret table, verify-via-Admin/Usage steps, and money/Payhip steps clearly marked owner-only.
+- **The single command we'll run once the upgrade is confirmed** (do NOT run before then): click
+  **Run workflow** on the GitHub Action — equivalently `.venv\Scripts\python.exe -m worker.refresh_worker`.
+- **Next action:** owner confirms RentCast upgrade is active → adds the 2 required GitHub Secrets →
+  Atlas sets small-batch safe mode → owner clicks Run workflow once → verify Admin/Usage shows real homes.
+
+---
+
+## Payments setup + full agent team + partnership doc — 2026-06-14 (Atlas)
+
+- **Where the project stands:** app LIVE (Streamlit), **Postgres LIVE** (Supabase), dark-luxe
+  design (Juliet), free data sources live (RentCast, FEMA, FHFA, Freddie Mac rate, HUD rents).
+  **Worker code complete but PAUSED** — RentCast quota maxed → do NOT run until **~July 7** reset
+  (overage). The bulletproof/never-crash worker fix is on GitHub.
+- **Payments (in progress):** chose **Payhip** for the **$18.99/mo "Founding Member"** subscription.
+  Payhip subscriptions need **Stripe** (it can't do PayPal subscriptions). Stripe is being activated
+  under the **PARTNER** (a co-owner with US work authorization) as **merchant of record** — resolves
+  the earlier H-1B active-income flag. Stripe business type = **Unregistered business** in the
+  partner's name; store = "Dinesha Studio"; website given = underlistedhomes.com.
+  **Next:** finish Stripe activation → set the **$18.99 monthly** plan → **Publish** → paste the
+  `payhip.com/b/...` link into `config/cache.yaml: checkout_url` to switch the Subscribe button on.
+- **Team built:** full **11-division agent team** in `.claude/agents/` — Atlas, Juliet, Scout, Forge,
+  Vera, Penny, Serena, Quill, Hazel, Portia, Knox. Plus **PROCEED.md** (operating manual),
+  **TEAM_AND_DIVISIONS.html** (roster), and **Team Log/TEAM_DAILY_LOG.xlsx** (daily tracker — Atlas
+  updates it every session).
+- **Legal:** `Legal/PARTNERSHIP_AGREEMENT.pdf` + `.html` — a fill-in one-page partnership agreement.
+  The partner is the legal/tax owner of the payment income; recommended an attorney/accountant
+  review (visa + tax).
+- **Advisory this session:** payment methods, Hostinger vs our free stack (**keep ours**), visa /
+  Social-Security income rules, pricing ($18.99 vs "angel numbers"), partnership split + taxes.
+- **Next up (no cost, team can run):** build the **"Can I Afford It?" moat** (Forge + Vera); Penny
+  models the RentCast plan cost; Portia runs a Fair-Housing copy audit; Knox a secrets audit;
+  Serena/Quill/Hazel prep launch + content. **Gated on money/quota:** Stripe/Payhip finish, and the
+  **one controlled worker run after July 7**.
+
+---
+
+## Free Investor Tools — rental cash-flow + fix-&-flip calculators — 2026-06-14 (Forge)
+
+- **Why:** PropStream and other investor tools lock "run the numbers" calculators (comps,
+  cash flow, fix-&-flip/ARV) behind paid plans. We can offer the two pure-math ones FREE as
+  top-of-funnel material — great SEO/teaching, serves our secondary audience (beginner
+  investors), and costs **0 billable API calls**.
+- **What I built:**
+  - **`src/investing/calculators.py`** — pure-logic engine, same shape as `afford.py`:
+    - `rental(price, monthly_rent, …)` → monthly **cash flow** (range), **cap rate**,
+      **cash-on-cash return**, the **1% rule** check, and a green/amber/red verdict. Reuses
+      `afford.monthly_costs(occupancy="investment")` for tax/insurance/HOA/upkeep so the two
+      tools never disagree, then layers on vacancy + management from config.
+    - `flip(arv, purchase, repairs, …)` → projected **profit**, **ROI**, the **70% rule** max
+      offer, and a verdict. Profit = ARV − purchase − repairs − holding − selling costs.
+  - **`config/investing.yaml`** — all assumptions (vacancy %, management %, 70% rule, selling
+    %, holding %); wired into `config/settings.py` as `settings.investing`.
+  - **`app/pages/4_Investor_Tools.py`** — new FREE page (no signup), two tabs (Buy & Hold /
+    Fix & Flip), plain-English verdicts + "How we got there" breakdowns. AppTest clean.
+  - **`tests/test_investing.py`** — 12/12 pass (ranges, 1% rule, 70% rule ceiling, verdict
+    bands, monotonic sanity checks). Affordability (10/10) and agent-contact (7/7) still green.
+- **Decision:** Skipped real "comps" for now — accurate comps need paid SOLD-price data
+  (ATTOM). Revisit when paid data lands. Also relaxed the CLAUDE.md data-source rule to permit
+  public/legal scraping (e.g. Firecrawl) while still barring competitor listing sites.
+- **Next:** mirror a teaser of these calculators into the static `site/` for SEO (Serena/Quill).
+
+---
+
 ## In-app "What does this mean?" tooltips — teaching at the point of confusion — 2026-06-14 (Juliet)
 
 - **Why:** the website already had a free plain-English glossary (`site/learn.html`), but a

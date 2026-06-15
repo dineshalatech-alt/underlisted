@@ -443,8 +443,14 @@ def _render_agent_contact(l) -> None:
 
 
 def render_detail(row) -> None:
+    # Lazily fetch ATTOM's independent second opinion (AVM + last sale) for THIS
+    # opened home only — cache-first, capped, never on the feed. Re-scores with
+    # the blended value. No-op if ATTOM isn't configured or it's a sample home.
+    row = sample_data.attom_second_opinion(row)
     l = row["listing"]
     val, rent, score = row["value"], row["rent"], row["score"]
+    attom_val = row.get("attom_value")
+    last_sale = row.get("attom_last_sale")
 
     if st.button("← Back to listings", key="back"):
         st.session_state.open_id = None
@@ -541,6 +547,31 @@ def render_detail(row) -> None:
             st.caption(f"Value range {money(val.value_low)}–{money(val.value_high)} · "
                        f"{len(val.comps or [])} comparable sales")
         _explain("estimated-value", label="What does 'estimated value' mean?")
+
+    # --- Second opinion on value (ATTOM, independent AVM) ---
+    if attom_val and attom_val.avm:
+        rng = ""
+        if attom_val.value_low and attom_val.value_high:
+            rng = (f" <span class='muted'>(range {money(attom_val.value_low)}–"
+                   f"{money(attom_val.value_high)})</span>")
+        st.markdown(f"{ic('value',18,DEEP_GREEN)} Second opinion on value "
+                    f"<b>{money(attom_val.avm)}</b>{rng} "
+                    f"<span class='muted'>· ATTOM, an independent source</span>",
+                    unsafe_allow_html=True)
+        if val.avm:
+            st.caption("Two independent estimates — when they agree, the deal "
+                       "score trusts the value more.")
+
+    # --- What it actually last sold for (ATTOM sale history) ---
+    if last_sale and last_sale.get("amount"):
+        year = ""
+        d = last_sale.get("date") or ""
+        if len(d) >= 4 and d[:4].isdigit():
+            year = f" in {d[:4]}"
+        st.markdown(f"{ic('clock',18,MUTED)} Last sold for "
+                    f"<b>{money(last_sale['amount'])}</b>{year} "
+                    f"<span class='muted'>· public sale record (ATTOM)</span>",
+                    unsafe_allow_html=True)
     if not row.get("foreclosure"):
         rsample = " <span class='sampletag'>sample</span>" if row["rent_sample"] else ""
         st.markdown(f"{ic('rent',20,PRIMARY_GREEN)} Estimated rent: "
@@ -548,6 +579,10 @@ def render_detail(row) -> None:
         with st.popover("What's 'estimated rent'?"):
             st.write("A computer estimate of monthly rent from similar nearby rentals. "
                      "Actual rent varies.")
+
+    st.divider()
+    # --- Contact the seller's agent (PROMINENT — buyers ask for this first) ---
+    _render_agent_contact(l)
 
     st.divider()
     # --- How much cash you really need ---
@@ -618,9 +653,6 @@ def render_detail(row) -> None:
 
     st.divider()
     _render_afford(l, occupancy, loan_type, band, row.get("risk"))
-
-    st.divider()
-    _render_agent_contact(l)
 
     st.divider()
     st.markdown(

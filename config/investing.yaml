@@ -1,0 +1,38 @@
+# ------------------------------------------------------------------
+# INVESTING assumptions — power the free Investor Tools page:
+#   1) Rental cash-flow + cash-on-cash (buy & hold)
+#   2) Fix-&-flip profit + the 70% rule (ARV)
+#
+# PURE logic. NO RentCast, NO billable API calls — these run on the
+# numbers the user types plus our existing cost engine
+# (config/affordability.yaml + config/financing.yaml).
+#
+# Everything is an ESTIMATE. Edit freely — these are NOT selling/payment
+# settings. Tune them as you learn real numbers.
+# ------------------------------------------------------------------
+
+# --- Buy & hold (rental cash flow) --------------------------------
+rental:
+  # Money lost to empty months, as a % of yearly rent. 5% ≈ ~2.5 weeks/yr.
+  vacancy_pct: 5
+  # Property-management fee, as a % of rent. ~8–10% if you hire a manager;
+  # set to 0 if the buyer self-manages.
+  management_pct: 8
+  # A monthly cash flow at or above this counts as "healthy" (green).
+  healthy_monthly_cashflow: 100
+  # NOTE: property tax, insurance, HOA and upkeep come straight from
+  # config/affordability.yaml so the two tools never disagree.
+
+# --- Fix & flip ---------------------------------------------------
+flip:
+  # The classic "70% rule": don't pay more than this % of the after-repair
+  # value, minus repairs. Lowering it = more conservative offers.
+  rule_of_thumb_pct: 70
+  # What it costs to SELL when you're done (agent commission + closing),
+  # as a % of the after-repair value (ARV).
+  selling_costs_pct: 8
+  # Holding costs while you own it (taxes, insurance, utilities, loan
+  # interest), as a % of the purchase price PER YEAR.
+  holding_costs_annual_pct: 6
+  # Default number of months the project is assumed to take.
+  default_hold_months: 5
