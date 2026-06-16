@@ -67,6 +67,10 @@ _SCHEMA = [
 _MIGRATIONS = [
     "ALTER TABLE saved_searches ADD COLUMN email TEXT",
     "ALTER TABLE alert_log ADD COLUMN notified INTEGER DEFAULT 0",
+    # previous_price ships in the CREATE TABLE above, but databases created before
+    # it was added (e.g. the live Supabase one) won't have it — and the feed query
+    # (load_cached_listings) SELECTs it, so without this the app crashes on Postgres.
+    "ALTER TABLE listings ADD COLUMN previous_price REAL",
 ]
 
 
