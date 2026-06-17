@@ -352,13 +352,32 @@ def load_cached_listings(
     """
     import json
 
+    has_prev = True
     with db.connect() as conn:
-        rows = conn.execute(
-            "SELECT id, payload, previous_price FROM listings "
-            "WHERE id NOT LIKE 'FC:%' "       # foreclosures load via foreclosure.py
-            "ORDER BY last_seen DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
+        # NOTE: pass the LIKE pattern as a BOUND PARAMETER. Inlining 'FC:%'
+        # breaks on PostgreSQL — the backend turns "?" into "%s", and psycopg
+        # then mis-reads a literal "%" as a placeholder. Binding it avoids that
+        # and works identically on SQLite. (foreclosures load via foreclosure.py)
+        try:
+            rows = conn.execute(
+                "SELECT id, payload, previous_price FROM listings "
+                "WHERE id NOT LIKE ? "
+                "ORDER BY last_seen DESC LIMIT ?",
+                ("FC:%", limit),
+            ).fetchall()
+        except Exception:
+            # Older databases may not have the previous_price column yet (the
+            # migration hadn't run there). Don't crash the whole feed over a
+            # price-drop nicety — clear the aborted Postgres transaction and
+            # load listings without it.
+            conn.rollback()
+            has_prev = False
+            rows = conn.execute(
+                "SELECT id, payload FROM listings "
+                "WHERE id NOT LIKE ? "
+                "ORDER BY last_seen DESC LIMIT ?",
+                ("FC:%", limit),
+            ).fetchall()
 
     listings: list[Listing] = []
     for row in rows:
@@ -367,7 +386,7 @@ def load_cached_listings(
         except (TypeError, ValueError):
             continue
         listing = raw_to_listing(raw)
-        if row["previous_price"] is not None:
+        if has_prev and row["previous_price"] is not None:
             listing.previous_price = float(row["previous_price"])
         if city_filter and listing.city not in city_filter:
             continue
