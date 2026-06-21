@@ -1,32 +1,56 @@
 name: keep-streamlit-awake
 
 # Keeps the public Streamlit app warm so first-time visitors never hit the
-# "Zzzz — this app has gone to sleep" screen. Streamlit Community Cloud naps an
-# app after a stretch of no traffic; a light periodic visit resets that timer.
-# Pure HTTP GETs to PUBLIC URLs — no secrets, no cost, no app code touched.
+# "Zzzz — this app has gone to sleep" screen. Streamlit Community Cloud decides
+# "asleep" from real browser sessions (not raw pings), so this loads the app in a
+# headless browser like a real visitor and clicks the wake button if it's asleep.
+# Public URL only, no secrets, no app code touched. Repo is public => free CI.
 
 on:
   schedule:
-    - cron: "*/12 * * * *"   # every 12 minutes (GitHub may delay under load — fine)
+    - cron: "*/20 * * * *"   # every 20 min (GitHub may delay under load — fine)
   workflow_dispatch:          # lets us trigger a run by hand to test
 
-# If a previous run is still going, don't pile up.
 concurrency:
   group: keep-warm
   cancel-in-progress: true
 
 jobs:
-  ping:
+  wake:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
-      - name: Visit the app so it stays awake
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install headless browser
         run: |
-          APP="https://underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app"
-          echo "Keep-warm ping at $(date -u) ..."
-          for url in "$APP/_stcore/health" "$APP/"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 90 \
-                   -A "Mozilla/5.0 (UnderlistedKeepWarm/1.0)" "$url" || echo "000")
-            echo "  $url -> HTTP $code"
-          done
-          echo "Done. (Note: this keeps a warm app warm; if it had fully slept it may take one more cycle to wake.)"
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Visit the app like a real person (wakes it + keeps it warm)
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          APP = "https://underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app"
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              page = browser.new_page()
+              page.goto(APP, wait_until="domcontentloaded", timeout=90000)
+              page.wait_for_timeout(5000)
+              try:
+                  btn = page.get_by_text("get this app back up", exact=False)
+                  if btn.count() > 0:
+                      print("App was ASLEEP -> clicking the wake button...")
+                      btn.first.click()
+                      page.wait_for_timeout(50000)  # let the container spin up
+                  else:
+                      print("App already awake.")
+              except Exception as e:
+                  print("wake-check note:", e)
+              page.wait_for_timeout(3000)
+              print("Page title:", page.title())
+              browser.close()
+          print("Keep-warm visit complete.")
+          PY
