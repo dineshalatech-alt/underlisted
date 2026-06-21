@@ -1,0 +1,32 @@
+name: keep-streamlit-awake
+
+# Keeps the public Streamlit app warm so first-time visitors never hit the
+# "Zzzz — this app has gone to sleep" screen. Streamlit Community Cloud naps an
+# app after a stretch of no traffic; a light periodic visit resets that timer.
+# Pure HTTP GETs to PUBLIC URLs — no secrets, no cost, no app code touched.
+
+on:
+  schedule:
+    - cron: "*/12 * * * *"   # every 12 minutes (GitHub may delay under load — fine)
+  workflow_dispatch:          # lets us trigger a run by hand to test
+
+# If a previous run is still going, don't pile up.
+concurrency:
+  group: keep-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Visit the app so it stays awake
+        run: |
+          APP="https://underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app"
+          echo "Keep-warm ping at $(date -u) ..."
+          for url in "$APP/_stcore/health" "$APP/"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 90 \
+                   -A "Mozilla/5.0 (UnderlistedKeepWarm/1.0)" "$url" || echo "000")
+            echo "  $url -> HTTP $code"
+          done
+          echo "Done. (Note: this keeps a warm app warm; if it had fully slept it may take one more cycle to wake.)"
