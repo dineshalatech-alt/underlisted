@@ -28,6 +28,7 @@ from src.affordability import afford  # noqa: E402
 from src.cache import db  # noqa: E402
 from app.assets.theme import (APP_CSS, DEEP_GREEN, PRIMARY_GREEN, LIGHT_FILL,  # noqa: E402
                               MUTED, AMBER, RED, score_color)
+from app.assets import deal_visual as dv  # noqa: E402  (approved "Trusted morning" deal page)
 from app.icons import TABLER_CSS, ic  # noqa: E402
 from app.helpers import (money, number, dom_label, gmaps_link, pct,  # noqa: E402
                          favicon_path, wait_message, random_tip)
@@ -291,45 +292,55 @@ def _cost_rows(mc) -> str:
     return "".join(rows)
 
 
-def _render_afford(l, occupancy, loan_type, band, risk) -> None:
-    """The 'Can I Afford It?' moat: true monthly cost + personal yes/no badge.
+def _render_credit_impact(price, occupancy, loan_type, band) -> None:
+    """Plain 'what your credit score means for THIS home' — in real dollars.
 
-    Pure logic — NO API calls. Personal inputs are kept out of logs; we only
-    save them (opt-in) to the per-user prefs row so they persist between visits.
+    Pure math (afford.credit_impact), zero API calls. Turns the credit dropdown
+    from a silent rate-tweak into a visible, motivating number: what a top score
+    would save, and what improving by one band is worth.
+    """
+    if not price:
+        return
+    ci = afford.credit_impact(price, occupancy=occupancy, loan_type=loan_type,
+                              credit_band=band)
+    if ci.is_best:
+        st.success(
+            f"{ic('check',18,PRIMARY_GREEN)} Your credit ({ci.current_band}) gets the "
+            f"**best rate lenders offer (~{pct(ci.current_rate)})** — the lowest "
+            f"payment on this home, about **{money(ci.current_payment)}/mo** "
+            "(loan only). Nice.", icon=None)
+    else:
+        msg = (
+            f"At **{ci.current_band}** your rate is about **{pct(ci.current_rate)}** "
+            f"(~{money(ci.current_payment)}/mo loan payment). Buyers with top credit "
+            f"(740+) get ~{pct(ci.best_rate)} — about **{money(ci.monthly_saving_to_best)}/mo "
+            "less** for the very same home.")
+        if ci.next_band and ci.monthly_saving_to_next >= 1:
+            msg += (f" Even nudging up to **{ci.next_band}** could save roughly "
+                    f"**{money(ci.monthly_saving_to_next)}/mo** "
+                    f"(~{money(ci.lifetime_saving_to_next)} over the loan).")
+        st.info(msg, icon=None)
+    _explain("credit-score", label="What does my credit score mean?")
+
+
+def _render_afford(l, occupancy, loan_type, band, risk, *, mc, hoa_val) -> None:
+    """The 'Can YOU afford it?' moat: a personal traffic-light verdict.
+
+    The true-monthly-cost panel now renders ABOVE this (the visual stacked bar),
+    so here we only collect the buyer's income/cash/debts and show the verdict
+    using the approved traffic-light card. Pure logic — NO API calls. Personal
+    inputs are kept out of logs; saved only (opt-in) to the per-user prefs row.
     """
     price = l.list_price or 0
-    st.markdown(f"#### {ic('wallet',22,DEEP_GREEN)} Can I afford it?",
-                unsafe_allow_html=True)
+    st.markdown(f"<div class='uv' style='margin-top:16px'><h4 style='font-family:\"Cormorant Garamond\",serif;"
+                f"font-weight:600;font-size:1.4rem;color:{dv.T.TV_INK}'>Can <span "
+                f"style='font-style:italic;color:{dv.T.TV_GOLD}'>you</span> "
+                f"afford it?</h4></div>", unsafe_allow_html=True)
     _explain("afford", label="What does 'Can I afford it?' mean?")
 
-    # --- Surprise-Cost panel: the true monthly cost, honest ranges ---
-    hoa_known = st.toggle("I know this home's HOA dues", key=f"hoatog_{l.id}")
-    hoa_val = None
-    if hoa_known:
-        hoa_val = st.number_input("HOA dues ($/month)", min_value=0, max_value=5000,
-                                  value=0, step=25, key=f"hoa_{l.id}")
-    mc = afford.monthly_costs(price, occupancy=occupancy, loan_type=loan_type,
-                              credit_band=band, risk=risk, hoa_monthly=hoa_val)
-    st.markdown(_cost_rows(mc), unsafe_allow_html=True)
-    st.caption("The surprise costs first-time buyers forget — each shown as an honest "
-               "low–high range, not a single pretend number.")
-    # Small, tucked-away helpers for the two terms people trip on most here.
-    h1, h2, h3 = st.columns(3)
-    with h1:
-        _explain("true-monthly-cost", label="True monthly cost?", example=False)
-    with h2:
-        _explain("pmi", label="What's PMI?")
-    with h3:
-        _explain("hoa", label="What's HOA?")
-    with st.expander("What each cost is"):
-        for it in mc.items:
-            st.markdown(f"**{it.label}** — {it.note}")
-        st.caption("Upkeep & repairs aren't part of the lender's payment, but they're "
-                   "real money — budget for them too.")
-
-    # --- Personal affordability badge: green / amber / red ---
     prefs = db.get_user_prefs(settings.current_user_id) or {}
-    st.markdown("**Your numbers** — get a personal yes / maybe / no for THIS home.")
+    st.caption("Enter your numbers for a personal yes / maybe / no for THIS home. "
+               "Private — never stored unless you ask.")
     a, b, c = st.columns(3)
     income = a.number_input("Your gross monthly income ($)", min_value=0,
                             max_value=200000, step=250,
@@ -353,7 +364,7 @@ def _render_afford(l, occupancy, loan_type, band, risk) -> None:
                            monthly_debts=debts, occupancy=occupancy,
                            loan_type=loan_type, credit_band=band, risk=risk,
                            hoa_monthly=hoa_val)
-        st.markdown(_verdict_badge(v), unsafe_allow_html=True)
+        st.markdown(dv.afford_light(v), unsafe_allow_html=True)
         st.caption("A rough screen, not a loan decision. Lenders look at your full "
                    "picture — talk to one before you commit.")
         if st.checkbox("Remember my numbers on this device", key=f"save_{l.id}"):
@@ -380,66 +391,50 @@ def _render_agent_contact(l) -> None:
     """
     c = listing_contact(l)
 
-    st.markdown(f"#### {ic('user',22,DEEP_GREEN)} Call / Email the listing agent",
-                unsafe_allow_html=True)
-
-    # The address, so the buyer can reference the exact home when they reach out.
-    if l.address:
-        st.markdown(f"<div class='facts'>{ic('location',16,MUTED)} {l.address}</div>",
-                    unsafe_allow_html=True)
-
-    if c["kind"] == "agent":
-        st.markdown(f"<div class='addr'>{ic('user',18,PRIMARY_GREEN)} {c['name']}</div>",
-                    unsafe_allow_html=True)
-        if l.office_name:
-            st.caption(f"{l.office_name}")
-    elif c["kind"] == "office":
-        st.markdown(f"<div class='addr'>{ic('bank',18,PRIMARY_GREEN)} {c['name']}</div>",
-                    unsafe_allow_html=True)
-        st.caption("Listing brokerage (the listing agent wasn't provided).")
-    else:
-        # Neutral fallback — no agent or office on this record yet.
-        mls = f" · MLS #{c['mls_number']}" if c.get("mls_number") else ""
-        st.markdown(f"<div class='addr'>{ic('user',18,MUTED)} {c['name']}"
-                    f"<span class='muted'>{mls}</span></div>", unsafe_allow_html=True)
-        st.caption("No listing-agent contact on this record yet. Any licensed local "
-                   "agent can pull up this home" + (f" by its MLS number." if mls
-                   else " and help you see it."))
-
-    # One-tap buttons that open the BUYER's own phone / email app.
-    btns = []
+    # Build the tel:/mailto:/site hrefs here (where URL quoting + the real
+    # listing data live), then hand them to the visual card renderer.
+    tel_href = mailto_href = site_href = None
     if c.get("phone"):
-        tel = "tel:" + "".join(ch for ch in c["phone"] if ch.isdigit() or ch == "+")
-        btns.append(("phone", "Call", tel, f"{c['phone']}"))
+        tel_href = "tel:" + "".join(ch for ch in c["phone"]
+                                    if ch.isdigit() or ch == "+")
     if c.get("email"):
         subj = f"Question about {l.address or 'your listing'}"
-        mailto = f"mailto:{c['email']}?subject={_url_quote(subj)}"
-        btns.append(("mail", "Email", mailto, c["email"]))
+        mailto_href = f"mailto:{c['email']}?subject={_url_quote(subj)}"
     if c.get("website"):
         site = c["website"]
         if not site.lower().startswith(("http://", "https://")):
             site = "https://" + site
-        btns.append(("globe", "Website", site, "Listing / agent site"))
+        site_href = site
 
-    if btns:
-        cols = st.columns(len(btns))
-        for col, (icon, label, href, sub) in zip(cols, btns):
-            col.markdown(
-                f"<a href='{href}' target='_blank' "
-                f"style='display:block;text-align:center;text-decoration:none;"
-                f"background:{LIGHT_FILL};color:{DEEP_GREEN};font-weight:700;"
-                f"padding:.7rem 1rem;border-radius:12px;'>"
-                f"{ic(icon,18,DEEP_GREEN)} {label}</a>"
-                f"<div class='muted' style='text-align:center;font-size:.85rem;"
-                f"margin-top:3px'>{sub}</div>",
-                unsafe_allow_html=True)
-    else:
-        # No phone/email/website at all — keep it honest and useful.
-        st.info("Contact details aren't published for this listing yet. Open it in "
-                "Google Maps above, or ask any local buyer's agent to look it up.")
-
+    st.markdown(dv.agent(contact=c, address=l.address, office_name=l.office_name,
+                         tel_href=tel_href, mailto_href=mailto_href,
+                         site_href=site_href), unsafe_allow_html=True)
     st.caption("You contact the agent directly from your own phone or email — "
                "Underlisted never messages agents for you.")
+
+
+def _hero_why_html(score, val, row) -> str:
+    """Plain one-paragraph 'why' for the dial hero, from REAL score factors."""
+    facs = {f.key: f for f in score.used_factors}
+    bits = []
+    vd = facs.get("value_discount")
+    if vd and vd.points > 0 and val and val.avm and row["listing"].list_price:
+        diff = (val.avm - row["listing"].list_price) / val.avm * 100
+        if diff >= 1:
+            agree = " and two independent estimates agree" if row.get("attom_value") else ""
+            bits.append(f"Listed about <b>{abs(diff):.0f}% below</b> what it's worth{agree}")
+    dom = row["listing"].days_on_market
+    if dom is not None and dom >= 30:
+        bits.append(f"it's been waiting <b>{dom} days</b> — room to make an offer")
+    if not bits:
+        # Fall back to the existing plain-English summary sentence.
+        return _esc_plain(_why_in_plain_english(score))
+    return ". ".join(b[0].upper() + b[1:] if i == 0 else b
+                     for i, b in enumerate(bits)) + "."
+
+
+def _esc_plain(s: str) -> str:
+    return s.replace("<", "&lt;").replace(">", "&gt;")
 
 
 def render_detail(row) -> None:
@@ -452,141 +447,95 @@ def render_detail(row) -> None:
     attom_val = row.get("attom_value")
     last_sale = row.get("attom_last_sale")
 
+    # Inject the approved "Trusted morning" page styles once.
+    st.markdown(dv.page_css(), unsafe_allow_html=True)
+
     if st.button("← Back to listings", key="back"):
         st.session_state.open_id = None
         st.rerun()
 
-    st.markdown(_photo_placeholder(), unsafe_allow_html=True)
-    st.caption("Photo — street view (preview placeholder)")
-
-    st.markdown(f"<div class='price'>{money(l.list_price)}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='addr'>{l.address or '—'}</div>", unsafe_allow_html=True)
+    # Foreclosure rows keep the older simple layout (no beds/baths/rent/afford).
     if row.get("foreclosure"):
-        demo = " <span class='sampletag'>demo</span>" if row.get("demo_foreclosure") else ""
-        st.markdown(_bank_badge() + demo, unsafe_allow_html=True)
-        st.markdown(_discount_html(val, l.list_price), unsafe_allow_html=True)
-        st.markdown(f"<div class='facts'>{ic('gavel',16,'#344054')} Sold as-is — may "
-                    "have liens or auction rules. Beds/baths aren't in foreclosure "
-                    "data; verify everything before bidding.</div>",
-                    unsafe_allow_html=True)
-        st.markdown(f"<div class='facts'>{ic('location')} {l.city} {l.zip_code}</div>",
-                    unsafe_allow_html=True)
-    else:
-        st.markdown(_facts_html(l), unsafe_allow_html=True)
-        st.markdown(f"<div class='facts'>{ic('clock')} {dom_label(l.days_on_market)} &nbsp; "
-                    f"{ic('location')} {l.city} {l.zip_code}</div>", unsafe_allow_html=True)
+        _render_foreclosure_detail(row)
+        return
+
+    # ===================== HERO: the Deal Dial (signature) =====================
+    why = _hero_why_html(score, val, row)
+    st.markdown(dv.hero(address=l.address or f"{l.city} {l.zip_code}",
+                        score=score.total, why_html=why), unsafe_allow_html=True)
+
+    # Facts + map link sit quietly under the hero.
+    st.markdown(f"<div class='facts' style='margin-top:12px'>{_facts_inline(l)}</div>",
+                unsafe_allow_html=True)
     link = gmaps_link(l.address)
-    if link:
-        st.markdown(f"<a href='{link}' target='_blank' style='color:{DEEP_GREEN}'>"
-                    f"{ic('location')} Open in Google Maps</a>", unsafe_allow_html=True)
-    if row.get("foreclosure"):
-        links = " · ".join(f"<a href='{u}' target='_blank' style='color:{DEEP_GREEN}'>"
-                           f"{n}</a>" for n, u in GOV_LINKS)
-        st.markdown(f"<div class='facts' style='margin-top:6px'>{ic('link',15,MUTED)} "
-                    f"Also check free government foreclosures: {links}</div>",
-                    unsafe_allow_html=True)
-
-    # --- Market context: free FHFA ZIP price trend ---
     pt = market.price_trend(l.zip_code)
+    meta = []
+    if link:
+        meta.append(f"<a href='{link}' target='_blank' style='color:{dv.T.TV_TEAL};"
+                    f"font-weight:600'>Open in Google Maps</a>")
     if pt and pt.get("change") is not None:
         up = pt["change"] >= 0
-        col = PRIMARY_GREEN if up else RED
+        col = dv.T.TV_GOOD if up else dv.T.TV_WALK
         arrow = "▲" if up else "▼"
-        st.markdown(f"<div class='facts'>{ic('trending',16,col)} Home prices in "
-                    f"{l.zip_code}: <b style='color:{col}'>{arrow} {abs(pt['change']):.1f}%</b> "
-                    f"in {pt['year']} <span class='muted'>· FHFA</span></div>",
+        meta.append(f"Prices in {l.zip_code}: <b style='color:{col}'>{arrow} "
+                    f"{abs(pt['change']):.1f}%</b> in {pt['year']} · FHFA")
+    if meta:
+        st.markdown(f"<div class='facts'>{' &nbsp;·&nbsp; '.join(meta)}</div>",
                     unsafe_allow_html=True)
 
-    # --- Risk flags (the differentiator: insurance-cost warning) ---
-    rb = _risk_badges(row.get("risk"))
-    note = getattr(row.get("risk"), "insurance_note", None)
-    if rb:
-        st.markdown(rb, unsafe_allow_html=True)
-    if note:
-        st.markdown(f"<div style='background:#FBE9C7;color:{AMBER};padding:8px 12px;"
-                    f"border-radius:10px;margin-top:6px;font-weight:600'>"
-                    f"{ic('shield',16,AMBER)} {note}</div>", unsafe_allow_html=True)
-    if rb or note:
+    # Tucked-away teaching for the score (kept from before — popovers stay calm).
+    with st.expander("How we got this score"):
+        _explain("deal-score", label="What does the Deal Score mean?")
+        st.markdown(_why_bar(score), unsafe_allow_html=True)
+        for f in score.factors:
+            color = FACTOR_COLORS.get(f.key, MUTED)
+            if f.included:
+                st.markdown(f"<span class='dot' style='background:{color}'></span>"
+                            f"**{f.label}** — {f.detail} &nbsp; "
+                            f"<span class='muted'>{f.points:.0f}/{f.weight:.0f} pts</span>",
+                            unsafe_allow_html=True)
+            else:
+                st.markdown(f"<span class='dot' style='background:#D0D5DD'></span>"
+                            f"<span class='muted'>{f.label} — {f.detail} "
+                            "(not counted yet)</span>", unsafe_allow_html=True)
+
+    # ===================== WHAT IT'S REALLY WORTH =====================
+    # Blended value drives the bar so it matches the deal score's own value.
+    from src.scoring.deal_score import blended_avm
+    blended, src_label = blended_avm(val, attom_val)
+    if blended:
+        st.markdown(dv.worth(asking=l.list_price or 0, value=blended,
+                             source_label=src_label), unsafe_allow_html=True)
+        with st.expander("More on value & rent"):
+            if val.avm:
+                if val.value_low and val.value_high:
+                    st.caption(f"RentCast value range {money(val.value_low)}–"
+                               f"{money(val.value_high)} · {len(val.comps or [])} comps"
+                               + (" · sample" if row['value_sample'] else ""))
+                _explain("estimated-value", label="What does 'estimated value' mean?")
+            if attom_val and attom_val.avm:
+                st.markdown(f"Second opinion on value **{money(attom_val.avm)}** "
+                            "· ATTOM, an independent source")
+            if last_sale and last_sale.get("amount"):
+                d = last_sale.get("date") or ""
+                yr = f" in {d[:4]}" if len(d) >= 4 and d[:4].isdigit() else ""
+                st.markdown(f"Last sold for **{money(last_sale['amount'])}**{yr} "
+                            "· public sale record (ATTOM)")
+            rsample = " (sample)" if row["rent_sample"] else ""
+            st.markdown(f"Estimated rent **{money(rent)}/mo**{rsample}")
+
+    # ===================== INSURANCE & DISASTER CHECK (moat) =====================
+    rf = row.get("risk")
+    risk_html = dv.risk(fire_zone=getattr(rf, "fire_zone", None),
+                        flood_zone=getattr(rf, "flood_zone", None),
+                        insurance_note=getattr(rf, "insurance_note", None))
+    if risk_html:
+        st.markdown(risk_html, unsafe_allow_html=True)
         _explain("insurance-risk", label="What does this warning mean?")
 
-    st.divider()
-    # --- Deal Score + why ---
-    st.markdown(_score_badge(score), unsafe_allow_html=True)
-    _explain("deal-score", label="What does the Deal Score mean?")
-    # Plain-English, one-line "why this score" — the biggest reason in words.
-    plain = _why_in_plain_english(score)
-    if plain:
-        st.markdown(f"<div style='background:{LIGHT_FILL};color:{DEEP_GREEN};"
-                    f"padding:10px 14px;border-radius:10px;font-weight:600;"
-                    f"margin:4px 0 8px'>{ic('info',16,DEEP_GREEN)} {plain}</div>",
-                    unsafe_allow_html=True)
-    st.markdown(f"##### Why it scored {score.total}")
-    st.markdown(_why_bar(score), unsafe_allow_html=True)
-    for f in score.factors:
-        color = FACTOR_COLORS.get(f.key, MUTED)
-        if f.included:
-            st.markdown(f"<span class='dot' style='background:{color}'></span>"
-                        f"**{f.label}** — {f.detail} &nbsp; "
-                        f"<span class='muted'>{f.points:.0f}/{f.weight:.0f} pts</span>",
-                        unsafe_allow_html=True)
-        else:
-            st.markdown(f"<span class='dot' style='background:#D0D5DD'></span>"
-                        f"<span class='muted'>{f.label} — {f.detail} "
-                        "(not counted yet)</span>", unsafe_allow_html=True)
-
-    st.divider()
-    # --- Value & rent (plain) ---
-    vsample = " <span class='sampletag'>sample</span>" if row["value_sample"] else ""
-    if val.avm:
-        diff = (val.avm or 0) - (l.list_price or 0)
-        word = "below" if diff > 0 else ("above" if diff < 0 else "right at")
-        st.markdown(f"{ic('value',20,PRIMARY_GREEN)} Estimated value: "
-                    f"**{money(val.avm)}**{vsample} — listed **{money(abs(diff))} "
-                    f"{word}** value.", unsafe_allow_html=True)
-        if val.value_low and val.value_high:
-            st.caption(f"Value range {money(val.value_low)}–{money(val.value_high)} · "
-                       f"{len(val.comps or [])} comparable sales")
-        _explain("estimated-value", label="What does 'estimated value' mean?")
-
-    # --- Second opinion on value (ATTOM, independent AVM) ---
-    if attom_val and attom_val.avm:
-        rng = ""
-        if attom_val.value_low and attom_val.value_high:
-            rng = (f" <span class='muted'>(range {money(attom_val.value_low)}–"
-                   f"{money(attom_val.value_high)})</span>")
-        st.markdown(f"{ic('value',18,DEEP_GREEN)} Second opinion on value "
-                    f"<b>{money(attom_val.avm)}</b>{rng} "
-                    f"<span class='muted'>· ATTOM, an independent source</span>",
-                    unsafe_allow_html=True)
-        if val.avm:
-            st.caption("Two independent estimates — when they agree, the deal "
-                       "score trusts the value more.")
-
-    # --- What it actually last sold for (ATTOM sale history) ---
-    if last_sale and last_sale.get("amount"):
-        year = ""
-        d = last_sale.get("date") or ""
-        if len(d) >= 4 and d[:4].isdigit():
-            year = f" in {d[:4]}"
-        st.markdown(f"{ic('clock',18,MUTED)} Last sold for "
-                    f"<b>{money(last_sale['amount'])}</b>{year} "
-                    f"<span class='muted'>· public sale record (ATTOM)</span>",
-                    unsafe_allow_html=True)
-    if not row.get("foreclosure"):
-        rsample = " <span class='sampletag'>sample</span>" if row["rent_sample"] else ""
-        st.markdown(f"{ic('rent',20,PRIMARY_GREEN)} Estimated rent: "
-                    f"**{money(rent)}/mo**{rsample}", unsafe_allow_html=True)
-        with st.popover("What's 'estimated rent'?"):
-            st.write("A computer estimate of monthly rent from similar nearby rentals. "
-                     "Actual rent varies.")
-
-    st.divider()
-    # --- Contact the seller's agent (PROMINENT — buyers ask for this first) ---
-    _render_agent_contact(l)
-
-    st.divider()
-    # --- How much cash you really need ---
-    st.markdown(f"#### {ic('key',22,DEEP_GREEN)} How much cash you really need",
+    # ===================== Your plan (drives cost + cash + afford) =====================
+    st.markdown(f"<div class='uv' style='margin-top:16px'><h4 style='font-family:\"Cormorant Garamond\",serif;"
+                f"font-weight:600;font-size:1.4rem;color:{dv.T.TV_INK}'>Set up your numbers</h4></div>",
                 unsafe_allow_html=True)
     plan = st.radio("Your plan", ["I'll live in it", "I'll rent it out"],
                     horizontal=True, key=f"plan_{l.id}")
@@ -598,72 +547,97 @@ def render_detail(row) -> None:
                                     format_func=str.upper, key=f"lt_{l.id}")
     band = cc[1].selectbox("Your credit score", cash_needed.CREDIT_BANDS,
                            key=f"cb_{l.id}")
+    _render_credit_impact(l.list_price or 0, occupancy, loan_type, band)
+    hoa_known = st.toggle("I know this home's HOA dues", key=f"hoatog_{l.id}")
+    hoa_val = None
+    if hoa_known:
+        hoa_val = st.number_input("HOA dues ($/month)", min_value=0, max_value=5000,
+                                  value=0, step=25, key=f"hoa_{l.id}")
 
+    # ===================== TRUE MONTHLY COST (stacked bar) =====================
+    mc = afford.monthly_costs(l.list_price or 0, occupancy=occupancy,
+                              loan_type=loan_type, credit_band=band,
+                              risk=rf, hoa_monthly=hoa_val)
+    st.markdown(dv.monthly_cost(mc), unsafe_allow_html=True)
+    h1, h2, h3 = st.columns(3)
+    with h1:
+        _explain("true-monthly-cost", label="True monthly cost?", example=False)
+    with h2:
+        _explain("pmi", label="What's PMI?")
+    with h3:
+        _explain("hoa", label="What's HOA?")
+
+    # ===================== CASH YOU'D NEED UP FRONT =====================
     cn = cash_needed.compute(l.list_price or 0, occupancy=occupancy,
                              loan_type=loan_type, credit_band=band)
-
-    st.markdown(f"<div class='cashbig'>To buy this home, you'd need about "
-                f"{money(cn.total)} in cash.</div>", unsafe_allow_html=True)
-    st.caption("An estimate — not a loan offer.")
-
-    def line(icon, label, amount, sub, help_text):
-        a, b = st.columns([3, 2])
-        with a.popover(f"{label}"):
-            st.write(help_text)
-        b.markdown(f"{ic(icon,18,PRIMARY_GREEN)} **{amount}**"
-                   + (f" <span class='muted'>· {sub}</span>" if sub else ""),
-                   unsafe_allow_html=True)
-
-    st.markdown("**Money that leaves your account**")
-    line("down", "Down payment", money(cn.down_payment),
-         f"{cn.down_payment_pct:.1f}% upfront", "The chunk you pay upfront.")
-    line("closing", "Closing costs",
-         f"{money(cn.closing_low)}–{money(cn.closing_high)}", "one-time fees",
-         "One-time fees to finalize: escrow, title, appraisal, lender fees "
-         "(usually 2–5%).")
-    st.markdown(f"= {ic('wallet',18,DEEP_GREEN)} **Cash to close: "
-                f"{money(cn.cash_to_close)}**", unsafe_allow_html=True)
-    _explain("cash-to-close",
-             label="What is 'cash to close' / a down payment?")
-    st.markdown("**Money you keep (don't spend)**")
-    line("reserves", "Reserves", money(cn.reserves),
-         f"{cn.reserves_months} months", "Cash the lender wants you to keep in "
-         "the bank after buying. You don't spend it.")
-    st.markdown(f"= {ic('key',18,DEEP_GREEN)} **Grand total cash needed: "
-                f"{money(cn.total)}**", unsafe_allow_html=True)
-
-    with st.expander("Full breakdown (for power users)"):
+    st.markdown(dv.cash(cn), unsafe_allow_html=True)
+    with st.expander("Money you keep (reserves) + the power-user breakdown"):
+        st.markdown(f"{ic('reserves',18,PRIMARY_GREEN)} **Reserves: {money(cn.reserves)}** "
+                    f"· {cn.reserves_months} months — cash the lender wants you to keep "
+                    "in the bank after buying. You don't spend it.", unsafe_allow_html=True)
+        st.markdown(f"**Grand total cash needed (with reserves): {money(cn.total)}**")
+        _explain("cash-to-close", label="What is 'cash to close' / a down payment?")
         m = metrics.compute(l, val, type("R", (), {"monthly_rent": rent})(),
                             settings.financing)
         c = st.columns(3)
-        c[0].metric("Monthly payment", money(cn.monthly_payment),
-                    help="Principal + interest. Taxes/insurance (PITI) add more.")
-        c[1].metric("Est. rate", pct(cn.interest_rate),
-                    help="Estimated by credit band; update in financing.yaml.")
+        c[0].metric("Monthly payment", money(cn.monthly_payment))
+        c[1].metric("Est. rate", pct(cn.interest_rate))
         c[2].metric("Loan amount", money(cn.loan_amount))
         c2 = st.columns(3)
-        c2[0].metric("Gross yield", pct(m.gross_yield_pct),
-                     help="Yearly rent ÷ price.")
-        one = "Yes" if m.meets_one_percent_rule else "No"
-        c2[1].metric("1% rule", one, help="Monthly rent ≥ 1% of price?")
-        c2[2].metric("Cap rate", pct(m.cap_rate_pct),
-                     help="Rough yearly return after assumed expenses.")
-        st.caption("DTI note: lenders also check your debt-to-income ratio — your "
-                   "monthly debts vs. income. Ask a lender for your number.")
+        c2[0].metric("Gross yield", pct(m.gross_yield_pct))
+        c2[1].metric("1% rule", "Yes" if m.meets_one_percent_rule else "No")
+        c2[2].metric("Cap rate", pct(m.cap_rate_pct))
 
-    st.divider()
-    _render_afford(l, occupancy, loan_type, band, row.get("risk"))
+    # ===================== CAN YOU AFFORD IT (traffic light) =====================
+    _render_afford(l, occupancy, loan_type, band, rf, mc=mc, hoa_val=hoa_val)
 
-    st.divider()
+    # ===================== AGENT CONTACT =====================
+    _render_agent_contact(l)
+
+    st.markdown(dv.footer_note(), unsafe_allow_html=True)
     st.markdown(
-        f"<div style='background:{LIGHT_FILL};border-radius:12px;padding:12px 16px;"
-        f"margin:2px 0 6px'>{ic('info',18,DEEP_GREEN)} New to home-buying words? "
+        f"<div style='background:{dv.T.TV_TEAL_SOFT};border-radius:12px;padding:12px 16px;"
+        f"margin:8px 0 6px'>{ic('info',18,dv.T.TV_TEAL)} New to home-buying words? "
         f"<a href='{glossary.LEARN_URL_PUBLIC}' target='_blank' "
-        f"style='color:{DEEP_GREEN};font-weight:700'>Learn the basics →</a> "
-        f"<span class='muted'>— every term on this page, in plain English. Free.</span>"
-        "</div>", unsafe_allow_html=True)
-    st.caption("All figures are ESTIMATES to help you screen homes — not advice, an "
-               "appraisal, or a loan offer. Verify with a licensed lender and agent.")
+        f"style='color:{dv.T.TV_TEAL};font-weight:700'>Learn the basics →</a></div>",
+        unsafe_allow_html=True)
+    return
+
+
+def _facts_inline(l) -> str:
+    return (f"{ic('beds')} {number(l.beds)} bd &nbsp; {ic('baths')} {number(l.baths)} ba "
+            f"&nbsp; {ic('sqft')} {number(l.sqft)} sqft &nbsp; "
+            f"{ic('clock')} {dom_label(l.days_on_market)} &nbsp; "
+            f"{ic('location')} {l.city} {l.zip_code}")
+
+
+def _render_foreclosure_detail(row) -> None:
+    """The simpler bank-owned/foreclosure detail (no beds/baths/rent/afford)."""
+    l = row["listing"]
+    val = row["value"]
+    st.markdown(_photo_placeholder(), unsafe_allow_html=True)
+    st.markdown(f"<div class='price'>{money(l.list_price)}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='addr'>{l.address or '—'}</div>", unsafe_allow_html=True)
+    demo = " <span class='sampletag'>demo</span>" if row.get("demo_foreclosure") else ""
+    st.markdown(_bank_badge() + demo, unsafe_allow_html=True)
+    st.markdown(_discount_html(val, l.list_price), unsafe_allow_html=True)
+    st.markdown(f"<div class='facts'>{ic('gavel',16,'#344054')} Sold as-is — may "
+                "have liens or auction rules. Beds/baths aren't in foreclosure "
+                "data; verify everything before bidding.</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='facts'>{ic('location')} {l.city} {l.zip_code}</div>",
+                unsafe_allow_html=True)
+    link = gmaps_link(l.address)
+    if link:
+        st.markdown(f"<a href='{link}' target='_blank' style='color:{DEEP_GREEN}'>"
+                    f"{ic('location')} Open in Google Maps</a>", unsafe_allow_html=True)
+    links = " · ".join(f"<a href='{u}' target='_blank' style='color:{DEEP_GREEN}'>"
+                       f"{n}</a>" for n, u in GOV_LINKS)
+    st.markdown(f"<div class='facts' style='margin-top:6px'>{ic('link',15,MUTED)} "
+                f"Also check free government foreclosures: {links}</div>",
+                unsafe_allow_html=True)
+    st.divider()
+    st.markdown(_score_badge(row["score"]), unsafe_allow_html=True)
+    _render_agent_contact(l)
 
 
 # ===========================================================================

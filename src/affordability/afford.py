@@ -81,6 +81,81 @@ class MonthlyCosts:
 
 
 @dataclass
+class CreditImpact:
+    """What the buyer's credit score means for THIS home, in real dollars.
+
+    All figures isolate the RATE effect of the score: we hold the loan amount
+    fixed and only vary the interest rate by credit band, so the message is a
+    clean 'your score costs/saves you $X a month'. Pure math, 0 API calls.
+    """
+
+    current_band: str
+    current_rate: float
+    current_payment: float            # P&I at the buyer's band
+    is_best: bool                     # already in the top (740+) band?
+    best_band: str
+    best_rate: float
+    best_payment: float
+    monthly_saving_to_best: float     # >= 0; what top credit would save vs now
+    next_band: Optional[str]          # the next band UP (better), or None if best
+    next_rate: Optional[float]
+    next_payment: Optional[float]
+    monthly_saving_to_next: float     # >= 0; saving from a one-band improvement
+    lifetime_saving_to_next: float    # that monthly saving over the full loan term
+
+
+def credit_impact(price: float, *, occupancy: str = "live_in",
+                  loan_type: str = "conventional",
+                  credit_band: str = "740+") -> CreditImpact:
+    """Translate a credit-score band into 'here's what it costs / could save you'.
+
+    We compute the monthly principal+interest on the SAME loan at three rates:
+    the buyer's band, the top band (740+), and the next band up. Isolating the
+    rate keeps the story honest and simple ('improve one band, save $X/mo').
+    No RentCast, no billable calls.
+    """
+    bands = cash_needed.CREDIT_BANDS
+    bumps = settings.financing.get("rate_bumps_by_credit", {})
+    term = int(settings.financing.get("loan_term_years", 30))
+
+    cn = cash_needed.compute(price, occupancy=occupancy, loan_type=loan_type,
+                             credit_band=credit_band)
+    loan = cn.loan_amount
+    cur_rate = cn.interest_rate
+    cur_pay = cn.monthly_payment
+    # Back out the occupancy base rate (the bump for this band is baked into cur_rate).
+    base_rate = cur_rate - float(bumps.get(credit_band, 0))
+
+    def rate_for(b: str) -> float:
+        return base_rate + float(bumps.get(b, 0))
+
+    def pay_for(b: str) -> float:
+        return cash_needed._pmt(loan, rate_for(b), term)
+
+    best_band = bands[0]
+    best_rate = rate_for(best_band)
+    best_pay = pay_for(best_band)
+
+    idx = bands.index(credit_band) if credit_band in bands else 0
+    is_best = idx == 0
+    next_band = bands[idx - 1] if idx > 0 else None
+    next_rate = rate_for(next_band) if next_band else None
+    next_pay = pay_for(next_band) if next_band else None
+
+    saving_best = max(0.0, cur_pay - best_pay)
+    saving_next = max(0.0, cur_pay - next_pay) if next_pay is not None else 0.0
+
+    return CreditImpact(
+        current_band=credit_band, current_rate=cur_rate, current_payment=cur_pay,
+        is_best=is_best, best_band=best_band, best_rate=best_rate, best_payment=best_pay,
+        monthly_saving_to_best=saving_best,
+        next_band=next_band, next_rate=next_rate, next_payment=next_pay,
+        monthly_saving_to_next=saving_next,
+        lifetime_saving_to_next=saving_next * term * 12,
+    )
+
+
+@dataclass
 class Verdict:
     band: str                 # "green" | "amber" | "red"
     headline: str             # plain one-liner
@@ -264,21 +339,31 @@ def verdict(price: float, *, gross_monthly_income: float,
                            "costs, and reserves.")
 
     # Plain headline + reason.
+    # Floor BOTH ends at $0: a deeply over-budget buyer can have a negative
+    # high end too, and "$0–$-2,240 left" reads as broken/dishonest math.
     left_lo = max(0.0, leftover.low)
+    left_hi = max(0.0, leftover.high)
+
+    def _left_phrase() -> str:
+        """'$X–$Y left' — collapses to a single '$0' when nothing is left over."""
+        if left_hi <= 0:
+            return "$0 left each month"
+        return f"${left_lo:,.0f}–${left_hi:,.0f} left each month"
+
     if band == "green":
         headline = "Looks affordable for you."
-        reasons.insert(0, f"After the house payment and your other debts, you'd have "
-                       f"roughly ${left_lo:,.0f}–${leftover.high:,.0f} left each month.")
+        reasons.insert(0, "After the house payment and your other debts, you'd have "
+                       f"roughly {_left_phrase()}.")
     elif band == "amber":
         headline = "A stretch — doable, but tight."
         reasons.insert(0, f"The payment runs about {front.mid:.0f}% of your income "
                        f"(comfortable is under {comf_front:.0f}%). You'd have around "
-                       f"${left_lo:,.0f}–${leftover.high:,.0f} left each month.")
+                       f"{_left_phrase()}.")
     else:
         headline = "Over budget — this one's a stretch too far."
         reasons.insert(0, f"The payment is about {front.mid:.0f}% of your income, above "
                        f"the {str_front:.0f}% lenders usually allow. You'd have only "
-                       f"around ${left_lo:,.0f}–${leftover.high:,.0f} left each month.")
+                       f"around {_left_phrase()}.")
 
     if debts > 0:
         reasons.append(f"Your other monthly debts (${debts:,.0f}) push your total up to "

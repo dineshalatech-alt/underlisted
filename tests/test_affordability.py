@@ -105,6 +105,42 @@ def test_debts_lower_the_leftover():
     assert with_debt.leftover.high < no_debt.leftover.high
 
 
+def test_credit_impact_top_band_is_best_and_saves_nothing():
+    ci = afford.credit_impact(400_000, credit_band="740+")
+    assert ci.is_best is True
+    assert ci.monthly_saving_to_best == 0.0
+    assert ci.next_band is None
+    assert ci.monthly_saving_to_next == 0.0
+
+
+def test_credit_impact_weaker_band_costs_more_per_month():
+    ci = afford.credit_impact(400_000, credit_band="620-679")
+    assert ci.is_best is False
+    # A weaker score must pay a higher rate -> a positive saving vs top credit.
+    assert ci.current_rate > ci.best_rate
+    assert ci.monthly_saving_to_best > 0
+    assert ci.current_payment > ci.best_payment
+
+
+def test_credit_impact_next_band_up_is_better_and_bounded_by_best():
+    ci = afford.credit_impact(400_000, credit_band="620-679")
+    assert ci.next_band == "680-739"          # one band up from 620-679
+    assert ci.next_rate is not None and ci.next_rate < ci.current_rate
+    # A one-band improvement can't save more than reaching top credit.
+    assert 0 < ci.monthly_saving_to_next <= ci.monthly_saving_to_best + 1e-6
+    # Lifetime saving = the monthly saving across every payment of the term.
+    assert ci.lifetime_saving_to_next > ci.monthly_saving_to_next
+
+
+def test_credit_impact_payment_matches_cash_needed_engine():
+    # The 'current payment' must agree with the real cash_needed math (same loan).
+    from src.financing import cash_needed
+    cn = cash_needed.compute(350_000, credit_band="580-619")
+    ci = afford.credit_impact(350_000, credit_band="580-619")
+    assert abs(ci.current_payment - cn.monthly_payment) < 0.01
+    assert abs(ci.current_rate - cn.interest_rate) < 1e-9
+
+
 def _run_all():
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0

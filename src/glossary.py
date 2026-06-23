@@ -138,6 +138,18 @@ TERMS: list = [
         "ago might have room to bargain.",
     ),
     Term(
+        "credit-score", "🎟️", "Credit score", "Credit score (and what it means)",
+        ["Your credit score is a number (about 300–850) that tells lenders how "
+         "safely you've handled money. A <b>higher score earns a lower mortgage "
+         "rate</b> — which means a smaller payment every month.",
+         "Same home, same price: a strong score can save you real money, while a "
+         "weaker one quietly adds to the payment. The good news is a score can be "
+         "<b>improved</b> — paying bills on time and lowering card balances helps."],
+        "<b>Example:</b> on a $300,000 loan, top credit (740+) might get about 6.6%, "
+        "while a 620–679 score pays closer to 7.35% — roughly <b>$150 more every "
+        "month</b> for the exact same house.",
+    ),
+    Term(
         "mortgage-rate", "📈", "Mortgage rate", "Mortgage rate",
         ["A mortgage is the loan you use to buy a home. The <b>mortgage rate is the "
          "interest you pay to borrow</b> that money, shown as a percentage.",
