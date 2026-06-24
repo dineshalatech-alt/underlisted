@@ -1,0 +1,1165 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Rent vs Buy Calculator — should I rent or buy a house? | Underlisted</title><meta name='description' content='Free rent vs buy calculator. Compare the true cost of renting versus buying over the years you'll stay, and find the break-even year buying pulls ahead.'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
+<style>
+ :root{
+   --ivory:#FBF7EF; --ivory-2:#F6F0E4; --surface:#FFFDF8; --surface-2:#FCF8F0;
+   --ink:#1E1A16; --ink-soft:#3A332B; --muted:#6B635A; --faint:#938A7E;
+   --hair:rgba(26,106,72,.26); --hair-soft:rgba(30,26,22,.10);
+   --gold:#1A6A48; --gold-2:#14533A; --gold-bright:#1F7A53; --gold-deep:#0E3A2A;
+   --good:#1A8F5A; --good-soft:rgba(26,143,90,.12);
+   --okay:#B5780A; --okay-soft:rgba(181,120,10,.13);
+   --weak:#C0392B; --weak-soft:rgba(192,57,43,.11);
+   /* BRICK RED from the new logo's roof — the secondary brand accent, reserved for
+      tasteful editorial / load-bearing emphasis only. Distinct from the brighter
+      "walk away" deal-score red so the two never get confused. */
+   --deep-red:#A8201C;
+   --deep-red-2:#8E1B18;
+   --r:16px; --r-lg:22px;
+   --shadow:0 30px 64px -32px rgba(60,44,20,.30);
+   --shadow-sm:0 14px 30px -18px rgba(60,44,20,.26);
+   /* ── UNIFIED CARD SYSTEM (one designed surface across map tiles + tool cards) ──
+      every card shares the same radius, hairline, soft elegant shadow, and the same
+      deeper shadow on hover. Hover-lift is a single shared transform/duration. */
+   --r-card:19px;
+   --card-shadow:0 18px 44px -26px rgba(60,44,20,.32), 0 2px 8px -4px rgba(60,44,20,.14);
+   --card-shadow-hover:0 30px 60px -28px rgba(60,44,20,.40), 0 4px 12px -5px rgba(60,44,20,.16);
+   --lift:translateY(-3px);
+   --ease-card:cubic-bezier(.22,.61,.36,1);
+   /* modular vertical-rhythm scale for section padding (top/bottom) */
+   --sp-1:clamp(40px,6vw,58px);   /* tight  */
+   --sp-2:clamp(58px,8vw,82px);   /* normal */
+   --sp-3:clamp(80px,11vw,118px); /* roomy  */
+   --maxw:1140px;
+ }
+ *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+ /* accessibility: a clean gold focus ring on every interactive element (keyboard
+    users see exactly where they are; mouse users don't get a ring on click) */
+ a:focus-visible,button:focus-visible,input:focus-visible,
+ [tabindex]:focus-visible,.tool:focus-visible{outline:2px solid var(--gold);
+   outline-offset:3px;border-radius:6px}
+ /* respect reduced-motion: no hover-lift transforms, no smooth-scroll for those users */
+ @media(prefers-reduced-motion:reduce){
+   html{scroll-behavior:auto}
+   *{transition-duration:.001ms!important;animation-duration:.001ms!important}
+ }
+ html{scroll-behavior:smooth}
+ body{margin:0;font-family:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+   color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+   background:
+     radial-gradient(1100px 620px at 84% -8%, rgba(26,106,72,.10), transparent 58%),
+     radial-gradient(1000px 700px at 8% 4%, rgba(26,106,72,.06), transparent 56%),
+     var(--ivory);}
+ .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+ @media(max-width:560px){.wrap{padding:0 18px}}
+ .tnum{font-feature-settings:"tnum" 1,"lnum" 1;font-variant-numeric:tabular-nums}
+ h1,h2,h3,h4,.display{font-family:"Cormorant Garamond",Georgia,serif;color:var(--ink)}
+ em{font-style:italic}
+ a{color:var(--gold-2)}
+
+ /* ===== HEADER / NAV ===== */
+ header{position:sticky;top:0;z-index:50;background:rgba(251,247,239,.85);
+   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+   border-bottom:1px solid var(--hair)}
+ .bar{display:flex;align-items:center;gap:16px;height:68px}
+ .logo{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+ .logo .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold-deep));
+   box-shadow:0 8px 18px -8px rgba(14,58,42,.5), inset 0 1px 0 rgba(255,255,255,.45)}
+ .logo .mark svg{width:21px;height:21px;color:#FFFBF1}
+ .logo b{font-family:"Inter";font-weight:700;font-size:1.16rem;letter-spacing:-.01em;color:var(--ink)}
+ .navlinks{margin-left:auto;display:flex;align-items:center;gap:30px}
+ .navlinks a{font-family:"Inter";text-decoration:none;color:var(--muted);font-weight:500;font-size:.93rem;transition:color .2s}
+ .navlinks a:hover,.navlinks a.here{color:var(--ink)}
+ .navlinks a.here{border-bottom:2px solid var(--gold);padding-bottom:3px}
+ .btn-top{padding:10px 20px !important;border-radius:11px;color:#FFFBF1 !important;font-weight:600;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold));
+   box-shadow:0 12px 24px -12px rgba(14,58,42,.5)}
+ .btn-top:hover{color:#FFFBF1 !important}
+ @media(max-width:760px){.navlinks a:not(.btn-top){display:none}}
+
+ .rule{height:1px;background:linear-gradient(90deg,transparent,var(--hair-soft) 50%,transparent)}
+ .rule.gold{background:linear-gradient(90deg,transparent,rgba(26,106,72,.55) 50%,transparent)}
+
+ /* ===== buttons ===== */
+ /* PRIMARY (gold) — one consistent treatment shared with .zipform button + .wl
+    button: gold gradient, soft warm shadow, a 2px lift that deepens on hover and
+    a gentle press on :active. SECONDARY (.btn-line / ghost) is the calm outline. */
+ .btn-fill{font-family:"Inter";display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+   padding:15px 28px;border-radius:13px;font-weight:600;font-size:1rem;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 18px 34px -16px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .btn-fill:hover{transform:translateY(-2px);box-shadow:0 24px 42px -16px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .btn-fill:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.btn-fill:hover,.btn-fill:active{transform:none}}
+ .btn-fill svg{width:18px;height:18px}
+ .btn-line{font-family:"Inter";display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+   padding:15px 24px;border-radius:13px;font-weight:600;font-size:1rem;color:var(--ink);
+   border:1px solid var(--hair);background:var(--surface);transition:border-color .2s,background .2s}
+ .btn-line:hover{border-color:rgba(26,106,72,.6);background:var(--surface-2)}
+ .btn-line .ar{color:var(--gold-2)}
+
+ /* ===== HERO (masthead) ===== */
+ .masthead{padding:74px 0 30px;text-align:center;position:relative}
+ .dateline{display:inline-flex;align-items:center;gap:10px;font-family:"Inter";
+   font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2);
+   border:1px solid var(--hair);border-radius:999px;padding:7px 16px;margin-bottom:26px;background:var(--surface)}
+ .dateline .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 10px rgba(26,143,90,.7)}
+ .masthead h1{font-weight:500;font-size:clamp(2.9rem,7vw,5.4rem);line-height:1.02;letter-spacing:.005em;margin:0 auto;max-width:14ch}
+ .masthead h1 em{color:var(--gold);font-weight:600}
+ .lede{font-family:"Inter";color:var(--muted);font-size:clamp(1.04rem,2.1vw,1.22rem);max-width:60ch;margin:24px auto 0;line-height:1.62}
+ .lede b{color:var(--ink);font-weight:600}
+ .cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:34px}
+ .trustrow{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;margin-top:30px;
+   font-family:"Inter";font-size:.86rem;color:var(--muted)}
+ .trustrow span{display:inline-flex;align-items:center;gap:8px}
+ .trustrow svg{width:16px;height:16px;color:var(--good)}
+
+ /* ===== HERO VIDEO (Kling map) — works as video OR elegant still ===== */
+ .hero-video{position:relative;overflow:hidden;border-radius:var(--r-lg);margin:46px auto 0;max-width:960px;
+   min-height:300px;display:flex;align-items:flex-end;border:1px solid var(--hair);
+   background:radial-gradient(120% 110% at 50% -10%, #FBF3E1, var(--surface) 72%);box-shadow:var(--shadow)}
+ .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+ .hero-video .scrim{position:absolute;inset:0;z-index:1;
+   background:linear-gradient(180deg,rgba(20,14,4,.06) 0%,rgba(20,14,4,.30) 48%,rgba(20,14,4,.74) 100%)}
+ .hero-video .vcontent{position:relative;z-index:2;padding:28px 30px;max-width:560px;color:#FFFDF8}
+ .hero-video .vcontent h3{font-family:"Cormorant Garamond",serif;font-weight:600;color:#FFFDF8;
+   font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.1;margin:0;text-shadow:0 2px 16px rgba(0,0,0,.45)}
+ .hero-video .vcontent p{font-family:"Inter";color:rgba(255,253,248,.92);margin:8px 0 0;font-size:.98rem;
+   text-shadow:0 1px 10px rgba(0,0,0,.4)}
+
+ /* ===== THE DEAL DIAL — specimen plate ===== */
+ .plate{display:grid;grid-template-columns:1fr 1.15fr;gap:0;margin:54px auto 0;max-width:960px;
+   background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-lg);overflow:hidden;
+   box-shadow:var(--shadow);text-align:left}
+ @media(max-width:780px){.plate{grid-template-columns:1fr}}
+ .dial-side{position:relative;padding:34px 30px 30px;display:flex;flex-direction:column;align-items:center;
+   background:radial-gradient(120% 110% at 50% -4%, #FBF3E1, #FFFDF8 72%);border-right:1px solid var(--hair)}
+ @media(max-width:780px){.dial-side{border-right:0;border-bottom:1px solid var(--hair)}}
+ .dial-side::before{content:"";position:absolute;left:50%;top:40%;width:320px;height:320px;
+   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+   background:radial-gradient(circle, rgba(26,106,72,.20), rgba(26,106,72,.06) 46%, transparent 70%)}
+ .dial-side .tag{position:relative;font-family:"Inter";font-size:.66rem;font-weight:600;
+   letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:16px}
+ .dial{position:relative;width:240px;max-width:82%;margin:0 auto}
+ .dial svg{width:100%;height:auto;filter:drop-shadow(0 6px 16px rgba(26,143,90,.18))}
+ .dial .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:8%}
+ .dial .score{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:4.1rem;line-height:1;color:var(--ink)}
+ .dial .score .of{font-family:"Inter";font-size:.95rem;color:var(--muted);font-weight:500}
+ .dial .verdict{font-family:"Inter";margin-top:2px;font-weight:700;font-size:.78rem;letter-spacing:.14em;color:var(--good)}
+ .scale{position:relative;display:flex;gap:16px;margin-top:18px;font-family:"Inter";font-size:.72rem;color:var(--muted)}
+ .scale span{display:inline-flex;align-items:center;gap:6px}
+ .scale i{width:9px;height:9px;border-radius:50%;display:inline-block}
+ .read-side{padding:32px 32px 30px;background:var(--surface)}
+ .read-side .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.85rem;line-height:1.1;color:var(--ink)}
+ .read-side .sub{font-family:"Inter";color:var(--muted);font-size:.88rem;margin-top:3px}
+ .specrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--hair-soft)}
+ .specrow:last-child{border-bottom:0}
+ .specrow .k{font-family:"Inter";display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:.9rem}
+ .specrow .k svg{width:17px;height:17px;color:var(--gold);opacity:.9}
+ .specrow .v{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;letter-spacing:.01em;color:var(--ink)}
+ .specrow .v.good{color:var(--good)} .specrow .v.okay{color:var(--okay)} .specrow .v.weak{color:var(--weak)}
+
+ /* ===== SECTION FRAME ===== */
+ /* one modular rhythm: every section breathes on --sp-2; stacked sections that
+    would otherwise double up (e.g. free-tools -> waitlist) collapse the seam so
+    there's no dead band between them. */
+ .sec{padding:var(--sp-2) 0}
+ /* the homepage free-tools section sits directly above the waitlist; their two
+    full paddings used to stack into a dead band. Collapse the seam so it reads
+    as ONE comfortable gap. (Scoped to these two IDs — other pages untouched.) */
+ #early-access{padding-top:0}
+ .sec-head{text-align:center;max-width:760px;margin:0 auto 50px}
+ .kicker{font-family:"Inter";font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:16px}
+ .sec-head h2{font-weight:500;font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.08;letter-spacing:.005em;margin:0}
+ .sec-head h2 em{color:var(--gold)}
+ .sec-head p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:54ch}
+
+ /* ===== WHY — editorial numbered register ===== */
+ .why-list{max-width:880px;margin:0 auto}
+ .why-item{display:grid;grid-template-columns:auto 50px 1fr auto;gap:20px 22px;align-items:start;
+   padding:26px 6px;border-top:1px solid var(--hair-soft);transition:background .25s}
+ .why-item:last-child{border-bottom:1px solid var(--hair-soft)}
+ .why-item:hover{background:linear-gradient(90deg,rgba(26,106,72,.06),transparent 72%)}
+ @media(max-width:640px){.why-item{grid-template-columns:auto 1fr;gap:12px 16px}}
+ .why-item .no{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;font-size:1.9rem;color:var(--gold);line-height:1.1;padding-top:2px}
+ .why-item .ico{width:50px;height:50px;border-radius:14px;flex:none;display:grid;place-items:center;
+   background:linear-gradient(155deg,rgba(26,106,72,.16),rgba(26,106,72,.05));border:1px solid var(--hair)}
+ .why-item .ico svg{width:25px;height:25px;color:var(--gold-2)}
+ @media(max-width:640px){.why-item .ico{display:none}}
+ .why-item .txt h3{font-weight:600;font-size:1.6rem;line-height:1.15;margin:0 0 5px;color:var(--ink)}
+ .why-item .txt p{font-family:"Inter";color:var(--muted);font-size:.97rem;margin:0;max-width:54ch}
+ .why-item .seal{align-self:center;font-family:"Inter";font-size:.72rem;font-weight:600;letter-spacing:.02em;
+   color:var(--gold-2);background:rgba(26,106,72,.1);border:1px solid var(--hair);padding:6px 13px;border-radius:999px;white-space:nowrap}
+ @media(max-width:640px){.why-item .seal{display:none}}
+
+ /* ===== WHAT YOU SEE — deal card on warm band ===== */
+ .glance-wrap{background:linear-gradient(180deg,var(--ivory-2),var(--ivory))}
+ .glance-card{max-width:920px;margin:0 auto;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-lg);padding:clamp(24px,4vw,40px);box-shadow:var(--shadow);position:relative;overflow:hidden}
+ .glance-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+   background:linear-gradient(90deg,var(--good),var(--okay) 50%,var(--weak))}
+ .glance-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--hair-soft)}
+ .glance-top .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.9rem;color:var(--ink)}
+ .glance-top .meta{font-family:"Inter";color:var(--muted);font-size:.9rem}
+ .glance-top .chip{margin-left:auto;font-family:"Inter";font-size:.78rem;font-weight:600;color:var(--good);
+   background:var(--good-soft);border:1px solid rgba(26,143,90,.32);padding:6px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px}
+ .glance-top .chip svg{width:14px;height:14px}
+ .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+ @media(max-width:680px){.stat-grid{grid-template-columns:1fr 1fr;gap:26px 20px}}
+ .stat .l{font-family:"Inter";font-size:.8rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+ .stat .l svg{width:16px;height:16px;color:var(--gold);opacity:.9}
+ .stat .v{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.05rem;line-height:1;color:var(--ink)}
+ .stat .v.good{color:var(--good)} .stat .v.okay{color:var(--okay)} .stat .v.weak{color:var(--weak)}
+ .stat .f{font-family:"Inter";font-size:.76rem;color:var(--faint);margin-top:8px}
+
+ /* ===== FREE TOOLS ===== */
+ .tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:960px;margin:0 auto}
+ @media(max-width:760px){.tools-grid{grid-template-columns:1fr 1fr}}
+ .tool{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+   text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-card);padding:30px 22px;text-align:center;box-shadow:var(--card-shadow);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card),border-color .18s}
+ .tool:hover{transform:var(--lift);box-shadow:var(--card-shadow-hover);border-color:rgba(26,106,72,.5)}
+ @media(prefers-reduced-motion:reduce){.tool:hover{transform:none}}
+ .tool .ico{width:46px;height:46px;border-radius:13px;margin:0 auto 15px;display:grid;place-items:center;
+   background:linear-gradient(155deg,rgba(26,106,72,.18),rgba(26,106,72,.05));border:1px solid var(--hair)}
+ .tool .ico svg{width:24px;height:24px;color:var(--gold-2)}
+ /* illustrated raster icon variant (gold-ringed full-colour art): bigger, no tint
+    frame, a soft drop-shadow for depth — premium without the line-icon chrome. */
+ .tool .ico.illus,.hub-card .ico.illus{background:transparent;border:0;overflow:visible}
+ .tool .ico.illus{width:62px;height:62px;border-radius:0}
+ .tool .ico.illus img{width:62px;height:62px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .hub-card .ico.illus{width:66px;height:66px;border-radius:0}
+ .hub-card .ico.illus img{width:66px;height:66px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .tool h4{font-weight:600;font-size:1.28rem;margin:0 0 4px;line-height:1.15;color:var(--ink)}
+ .tool p{font-family:"Inter";font-size:.84rem;color:var(--muted);line-height:1.5;margin:0}
+ .tool h4{margin-top:2px}
+ .tool .free{font-family:"Inter";margin-top:auto;padding-top:14px;display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+ .tool .freebadge{margin-top:auto;padding-top:14px}
+
+ /* ===== EVERYTHING-YOU-GET — static full-colour feature grid (#why-grid) =====
+    Always-visible companion to the spinning constellation: this is where the
+    full-colour illustrated art is shown at its best, in a calm premium grid. */
+ .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;margin:0 auto}
+ @media(max-width:820px){.fgrid{grid-template-columns:1fr 1fr}}
+ @media(max-width:520px){.fgrid{grid-template-columns:1fr}}
+ .fcard{display:flex;align-items:flex-start;gap:18px;text-align:left;
+   background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);
+   padding:24px 22px;box-shadow:var(--card-shadow);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card),border-color .18s}
+ .fcard:hover{transform:var(--lift);box-shadow:var(--card-shadow-hover);border-color:rgba(26,106,72,.5)}
+ @media(prefers-reduced-motion:reduce){.fcard:hover{transform:none}}
+ .fcard .fico{flex:0 0 auto;width:58px;height:58px;display:grid;place-items:center}
+ .fcard .fico img{width:58px;height:58px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .fcard .fbody{min-width:0}
+ .fcard h4{font-weight:600;font-size:1.18rem;margin:2px 0 4px;line-height:1.18;color:var(--ink)}
+ .fcard p{font-family:"Inter";font-size:.84rem;color:var(--muted);line-height:1.5;margin:0}
+ /* anchor cards (e.g. credit → learn page) shouldn't look like dead links */
+ a.fcard{text-decoration:none;color:inherit}
+
+ /* ===== CITY / REPORT — page hero + listing cards ===== */
+ .pagehero{text-align:center;max-width:760px;margin:54px auto 8px}
+ .pagehero h1{font-weight:500;font-size:clamp(2.3rem,5vw,3.6rem);line-height:1.06;letter-spacing:.005em;margin:0 auto;max-width:18ch}
+ .pagehero h1 em{color:var(--gold)}
+ .pagehero p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:56ch}
+ .pagehero .cta-row{margin-top:26px}
+ .deal-list{max-width:820px;margin:40px auto 0;display:flex;flex-direction:column;gap:14px}
+ .lcard{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow-sm);transition:transform .18s,border-color .2s}
+ .lcard:hover{transform:translateY(-2px);border-color:rgba(26,106,72,.5)}
+ .lcard .gauge{width:60px;height:60px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;position:relative}
+ .lcard .gauge .ring{position:absolute;inset:0;border-radius:50%}
+ .lcard .gauge .num{position:relative;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.55rem;color:var(--ink)}
+ .lcard .body{flex:1;min-width:0}
+ .lcard .price{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.65rem;line-height:1;color:var(--ink)}
+ .lcard .addr{font-family:"Inter";font-weight:600;font-size:.98rem;color:var(--ink-soft);margin-top:3px}
+ .lcard .pills{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}
+ .pill{font-family:"Inter";display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+   padding:4px 11px;font-size:.76rem;font-weight:600}
+ .pill.good{background:var(--good-soft);color:var(--good);border:1px solid rgba(26,143,90,.3)}
+ .pill.warn{background:var(--weak-soft);color:var(--weak);border:1px solid rgba(192,57,43,.28)}
+ .lcard .trend{font-family:"Inter";font-size:.8rem;color:var(--faint);margin-top:7px}
+ .pagelinks{max-width:820px;margin:32px auto 0;font-family:"Inter";font-size:.95rem;text-align:center}
+ .pagelinks a{color:var(--gold-2);text-decoration:none;font-weight:600}
+ .pagelinks a:hover{text-decoration:underline}
+
+ /* ===== LEARN — editorial glossary on ivory ===== */
+ .learn-intro{max-width:780px;margin:54px auto 10px;text-align:center}
+ .learn-intro .learn-kicker{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap}
+ .learn-intro .learn-kicker .freebadge{text-transform:uppercase;letter-spacing:.16em}
+ .learn-intro h1{font-weight:500;font-size:clamp(2.3rem,5vw,3.5rem);line-height:1.06;margin:0}
+ .learn-intro h1 em{color:var(--gold)}
+ .learn-intro p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:58ch;line-height:1.6}
+ .toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:820px;margin:24px auto 10px}
+ .toc a{font-family:"Inter";display:inline-block;background:var(--surface);border:1px solid var(--hair);
+   border-radius:999px;padding:7px 14px;font-size:.85rem;font-weight:600;color:var(--gold-2);text-decoration:none;transition:background .2s,border-color .2s}
+ .toc a:hover{background:var(--surface-2);border-color:rgba(26,106,72,.55)}
+ .term-list{max-width:780px;margin:30px auto 0;display:flex;flex-direction:column;gap:16px}
+ .term{background:var(--surface);border:1px solid var(--hair);border-left:4px solid var(--gold);
+   border-radius:var(--r);padding:22px 24px;scroll-margin-top:84px;box-shadow:var(--shadow-sm)}
+ .term h2{font-weight:600;font-size:1.55rem;margin:0 0 8px;display:flex;align-items:center;gap:11px;color:var(--ink)}
+ .term .ic{font-size:1.35rem;line-height:1}
+ .term p{font-family:"Inter";margin:.4rem 0;color:var(--ink-soft);line-height:1.6;font-size:1rem}
+ .term p b{color:var(--ink);font-weight:600}
+ .term .eg{font-family:"Inter";background:var(--surface-2);border:1px dashed var(--hair);border-radius:12px;
+   padding:11px 14px;margin:.7rem 0 .1rem;color:var(--ink-soft);font-size:.95rem}
+ .term .eg b{color:var(--gold-2)}
+ .term.warnterm{border-left-color:var(--okay)}
+ .term.warnterm .eg b{color:var(--okay)}
+ .scorekey{display:flex;gap:8px;flex-wrap:wrap;margin:.6rem 0 .2rem}
+ .scorekey span{font-family:"Inter";display:inline-flex;align-items:center;gap:7px;border-radius:999px;
+   padding:5px 13px;font-weight:600;font-size:.85rem;color:#fff}
+ .scorekey .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.9);display:inline-block}
+
+ /* ===== FORECLOSURE JOURNEY — four-stage explainer on ivory ===== */
+ .fjourney{max-width:820px;margin:0 auto;scroll-margin-top:84px}
+ .fjourney .fj-head{text-align:center;max-width:680px;margin:0 auto 8px}
+ .fjourney .fj-head .kicker{display:inline-flex;align-items:center;gap:9px;font-family:"Inter";font-size:.72rem;
+   font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:14px}
+ .fjourney .fj-head .kicker::before,.fjourney .fj-head .kicker::after{content:"";width:24px;height:1px;
+   background:linear-gradient(90deg,transparent,var(--gold))}
+ .fjourney .fj-head .kicker::after{transform:scaleX(-1)}
+ .fjourney .fj-head h2{font-weight:500;font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.08;margin:0;color:var(--ink)}
+ .fjourney .fj-head h2 em{color:var(--gold);font-style:italic}
+ .fjourney .fj-head p{font-family:"Inter";color:var(--muted);font-size:1.02rem;line-height:1.6;margin:14px auto 0;max-width:54ch}
+ /* the vertical journey — a gold spine threading the stages */
+ .fj-steps{position:relative;margin:38px auto 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:18px}
+ .fj-steps::before{content:"";position:absolute;left:23px;top:18px;bottom:42px;width:2px;
+   background:linear-gradient(180deg,var(--gold),rgba(26,106,72,.25));border-radius:2px}
+ .fj-step{position:relative;background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);
+   padding:22px 24px 22px 70px;scroll-margin-top:84px;box-shadow:var(--shadow-sm);
+   border-left:4px solid var(--stage,var(--gold))}
+ .fj-step .num{position:absolute;left:8px;top:20px;width:32px;height:32px;border-radius:50%;
+   display:flex;align-items:center;justify-content:center;font-family:"Inter";font-weight:700;font-size:.95rem;
+   color:#fff;background:var(--stage,var(--gold));box-shadow:0 0 0 5px var(--surface),0 6px 14px -6px rgba(60,44,20,.5)}
+ .fj-step h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.5rem;line-height:1.1;
+   margin:0;color:var(--ink);display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+ .fj-step h3 .chip{font-family:"Inter";font-weight:600;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+   padding:4px 10px;border-radius:999px;background:var(--stage-soft,var(--okay-soft));color:var(--stage,var(--gold-2));
+   white-space:nowrap}
+ .fj-step p{font-family:"Inter";color:var(--ink-soft);line-height:1.62;font-size:1rem;margin:.6rem 0 0}
+ .fj-step p b{color:var(--ink);font-weight:600}
+ .fj-step.warm{--stage:var(--good);--stage-soft:var(--good-soft)}
+ .fj-step.caution{--stage:var(--okay);--stage-soft:var(--okay-soft)}
+ .fj-step.early{--stage:var(--gold);--stage-soft:rgba(26,106,72,.13)}
+ /* why-this-matters payoff panel */
+ .fj-why{max-width:820px;margin:24px auto 0;background:radial-gradient(120% 150% at 50% -10%, #FCF3DF, var(--surface) 62%);
+   border:1px solid rgba(26,106,72,.4);border-radius:var(--r-lg);padding:26px 28px;text-align:center;
+   box-shadow:0 30px 64px -38px rgba(60,44,20,.30)}
+ .fj-why h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.6rem;margin:0;color:var(--ink)}
+ .fj-why p{font-family:"Inter";color:var(--ink-soft);font-size:1.02rem;line-height:1.6;margin:10px auto 0;max-width:58ch}
+ .fj-why p b{color:var(--gold-2)}
+ .fj-caveat{font-family:"Inter";display:flex;align-items:flex-start;gap:10px;max-width:760px;margin:16px auto 0;
+   background:var(--okay-soft);border:1px solid rgba(181,120,10,.3);border-radius:12px;padding:12px 16px;
+   color:var(--ink-soft);font-size:.92rem;line-height:1.5;text-align:left}
+ .fj-caveat .ic{color:var(--okay);font-size:1.1rem;line-height:1.3;flex:none}
+ @media(max-width:560px){
+   .fj-step{padding:20px 18px 20px 56px}
+   .fj-step .num{left:6px;width:28px;height:28px;font-size:.85rem}
+   .fj-steps::before{left:19px}
+ }
+
+ /* ===== WAITLIST — gold-bordered coupon ===== */
+ .wl{max-width:800px;margin:0 auto;text-align:center;
+   background:radial-gradient(120% 150% at 50% -10%, #FCF3DF, var(--surface) 60%);
+   border:1px solid rgba(26,106,72,.4);border-radius:var(--r-lg);padding:clamp(36px,5vw,60px);
+   position:relative;overflow:hidden;box-shadow:0 36px 72px -38px rgba(60,44,20,.34)}
+ .wl::before{content:"";position:absolute;inset:0;pointer-events:none;
+   background:radial-gradient(70% 60% at 18% 0%, rgba(26,106,72,.14), transparent 56%),
+              radial-gradient(70% 70% at 86% 110%, rgba(26,106,72,.10), transparent 58%)}
+ .wl::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+   background:linear-gradient(90deg,transparent,var(--gold) 50%,transparent);opacity:.8}
+ .wl > *{position:relative;z-index:1}
+ .wl .key{display:inline-flex;align-items:center;gap:10px;font-family:"Inter";font-size:.72rem;font-weight:600;
+   letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:18px}
+ .wl .key::before,.wl .key::after{content:"";width:24px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+ .wl .key::after{transform:scaleX(-1)}
+ .wl h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.06;letter-spacing:.005em;margin:0;color:var(--ink)}
+ .wl p{font-family:"Inter";color:var(--muted);max-width:48ch;margin:16px auto 4px;font-size:1.04rem}
+ .wl .price{color:var(--gold-2);font-weight:700}
+ .wl form{max-width:500px;margin:30px auto 0;display:flex;flex-wrap:wrap;gap:12px}
+ .wl input[type=email]{flex:1 1 240px;min-width:0;padding:16px 18px;border-radius:13px;
+   border:1px solid rgba(30,26,22,.18);background:var(--surface);color:var(--ink);
+   font-family:"Inter";font-size:1rem;min-height:44px;transition:border-color .2s,box-shadow .2s}
+ .wl input::placeholder{color:var(--faint)}
+ .wl input:focus{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+ .wl button{flex:0 0 auto;border:0;cursor:pointer;font-family:"Inter";padding:16px 28px;border-radius:13px;
+   font-weight:600;font-size:1rem;min-height:44px;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .wl button:hover{transform:translateY(-2px);box-shadow:0 20px 36px -14px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .wl button:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.wl button:hover,.wl button:active{transform:none}}
+ .wl .fine{font-family:"Inter";margin-top:18px;font-size:.8rem;color:var(--faint)}
+
+ /* ===== FOOTER ===== */
+ footer{padding:46px 0 60px}
+ .foot-grid{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center}
+ .foot-links{display:flex;flex-wrap:wrap;gap:24px;margin-left:auto}
+ .foot-links a{font-family:"Inter";text-decoration:none;color:var(--muted);font-size:.9rem;transition:color .2s}
+ .foot-links a:hover{color:var(--gold-2)}
+ .disclaim{font-family:"Inter";margin-top:26px;font-size:.76rem;color:var(--faint);line-height:1.7;max-width:74ch}
+
+ /* ===== BEST-DEALS BANNER — editorial headline + HOW + count + ZIP box ===== */
+ /* SEAMLESS HERO HAND-OFF (lightened 2026-06-21, owner: "keep it sunny"):
+    the cinematic hero now ends on a LIGHT warm cream (.ch-fade → rgba(238,229,213,.95)),
+    not near-black. So this section STARTS at that same warm cream and settles into
+    ivory over a short, gentle band. The eye finds no hard line — the bright hero
+    foot melts straight into the warm page as ONE continuous surface, with no dark
+    band reintroduced. The section's real content sits below the blend, on ivory. */
+ .best-wrap{background:
+     linear-gradient(180deg,
+       rgb(238,229,213) 0,
+       var(--ivory-2) 64px,
+       var(--ivory) 140px,
+       var(--ivory) 100%)}
+ /* extra top padding so the headline never lands inside the dark blend band */
+ .best-wrap>.sec{padding-top:clamp(150px,18vh,220px)}
+ .best{max-width:980px;margin:0 auto;text-align:center}
+ .best .kicker{margin-bottom:18px}
+ .best h2{font-weight:500;font-size:clamp(2.2rem,5.4vw,3.7rem);line-height:1.08;
+   letter-spacing:.004em;margin:0 auto;max-width:20ch}
+ /* RED used TASTEFULLY — only on the load-bearing words, never the whole block,
+    so it stays luxe and doesn't fight the deal-score "walk away" red. */
+ .best h2 .red{color:var(--deep-red);font-weight:600}
+ .best h2 em{color:var(--gold);font-weight:600;font-style:italic}
+ .best .how{font-family:"Inter";color:var(--ink-soft);font-size:clamp(1.02rem,2vw,1.14rem);
+   line-height:1.64;max-width:60ch;margin:22px auto 0}
+ .best .how b{color:var(--ink);font-weight:600}
+ .best .how .src{color:var(--gold-2);font-weight:600}
+
+ /* live count stat — big calm Cormorant number with a gold halo */
+ .countstat{position:relative;display:inline-flex;flex-direction:column;align-items:center;
+   margin:34px auto 0;padding:6px 30px}
+ .countstat::before{content:"";position:absolute;left:50%;top:46%;width:300px;height:160px;
+   transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;
+   background:radial-gradient(circle, rgba(26,106,72,.18), transparent 68%)}
+ .countstat .num{position:relative;font-family:"Cormorant Garamond",serif;font-weight:600;
+   font-size:clamp(3rem,9vw,5rem);line-height:1;letter-spacing:.005em;color:var(--ink)}
+ .countstat .cap{position:relative;font-family:"Inter";font-size:.78rem;font-weight:600;
+   letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2);margin-top:10px}
+
+ /* ZIP / city box — inviting, mobile-first, hands off to the live app */
+ .ziphunt{max-width:560px;margin:34px auto 0}
+ .ziphunt .prompt{font-family:"Inter";color:var(--muted);font-size:.96rem;margin:0 0 14px}
+ .zipform{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+ .zipform .zipwrap{position:relative;flex:1 1 260px;min-width:0;display:flex;align-items:center}
+ .zipform .zipwrap svg{position:absolute;left:16px;width:18px;height:18px;color:var(--gold);opacity:.85;pointer-events:none}
+ .zipform input{width:100%;font-family:"Inter";font-size:1.02rem;color:var(--ink);
+   background:var(--surface);border:1px solid rgba(30,26,22,.18);border-radius:13px;
+   padding:16px 18px 16px 44px;min-height:44px;transition:border-color .2s,box-shadow .2s}
+ .zipform input::placeholder{color:var(--faint)}
+ .zipform input:focus{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+ .zipform button{flex:0 0 auto;border:0;cursor:pointer;font-family:"Inter";padding:16px 26px;
+   border-radius:13px;font-weight:600;font-size:1rem;min-height:44px;color:#FFFBF1;
+   display:inline-flex;align-items:center;gap:8px;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .zipform button:hover{transform:translateY(-2px);box-shadow:0 20px 36px -14px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .zipform button:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.zipform button:hover,.zipform button:active{transform:none}}
+ .zipform button svg{width:18px;height:18px}
+ .ziphunt .zipfine{font-family:"Inter";margin-top:12px;font-size:.78rem;color:var(--faint)}
+ @media(max-width:460px){.zipform button{flex:1 1 100%;justify-content:center}}
+
+ /* ===== "FREE" BADGE — ONE classy seal, reused everywhere we give value away ===== */
+ .freebadge{display:inline-flex;align-items:center;gap:6px;font-family:"Inter";
+   font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+   color:var(--good);background:linear-gradient(180deg,rgba(26,143,90,.10),rgba(26,106,72,.07));
+   border:1px solid rgba(26,143,90,.34);border-radius:999px;padding:5px 12px 5px 10px;
+   line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+ .freebadge .fdot{width:6px;height:6px;border-radius:50%;background:var(--good);
+   box-shadow:0 0 8px rgba(26,143,90,.7);flex:none}
+ .freebadge.big{font-size:.74rem;letter-spacing:.18em;padding:7px 16px 7px 13px;gap:8px}
+ .freebadge.big .fdot{width:7px;height:7px}
+
+ /* ===== LOCKED TEASER — "a taste of the paid magic, behind glass" ===== */
+ .teaser-wrap{background:linear-gradient(180deg,var(--ivory),var(--ivory-2))}
+ .teaser-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:940px;margin:0 auto}
+ @media(max-width:780px){.teaser-grid{grid-template-columns:1fr;max-width:460px}}
+ .tcard{position:relative;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+ .tcard .sample-tag{position:absolute;top:14px;right:14px;z-index:4;font-family:"Inter";
+   font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2);
+   background:rgba(251,247,239,.9);border:1px solid var(--hair);border-radius:999px;padding:5px 11px;
+   backdrop-filter:blur(4px)}
+ /* the FREE / visible top of the card */
+ .tcard .open{padding:24px 24px 18px;border-bottom:1px solid var(--hair-soft)}
+ .tcard .open .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.7rem;
+   line-height:1.1;color:var(--ink);max-width:80%}
+ .tcard .open .meta{font-family:"Inter";color:var(--muted);font-size:.86rem;margin-top:5px}
+ .tcard .open .teaserline{font-family:"Inter";color:var(--ink-soft);font-size:.92rem;margin-top:12px;
+   display:inline-flex;align-items:center;gap:7px}
+ .tcard .open .teaserline svg{width:15px;height:15px;color:var(--gold);flex:none}
+ /* the LOCKED / paid rows — real-looking numbers blurred behind frosted glass */
+ .tlocked{position:relative;padding:20px 24px 24px}
+ .tlocked .lrow{display:flex;align-items:center;justify-content:space-between;gap:14px;
+   padding:13px 0;border-bottom:1px solid var(--hair-soft)}
+ .tlocked .lrow:last-child{border-bottom:0}
+ .tlocked .lrow .lk{font-family:"Inter";display:inline-flex;align-items:center;gap:9px;
+   color:var(--muted);font-size:.88rem}
+ .tlocked .lrow .lk svg{width:16px;height:16px;color:var(--gold);opacity:.9}
+ .tlocked .lrow .lv{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;
+   letter-spacing:.01em;color:var(--ink)}
+ .tlocked .lrow .lv.good{color:var(--good)} .tlocked .lrow .lv.okay{color:var(--okay)}
+ /* the frost: blur the numbers, dim them, kill selection — genuinely hidden */
+ .tlocked .blurfield{filter:blur(7px);opacity:.85;user-select:none;pointer-events:none;
+   -webkit-user-select:none}
+ /* glass overlay with the lock + unlock CTA */
+ .tlocked .glass{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+   align-items:center;justify-content:center;text-align:center;gap:12px;padding:22px;
+   background:linear-gradient(180deg,rgba(251,247,239,.36),rgba(251,247,239,.72));
+   backdrop-filter:blur(2.5px) saturate(1.05);-webkit-backdrop-filter:blur(2.5px) saturate(1.05)}
+ .tlocked .glass .lockwrap{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+   background:linear-gradient(155deg,var(--gold-bright),var(--gold-deep));
+   box-shadow:0 12px 26px -12px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .tlocked .glass .lockwrap svg{width:24px;height:24px;color:#FFFBF1}
+ .tlocked .glass .gline{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.28rem;
+   line-height:1.2;color:var(--ink);max-width:26ch}
+ .tlocked .glass .unlock{font-family:"Inter";display:inline-flex;align-items:center;gap:8px;
+   text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:600;font-size:.95rem;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);transition:transform .18s}
+ .tlocked .glass .unlock:hover{transform:translateY(-2px);color:#FFFBF1}
+ .tlocked .glass .unlock svg{width:16px;height:16px}
+ .tlocked .glass .gfine{font-family:"Inter";font-size:.74rem;color:var(--muted)}
+ .teaser-foot{text-align:center;max-width:620px;margin:34px auto 0;font-family:"Inter";
+   font-size:.9rem;color:var(--muted)}
+ .teaser-foot a{color:var(--gold-2);font-weight:600;text-decoration:none}
+ .teaser-foot a:hover{text-decoration:underline}
+
+ /* reveal */
+ .reveal{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease}
+ .reveal.in{opacity:1;transform:none}
+ @media(prefers-reduced-motion:reduce){
+   .reveal{opacity:1;transform:none;transition:none}
+   #arcF{transition:none!important}
+   html{scroll-behavior:auto}
+ }
+
+ /* ===================================================================
+    THE FEATURE GALAXY — dark constellation of everything you get.
+    Lifted from design_preview/feature_orbit.html (owner-approved 2026-06-18)
+    and folded into the Ivory & Gold brand. The site :root already defines
+    --ivory/--ink/--gold*/--good/--okay/--weak/--r/--r-lg, so we DO NOT
+    redefine them here — only the NEW dark-field tokens this section needs.
+    =================================================================== */
+ :root{
+   --teal:#3FB8A0;            /* cool counterpart to the gold — glow accent only */
+   --ink-deep:#13100B;        /* warm charcoal / deep ink */
+   --ink-deep-2:#1C1711;
+   --g-card:rgba(36,29,20,.78);
+   --g-line:rgba(46,140,98,.30);
+ }
+
+ .galaxy{position:relative;overflow:hidden;padding:84px 24px 92px;
+   /* pull up under the hero's blurred fade and blend the top edge dark→dark so
+      there is NO seam between the cover photo and the constellation (2026-06-20) */
+   margin-top:-1px;
+   /* CLASSICAL LUXURY BACKGROUND IMAGE SLOT ──────────────────────────
+      A single owner-supplied photo (site/assets/galaxy_bg.jpg) sits BEHIND
+      the constellation, ALWAYS under a heavy dark scrim so the gold/teal
+      nodes + white text stay readable. The warm-ink gradient is layered
+      ON TOP of the image as the scrim AND doubles as a tasteful fallback
+      when galaxy_bg.jpg is absent — so it looks intentional with OR
+      without the file. Recommended image: 2000×1400px landscape, dark/moody
+      (classical architecture, marble, night sky). */
+   background-color:var(--ink-deep);
+   background-image:
+     radial-gradient(900px 520px at 50% 8%, rgba(46,140,98,.16), transparent 60%),
+     radial-gradient(680px 520px at 12% 96%, rgba(63,184,160,.10), transparent 62%),
+     radial-gradient(680px 520px at 92% 70%, rgba(46,140,98,.07), transparent 60%),
+     linear-gradient(180deg, rgba(28,23,17,.82) 0%, rgba(19,16,11,.90) 58%, rgba(15,12,8,.95) 100%),
+     url('assets/galaxy_bg.jpg');
+   background-size:auto,auto,auto,auto,cover;
+   background-position:center;background-repeat:no-repeat}
+ /* faint starfield + texture (sits above the bg image, below content) */
+ .galaxy::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+   background-image:
+     radial-gradient(1.4px 1.4px at 18% 24%, rgba(255,247,225,.55), transparent),
+     radial-gradient(1.2px 1.2px at 72% 16%, rgba(255,247,225,.40), transparent),
+     radial-gradient(1.3px 1.3px at 41% 78%, rgba(255,247,225,.42), transparent),
+     radial-gradient(1.1px 1.1px at 86% 52%, rgba(255,247,225,.35), transparent),
+     radial-gradient(1.2px 1.2px at 9% 64%, rgba(255,247,225,.30), transparent),
+     radial-gradient(1.1px 1.1px at 60% 90%, rgba(255,247,225,.32), transparent)}
+ /* top-edge blend: a short dark wash matching the hero's bottom fade colour,
+    resolving into the galaxy's own warm dark — kills any step where the cover
+    meets the constellation. Sits above the bg, below the content/starfield. */
+ .galaxy::after{content:"";position:absolute;left:0;right:0;top:0;height:160px;
+   z-index:1;pointer-events:none;
+   background:linear-gradient(180deg, rgba(14,15,20,1) 0%, rgba(14,15,20,.72) 34%,
+     rgba(15,12,8,.30) 70%, transparent 100%)}
+ .galaxy-inner{position:relative;z-index:2;max-width:1100px;margin:0 auto}
+
+ .g-head{text-align:center;margin:0 auto 14px;max-width:64ch}
+ .g-tag{display:inline-flex;align-items:center;gap:9px;font-family:"Inter";font-size:.7rem;
+   font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-bright);
+   border:1px solid rgba(46,140,98,.4);border-radius:999px;padding:7px 16px;
+   background:rgba(46,140,98,.07)}
+ .g-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--good);
+   box-shadow:0 0 10px rgba(26,143,90,.9)}
+ .g-head h2{font-family:"Cormorant Garamond",Georgia,serif;color:#FBF3E1;font-weight:500;
+   font-size:clamp(2.1rem,5.2vw,3.4rem);line-height:1.04;letter-spacing:.005em;margin:20px 0 0}
+ .g-head h2 em{color:var(--gold-bright);font-style:italic;font-weight:600}
+ .g-head p{font-family:"Inter";color:rgba(251,243,225,.66);font-size:clamp(1rem,2vw,1.12rem);
+   max-width:54ch;margin:16px auto 0;line-height:1.6}
+ .g-hint{font-family:"Inter";font-size:.8rem;color:rgba(251,243,225,.45);margin-top:10px;font-style:italic}
+
+ /* ===== ORBIT STAGE (desktop / tablet) ===== */
+ .stage{position:relative;width:min(560px,90vw);height:min(560px,90vw);margin:48px auto 10px}
+ .orbit-field{position:absolute;inset:0;animation:gspin 60s linear infinite;transform-origin:50% 50%}
+ @keyframes gspin{to{transform:rotate(360deg)}}
+ .stage.paused .orbit-field{animation-play-state:paused}
+ .ring{position:absolute;left:50%;top:50%;border-radius:50%;
+   border:1px solid rgba(46,140,98,.14);transform:translate(-50%,-50%);pointer-events:none}
+ .ring.r1{width:62%;height:62%}
+ .ring.r2{width:96%;height:96%;border-style:dashed;border-color:rgba(46,140,98,.10)}
+
+ /* center hub — the Deal Dial mark, pulsing */
+ .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+   width:148px;height:148px;border-radius:50%;display:grid;place-items:center;z-index:6;
+   cursor:pointer;border:0;padding:0;background:transparent}
+ .hub .glow{position:absolute;inset:-46px;border-radius:50%;
+   background:radial-gradient(circle,rgba(26,143,90,.40),rgba(26,143,90,.10) 48%,transparent 70%);
+   animation:gbreathe 4.6s ease-in-out infinite}
+ @keyframes gbreathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.14);opacity:1}}
+ /* the central Deal-Score dial reads GREEN (good) — reinforcing "green = a good
+    deal" — on a calm ivory face, ringed by a thin gold luxury band. */
+ .hub .disc{position:relative;width:148px;height:148px;border-radius:50%;
+   background:radial-gradient(120% 120% at 38% 30%, #FFFDF6, #FBF4E1 70%, #F3E8CC 100%);
+   box-shadow:0 0 0 2px var(--gold-bright), 0 0 0 4px rgba(255,247,225,.30),
+     inset 0 2px 10px rgba(255,255,255,.7), inset 0 -10px 26px rgba(26,143,90,.12),
+     0 24px 50px -14px rgba(26,143,90,.4);
+   display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--good)}
+ .hub .disc .ring-svg{position:absolute;inset:9px;width:auto;height:auto}
+ .hub .disc .num{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.55rem;line-height:1;color:#127A4A}
+ .hub .disc .lbl{font-family:"Inter";font-weight:700;font-size:.56rem;letter-spacing:.18em;
+   text-transform:uppercase;margin-top:1px;color:#1A8F5A}
+
+ /* nodes — positioned by JS via transform; counter-rotated to stay upright */
+ .node{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;z-index:5}
+ .node .spin-fix{animation:gspin-rev 60s linear infinite;transform-origin:50% 50%;
+   width:100%;height:100%;border-radius:50%}
+ .stage.paused .node .spin-fix{animation-play-state:paused}
+ @keyframes gspin-rev{to{transform:rotate(-360deg)}}
+ .node button{all:unset;cursor:pointer;display:block;width:96px;height:96px;border-radius:50%}
+ .node .bubble{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
+   background:radial-gradient(120% 120% at 40% 32%, rgba(48,40,28,.96), rgba(28,23,16,.96));
+   border:1px solid var(--g-line);
+   box-shadow:0 14px 34px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,247,225,.10);
+   transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+ .node .bubble::after{content:"";position:absolute;inset:-9px;border-radius:50%;
+   background:radial-gradient(circle, rgba(46,140,98,.34), transparent 68%);opacity:0;
+   transition:opacity .3s;animation:gnodepulse 5s ease-in-out infinite}
+ @keyframes gnodepulse{0%,100%{opacity:.18}50%{opacity:.42}}
+ .node .bubble svg{width:34px;height:34px;color:var(--gold-bright);position:relative;z-index:2}
+ .node .cap{position:absolute;top:104px;left:50%;transform:translateX(-50%);white-space:nowrap;
+   font-family:"Inter";font-size:.72rem;font-weight:600;color:rgba(251,243,225,.78);
+   text-shadow:0 1px 8px rgba(0,0,0,.6);text-align:center}
+ .node button:hover .bubble,.node button:focus-visible .bubble{transform:scale(1.1);
+   border-color:rgba(46,140,98,.75);box-shadow:0 18px 40px -12px rgba(46,140,98,.5)}
+ .node button:focus-visible .bubble{outline:2px solid var(--gold-bright);outline-offset:3px}
+ .node.active .bubble{background:radial-gradient(120% 120% at 40% 32%, #6FD49F, var(--gold) 58%, var(--gold-deep));
+   border-color:rgba(255,247,225,.6);box-shadow:0 20px 46px -10px rgba(46,140,98,.72)}
+ .node.active .bubble svg{color:#FFFBF1}
+ .node.active .bubble::after{opacity:.7}
+ .node.related .bubble{border-color:rgba(63,184,160,.65);box-shadow:0 16px 38px -12px rgba(63,184,160,.45)}
+ .node.related .bubble svg{color:var(--teal)}
+ .stage.has-active .node:not(.active):not(.related) .bubble{opacity:.4}
+
+ /* MEANING-COLOURED constellation icons (owner: all-gold is hard to scan fast).
+    GREEN = the deal/found · RED = a warning · BLUE = a money tool. Brighter,
+    on-dark variants so they read cleanly over the deep field. Gold stays the
+    section accent. */
+ .node.mc-green .bubble svg{color:#5FD89C}
+ .node.mc-red   .bubble svg{color:#E8917F}
+ .node.mc-blue  .bubble svg{color:#7FB4E6}
+ .node.mc-green .bubble{border-color:rgba(95,216,156,.40)}
+ .node.mc-red   .bubble{border-color:rgba(232,145,127,.40)}
+ .node.mc-blue  .bubble{border-color:rgba(127,180,230,.40)}
+ .node.mc-green .bubble::after{background:radial-gradient(circle, rgba(95,216,156,.26), transparent 68%)}
+ .node.mc-red   .bubble::after{background:radial-gradient(circle, rgba(232,145,127,.26), transparent 68%)}
+ .node.mc-blue  .bubble::after{background:radial-gradient(circle, rgba(127,180,230,.26), transparent 68%)}
+ /* keep the ACTIVE (gold-filled) state legible: dark glyph on the gold disc */
+ .node.active .bubble svg{color:#2A1E08 !important}
+
+ /* ===== detail card (popover) ===== */
+ .gdetail{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);
+   width:min(340px,86vw);z-index:9;opacity:0;pointer-events:none;
+   transition:opacity .28s ease, transform .28s ease}
+ .gdetail.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+ .gdetail .card{position:relative;background:#FFFDF8;border:1px solid var(--g-line);
+   border-radius:var(--r-lg);padding:24px 24px 22px;text-align:left;
+   box-shadow:0 40px 80px -24px rgba(0,0,0,.7), 0 0 0 1px rgba(46,140,98,.18)}
+ .gdetail .card::before{content:"";position:absolute;inset:0;border-radius:var(--r-lg);
+   background:radial-gradient(120% 90% at 50% -10%, rgba(46,140,98,.12), transparent 60%);pointer-events:none}
+ .gdetail .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold-deep));margin-bottom:14px;
+   box-shadow:0 10px 22px -10px rgba(14,58,42,.6),inset 0 1px 0 rgba(255,255,255,.45);position:relative}
+ .gdetail .ic svg{width:24px;height:24px;color:#FFFBF1}
+ /* meaning-tinted icon tile in the popover (matches the node colour) */
+ .gdetail .card.mc-green .ic{background:linear-gradient(150deg,#2FB873,#147A4A)}
+ .gdetail .card.mc-red   .ic{background:linear-gradient(150deg,#D75A47,#A22C20)}
+ .gdetail .card.mc-blue  .ic{background:linear-gradient(150deg,#4A8FCC,#235E94)}
+ .gdetail h3{font-family:"Cormorant Garamond",serif;font-weight:600;color:var(--ink);
+   font-size:1.6rem;line-height:1.1;margin:0;position:relative}
+ .gdetail .what{font-family:"Inter";font-size:.94rem;color:var(--ink-soft);line-height:1.58;margin:10px 0 0;position:relative}
+ .gdetail .chip{display:inline-flex;align-items:center;gap:7px;margin-top:14px;
+   font-family:"Inter";font-size:.74rem;font-weight:600;letter-spacing:.04em;
+   padding:6px 12px;border-radius:999px;position:relative}
+ .gdetail .chip.good{background:rgba(26,143,90,.12);color:var(--good)}
+ .gdetail .chip.okay{background:rgba(181,120,10,.13);color:var(--okay)}
+ .gdetail .chip.weak{background:rgba(192,57,43,.11);color:var(--weak)}
+ /* "See how it works →" link on each card */
+ .gdetail .seemore{display:inline-flex;align-items:center;gap:6px;margin-top:16px;
+   font-family:"Inter";font-size:.86rem;font-weight:600;color:var(--gold-2);text-decoration:none;
+   position:relative;transition:gap .18s}
+ .gdetail .seemore:hover{gap:10px;text-decoration:underline}
+ .gdetail .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;border-radius:50%;
+   background:rgba(30,26,22,.06);color:var(--muted);cursor:pointer;display:grid;place-items:center;z-index:2}
+ .gdetail .x:hover{background:rgba(30,26,22,.12);color:var(--ink)}
+ .gdetail .x svg{width:15px;height:15px}
+
+ /* ===== MOBILE FALLBACK — stacked feature cards ===== */
+ .glist{display:none;max-width:540px;margin:30px auto 0;gap:14px;flex-direction:column}
+ .fcard{display:block;text-align:left;width:100%;
+   background:var(--g-card);border:1px solid var(--g-line);border-radius:var(--r);
+   padding:17px 18px;color:#FBF3E1;box-shadow:0 16px 36px -22px rgba(0,0,0,.7)}
+ .fcard .frow{display:flex;gap:15px;align-items:flex-start}
+ .fcard .fic{flex:0 0 46px;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+   background:radial-gradient(120% 120% at 40% 30%, rgba(46,140,98,.22), rgba(28,23,16,.9));
+   border:1px solid rgba(46,140,98,.35)}
+ .fcard .fic svg{width:24px;height:24px;color:var(--gold-bright)}
+ /* meaning-coloured icons on the mobile stacked cards too */
+ .fcard.mc-green .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(95,216,156,.20), rgba(28,23,16,.9));border-color:rgba(95,216,156,.35)}
+ .fcard.mc-green .fic svg{color:#5FD89C}
+ .fcard.mc-red .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(232,145,127,.20), rgba(28,23,16,.9));border-color:rgba(232,145,127,.35)}
+ .fcard.mc-red .fic svg{color:#E8917F}
+ .fcard.mc-blue .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(127,180,230,.20), rgba(28,23,16,.9));border-color:rgba(127,180,230,.35)}
+ .fcard.mc-blue .fic svg{color:#7FB4E6}
+ .fcard h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:0;color:#FBF3E1;line-height:1.12}
+ .fcard .what{font-family:"Inter";font-size:.88rem;color:rgba(251,243,225,.66);margin:5px 0 0;line-height:1.5}
+ .fcard .chip{display:inline-flex;margin-top:9px;font-family:"Inter";font-size:.7rem;font-weight:600;
+   padding:4px 11px;border-radius:999px}
+ .fcard .chip.good{background:rgba(26,143,90,.18);color:#5FD89C}
+ .fcard .chip.okay{background:rgba(181,120,10,.20);color:#E9C06A}
+ .fcard .chip.weak{background:rgba(192,57,43,.20);color:#E8917F}
+ .fcard .seemore{display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+   font-family:"Inter";font-size:.84rem;font-weight:600;color:var(--gold-bright);text-decoration:none}
+ .fcard .seemore:hover{text-decoration:underline}
+
+ /* below 760px → drop the orbit, show the premium stacked list */
+ @media(max-width:760px){
+   .galaxy{padding:60px 18px 64px}
+   .stage{display:none}
+   .glist{display:flex}
+   .g-hint{display:none}
+ }
+ @media(prefers-reduced-motion:reduce){
+   .orbit-field,.node .spin-fix,.hub .glow,.node .bubble::after{animation:none !important}
+ }
+</style>
+<style>
+ /* ===== FREE-TOOLS CALCULATOR — Ivory & Gold reskin of the verified previews ===== */
+ .calc{max-width:600px;margin:0 auto}
+ .calc .tnum{font-variant-numeric:tabular-nums}
+ .calc .card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);
+   box-shadow:var(--shadow-sm);padding:18px 16px;margin-bottom:16px}
+ @media(min-width:600px){.calc .card{padding:22px}}
+
+ .calc .grid2,.calc .dp-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ .calc .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ @media(max-width:430px){.calc .grid2{grid-template-columns:1fr}}
+ @media(max-width:380px){.calc .row2{grid-template-columns:1fr}}
+ .calc .dp-row .field{margin:0}
+
+ .calc .field{margin-bottom:14px}
+ .calc .field:last-child{margin-bottom:0}
+ .calc .field label,.calc .field > label{display:block;font-family:"Inter";font-size:.82rem;
+   font-weight:600;color:var(--ink);margin-bottom:6px}
+ .calc .field .hint{color:var(--muted);font-weight:400}
+
+ .calc .inputwrap{position:relative;display:flex;align-items:center}
+ .calc .inputwrap .pre,.calc .inputwrap .post{position:absolute;color:var(--muted);
+   font-weight:600;font-size:1.05rem;pointer-events:none}
+ .calc .inputwrap .pre{left:14px} .calc .inputwrap .post{right:14px}
+ .calc input[type="text"],.calc input[type="number"]{width:100%;font-family:"Inter";
+   font-variant-numeric:tabular-nums;font-size:1.15rem;font-weight:600;color:var(--ink);
+   background:var(--surface-2);border:1.5px solid var(--hair);border-radius:12px;
+   padding:13px 14px;min-height:44px;
+   transition:border-color .16s,box-shadow .16s,background .16s;-moz-appearance:textfield}
+ .calc input::-webkit-outer-spin-button,.calc input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+ .calc input.has-pre{padding-left:30px} .calc input.has-post{padding-right:40px}
+ .calc input:focus{outline:0;background:var(--surface);border-color:var(--gold);
+   box-shadow:0 0 0 4px rgba(26,106,72,.14)}
+ .calc input.bad{border-color:var(--weak);box-shadow:0 0 0 4px rgba(192,57,43,.10)}
+
+ /* segmented / toggle / chips — gold-tinted */
+ .calc .seg,.calc .toggle{display:grid;gap:4px;background:rgba(26,106,72,.10);
+   border:1px solid var(--hair);border-radius:999px;padding:5px}
+ .calc .seg{grid-template-columns:repeat(4,1fr)}
+ .calc .toggle{grid-template-columns:1fr 1fr;margin-bottom:18px}
+ .calc .seg button,.calc .toggle button{border:0;cursor:pointer;font-family:"Inter";font-weight:600;
+   background:transparent;color:var(--gold-2);border-radius:999px;
+   transition:background .18s,color .18s,box-shadow .18s}
+ .calc .seg button{padding:9px 4px;font-size:.86rem}
+ .calc .toggle button{padding:11px 10px;font-size:.92rem}
+ .calc .seg button.on,.calc .toggle button.on{background:var(--surface);color:var(--ink);
+   box-shadow:0 1px 2px rgba(60,44,20,.08),0 8px 18px -10px rgba(60,44,20,.30)}
+ .calc .miniseg{display:inline-flex;gap:2px;margin-left:8px;background:rgba(26,106,72,.10);
+   border:1px solid var(--hair);border-radius:999px;padding:2px;vertical-align:middle}
+ .calc .miniseg button{border:0;cursor:pointer;font-family:"Inter";font-size:.72rem;font-weight:600;
+   color:var(--gold-2);padding:2px 9px;border-radius:999px;background:transparent;
+   transition:background .15s,color .15s}
+ .calc .miniseg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(60,44,20,.12)}
+ .calc .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+ .calc .chip{border:1.5px solid var(--hair);background:var(--surface-2);cursor:pointer;
+   font-family:"Inter";font-size:.82rem;font-weight:600;color:var(--gold-2);
+   padding:7px 13px;border-radius:999px;transition:background .16s,border-color .16s,color .16s}
+ .calc .chip small{color:var(--muted);font-weight:500}
+ .calc .chip:hover{border-color:rgba(26,106,72,.6)}
+ .calc .chip.on{background:var(--gold);border-color:var(--gold);color:#FFFBF1}
+ .calc .chip.on small{color:rgba(255,251,241,.85)}
+
+ .calc select{width:100%;font-family:"Inter";font-size:1rem;font-weight:600;color:var(--ink);
+   background:var(--surface-2);border:1.5px solid var(--hair);border-radius:12px;
+   padding:12px 14px;min-height:44px;cursor:pointer;appearance:none;
+   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B635A' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+   background-repeat:no-repeat;background-position:right 14px center}
+ .calc select:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 4px rgba(26,106,72,.14)}
+
+ /* advanced disclosure */
+ .calc details.adv{background:var(--surface-2);border:1px solid var(--hair);border-radius:var(--r);
+   margin-bottom:16px;overflow:hidden}
+ .calc details.adv > summary{list-style:none;cursor:pointer;padding:15px 16px;font-family:"Inter";
+   font-weight:600;font-size:.92rem;color:var(--ink);display:flex;align-items:center;gap:8px;user-select:none}
+ .calc details.adv > summary::-webkit-details-marker{display:none}
+ .calc details.adv > summary .chev{margin-left:auto;transition:transform .2s;color:var(--muted)}
+ .calc details.adv[open] > summary .chev{transform:rotate(180deg)}
+ .calc details.adv > summary small{color:var(--muted);font-weight:400}
+ .calc .adv-body{padding:0 16px 16px}
+ .calc .adv-note{font-family:"Inter";color:var(--muted);font-size:.8rem;margin:-2px 0 14px}
+
+ /* ===== the big answer hero — dark INK plate with a gold halo (Ivory & Gold) ===== */
+ .calc .answer{position:relative;background:radial-gradient(120% 95% at 50% 0%, #2A2118 0%, #17120C 74%);
+   color:#F4ECDD;border-radius:24px;padding:28px 22px 24px;text-align:center;
+   box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;border:1px solid rgba(26,106,72,.30)}
+ .calc .answer::after{content:"";position:absolute;inset:0;pointer-events:none;
+   background:radial-gradient(70% 55% at 50% 4%, rgba(217,169,63,.28), transparent 70%)}
+ .calc .answer .eyebrow{position:relative;z-index:1;font-family:"Inter";text-transform:uppercase;
+   letter-spacing:.16em;font-size:.68rem;font-weight:600;color:var(--gold-bright);margin-bottom:10px}
+ .calc .answer .lede-top{position:relative;z-index:1;color:rgba(244,236,221,.85);font-size:1rem;margin-bottom:4px}
+ .calc .answer .big{position:relative;z-index:1;font-family:"Cormorant Garamond",serif;font-weight:600;
+   font-size:clamp(2.3rem,11vw,3.3rem);line-height:1.04;letter-spacing:.005em;color:#FFFDF8}
+ .calc .answer .big .unit{font-size:.5em;font-weight:500;color:var(--gold-bright);font-family:"Inter"}
+ .calc .answer .big b{color:#5FCF93;font-weight:600}
+ .calc .answer .lede{position:relative;z-index:1;font-family:"Inter";margin-top:10px;
+   color:rgba(244,236,221,.86);font-size:.97rem}
+ .calc .answer .lede b{color:#FFFDF8;font-weight:600}
+ /* warm-warning hero (debts/payment-too-low/renting-wins) */
+ .calc .answer.warn{background:radial-gradient(120% 95% at 50% 0%, #5A3417 0%, #38200E 74%);border-color:rgba(217,169,63,.34)}
+ .calc .answer.warn::after{background:radial-gradient(70% 55% at 50% 4%, rgba(217,169,63,.30), transparent 70%)}
+ .calc .answer.warn .eyebrow{color:#F0CE9A}
+ .calc .answer.warn .big{font-size:clamp(1.35rem,6vw,1.8rem);line-height:1.22}
+ .calc .answer.warn .big b{color:#FFD08A}
+
+ /* secondary stat strip */
+ .calc .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+ .calc .stat{background:var(--surface);border:1px solid var(--hair);border-radius:12px;
+   padding:14px;box-shadow:var(--shadow-sm)}
+ .calc .stat .k{font-family:"Inter";font-size:.76rem;color:var(--muted);font-weight:600;margin-bottom:4px}
+ .calc .stat .v{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.4rem;color:var(--ink)}
+ .calc .stat .v .per{font-size:.6em;font-weight:500;color:var(--muted);font-family:"Inter"}
+ .calc .stat.muted-stat{background:var(--surface-2)}
+
+ /* bars / timeline */
+ .calc .timeline{margin-bottom:16px}
+ .calc .barlabels{display:flex;justify-content:space-between;align-items:baseline;
+   font-family:"Inter";font-size:.74rem;color:var(--muted);margin-bottom:8px}
+ .calc .barlabels h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.05rem;color:var(--ink)}
+ .calc .bar{height:16px;border-radius:999px;overflow:hidden;background:var(--okay-soft);display:flex}
+ .calc .bar .principal,.calc .bar .used{background:var(--good);height:100%;transition:width .5s cubic-bezier(.4,0,.2,1)}
+ .calc .bar .interest{background:var(--okay);height:100%;transition:width .5s cubic-bezier(.4,0,.2,1)}
+ .calc .bar .used.amber{background:var(--okay)} .calc .bar .used.red{background:var(--weak)}
+ .calc .legend{display:flex;gap:16px;margin-top:10px;font-family:"Inter";font-size:.8rem;color:var(--muted);flex-wrap:wrap}
+ .calc .legend span{display:inline-flex;align-items:center;gap:6px}
+ .calc .legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+ .calc .dot.g,.calc .dot.buy{background:var(--good)} .calc .dot.a{background:var(--okay)}
+ .calc .dot.rent{background:var(--weak)} .calc .dot.be{background:var(--ink)}
+ .calc .chart svg{display:block;width:100%;height:auto}
+
+ /* cash cards (cash-to-close) */
+ .calc .cash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ .calc .cash{background:var(--surface-2);border:1px solid var(--hair);border-radius:12px;padding:16px}
+ .calc .cash .lbl{font-family:"Inter";font-size:.8rem;color:var(--muted)}
+ .calc .cash .val{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;margin-top:5px;color:var(--ink)}
+ .calc .cash .note{font-family:"Inter";font-size:.73rem;color:var(--muted);margin-top:2px}
+ .calc .cash-total{margin-top:12px;display:flex;justify-content:space-between;align-items:center;
+   padding:14px 16px;background:rgba(26,106,72,.12);border:1px solid var(--hair);border-radius:12px;
+   font-family:"Inter";color:var(--gold-deep);font-weight:700}
+ .calc .cash-total .v{font-family:"Cormorant Garamond",serif;font-size:1.35rem}
+ .calc .reserves{margin-top:12px;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;
+   background:var(--good-soft);border:1px solid rgba(26,143,90,.22);border-radius:12px}
+ .calc .reserves .ic{font-size:1.1rem;line-height:1.2}
+ .calc .reserves .rt b{display:block;font-family:"Inter";font-size:.9rem;font-weight:700;color:var(--good)}
+ .calc .reserves .rt span{font-family:"Inter";font-size:.8rem;color:var(--muted);line-height:1.45}
+ .calc .reserves .rt b .amt{font-family:"Cormorant Garamond",serif}
+ .calc .card h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.15rem;
+   display:flex;align-items:center;gap:9px;margin:0 0 3px;color:var(--ink)}
+ .calc .card .sub{font-family:"Inter";color:var(--muted);font-size:.84rem;margin-bottom:15px}
+ .calc .ico{width:22px;height:22px;flex:none;color:var(--gold-2)}
+
+ /* break-even callout (rent vs buy) */
+ .calc .breakeven{display:flex;align-items:center;gap:12px;background:var(--good-soft);
+   border:1px solid rgba(26,143,90,.22);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;
+   font-family:"Inter";font-size:.98rem;color:var(--ink)}
+ .calc .breakeven .ico{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--good);
+   color:#fff;display:grid;place-items:center;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.1rem}
+ .calc .breakeven b{color:var(--good)}
+ .calc .breakeven.amber{background:var(--okay-soft);border-color:rgba(181,120,10,.28)}
+ .calc .breakeven.amber .ico{background:var(--okay)} .calc .breakeven.amber b{color:var(--okay)}
+ .calc .breakeven.red{background:var(--weak-soft);border-color:rgba(192,57,43,.28)}
+ .calc .breakeven.red .ico{background:var(--weak)} .calc .breakeven.red b{color:var(--weak)}
+
+ /* the "magic" reward line */
+ .calc .magic,.calc .extra{background:var(--good-soft);border:1px solid rgba(26,143,90,.22);
+   border-radius:var(--r);padding:16px;margin-bottom:16px}
+ .calc .magic{display:flex;align-items:center;gap:10px}
+ .calc .magic.col{display:block}
+ .calc .magic .toprow,.calc .extra .toprow{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+ .calc .magic .spark,.calc .extra .spark{font-size:1.05rem}
+ .calc .magic h3,.calc .extra h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.05rem;color:var(--ink)}
+ .calc .extra .sub{font-family:"Inter";color:var(--muted);font-size:.85rem;margin-bottom:12px}
+ .calc .magic p,.calc .magicline,.calc .saveline{font-family:"Inter";font-size:.98rem;color:var(--ink)}
+ .calc .magic p b,.calc .magicline b,.calc .saveline b{color:var(--good)}
+ .calc .magic.idle,.calc .magicline.idle,.calc .saveline.idle{color:var(--muted)}
+ .calc .magic.idle{background:var(--surface-2);border-color:var(--hair)}
+ .calc .magic.idle p{color:var(--muted)}
+ .calc .magic p b.less{color:var(--good)} .calc .magic p b.more{color:var(--weak)}
+ .calc .magic .tag{font-family:"Inter";color:var(--muted);font-size:.78rem;margin-top:8px}
+ @keyframes calcpop{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(26,143,90,.40)}
+   40%{transform:scale(1.012);box-shadow:0 0 0 8px rgba(26,143,90,0)}
+   100%{transform:scale(1);box-shadow:0 0 0 0 rgba(26,143,90,0)}}
+ .calc .pop{animation:calcpop .55s ease}
+
+ .calc .disclaimer{text-align:center;font-family:"Inter";color:var(--faint);font-size:.78rem;
+   margin-top:18px;line-height:1.5}
+
+ /* the calculator page hero (H1 + SEO intro) */
+ .calc-intro{text-align:center;max-width:640px;margin:50px auto 26px}
+ .calc-intro .kicker{margin-bottom:14px;display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap}
+ .calc-intro .kicker .freebadge{text-transform:uppercase;letter-spacing:.16em}
+ .calc-intro h1{font-weight:500;font-size:clamp(2.1rem,5vw,3.2rem);line-height:1.07;letter-spacing:.005em;margin:0}
+ .calc-intro h1 em{color:var(--gold)}
+ .calc-intro p{font-family:"Inter";color:var(--muted);font-size:1.04rem;margin:16px auto 0;max-width:54ch;line-height:1.6}
+
+ /* free-tools hub cards */
+ .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px;margin:0 auto}
+ @media(max-width:640px){.hub-grid{grid-template-columns:1fr}}
+ .hub-card{position:relative;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-lg);padding:28px 26px;box-shadow:var(--shadow-sm);text-decoration:none;
+   color:var(--ink);transition:transform .2s,border-color .2s}
+ .hub-card:hover{transform:translateY(-3px);border-color:rgba(26,106,72,.55)}
+ .hub-card .hub-badge{position:absolute;top:22px;right:22px}
+ .hub-card .ico{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;margin-bottom:18px;
+   background:linear-gradient(155deg,rgba(26,106,72,.18),rgba(26,106,72,.05));border:1px solid var(--hair)}
+ .hub-card .ico svg{width:26px;height:26px;color:var(--gold-2)}
+ .hub-card h3{font-weight:600;font-size:1.5rem;line-height:1.12;margin:0 0 6px;color:var(--ink)}
+ .hub-card p{font-family:"Inter";color:var(--muted);font-size:.95rem;line-height:1.55;margin:0}
+ .hub-card .go{font-family:"Inter";margin-top:18px;display:inline-flex;align-items:center;gap:8px;
+   font-weight:600;font-size:.92rem;color:var(--gold-2)}
+ .hub-card .go svg{width:16px;height:16px}
+</style></head><body><header><div class='wrap bar'><a class='logo' href='index.html'><span class='mark'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg></span><b>Underlisted</b></a><nav class='navlinks'><a href='index.html'>Deals</a><a href='free-tools.html' class='here'>Free tools</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html'>Learn the basics</a><a class='btn-top' href='index.html#early-access'>Get early access</a></nav></div></header><div class='rule gold'></div><section class='masthead' style='padding:0'><div class='wrap'><div class='calc-intro reveal in'><div class='kicker'><span class='freebadge big'><span class='fdot'></span>FREE</span> &nbsp;Plain English · no signup</div><h1>Should I keep renting, or <em>buy?</em></h1><p>A free rent vs buy calculator that shows which one leaves more money in your pocket over the years you'll stay — and the year buying pulls ahead.</p></div></div></section><section class='sec' style='padding-top:18px'><div class='wrap'><div class='calc'>
+    <div class="card">
+      <div class="field">
+        <label for="rent">Your rent now <span class="hint">— per month</span></label>
+        <div class="inputwrap"><span class="pre">$</span>
+          <input id="rent" class="has-pre" type="text" inputmode="numeric" value="2,000" /></div>
+      </div>
+      <div class="field">
+        <label for="price">Home you'd buy <span class="hint">— the price</span></label>
+        <div class="inputwrap"><span class="pre">$</span>
+          <input id="price" class="has-pre" type="text" inputmode="numeric" value="350,000" /></div>
+      </div>
+      <div class="field">
+        <label for="down">Down payment
+          <span class="miniseg" id="downseg">
+            <button type="button" class="on" data-mode="amt" onclick="setDownMode('amt')">$</button>
+            <button type="button" data-mode="pct" onclick="setDownMode('pct')">%</button>
+          </span>
+        </label>
+        <div class="inputwrap"><span class="pre" id="down-pre">$</span>
+          <span class="post" id="down-post" style="display:none">%</span>
+          <input id="down" class="has-pre" type="text" inputmode="numeric" value="35,000" /></div>
+        <p class="adv-note" id="down-note" style="margin:6px 0 0">That's 10% down.</p>
+      </div>
+      <div class="row2">
+        <div class="field" style="margin-bottom:0"><label for="rate">Interest rate</label>
+          <div class="inputwrap"><input id="rate" class="has-post" type="text" inputmode="decimal" value="6.5" /><span class="post">%</span></div></div>
+        <div class="field" style="margin-bottom:0"><label for="years">Years you'll stay</label>
+          <div class="inputwrap"><input id="years" class="has-post" type="text" inputmode="numeric" value="7" /><span class="post">yrs</span></div></div>
+      </div>
+    </div>
+    <details class="adv">
+      <summary>Fine-tune the assumptions <small>(optional)</small><span class="chev">⌄</span></summary>
+      <div class="adv-body">
+        <p class="adv-note">Good defaults are filled in. Change them only if you know your area's numbers.</p>
+        <div class="row2">
+          <div class="field"><label for="rentGrow">Rent goes up</label>
+            <div class="inputwrap"><input id="rentGrow" class="has-post" type="text" inputmode="decimal" value="3" /><span class="post">%/yr</span></div></div>
+          <div class="field"><label for="appr">Home value grows</label>
+            <div class="inputwrap"><input id="appr" class="has-post" type="text" inputmode="decimal" value="3" /><span class="post">%/yr</span></div></div>
+          <div class="field"><label for="tax">Property tax</label>
+            <div class="inputwrap"><input id="tax" class="has-post" type="text" inputmode="decimal" value="1.1" /><span class="post">%/yr</span></div></div>
+          <div class="field"><label for="ins">Insurance</label>
+            <div class="inputwrap"><input id="ins" class="has-post" type="text" inputmode="decimal" value="0.5" /><span class="post">%/yr</span></div></div>
+          <div class="field"><label for="upkeep">Upkeep</label>
+            <div class="inputwrap"><input id="upkeep" class="has-post" type="text" inputmode="decimal" value="1" /><span class="post">%/yr</span></div></div>
+          <div class="field"><label for="loanyears">Loan length</label>
+            <div class="inputwrap"><input id="loanyears" class="has-post" type="text" inputmode="numeric" value="30" /><span class="post">yrs</span></div></div>
+          <div class="field"><label for="buycost">Cost to buy</label>
+            <div class="inputwrap"><input id="buycost" class="has-post" type="text" inputmode="decimal" value="3" /><span class="post">% of price</span></div></div>
+          <div class="field"><label for="sellcost">Cost to sell</label>
+            <div class="inputwrap"><input id="sellcost" class="has-post" type="text" inputmode="decimal" value="6" /><span class="post">% of value</span></div></div>
+        </div>
+      </div>
+    </details>
+    <div class="answer" id="answer">
+      <div class="eyebrow" id="ans-eyebrow">Over your time in the home</div>
+      <div class="big" id="ans-big">—</div>
+      <div class="lede" id="ans-lede"></div>
+    </div>
+    <div class="breakeven" id="breakeven">
+      <span class="ico" id="be-ico">4</span>
+      <div id="be-text">Buying pulls ahead after about <b>year 4</b>.</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Renting costs you</div><div class="v tnum" id="s1-v">—</div></div>
+      <div class="stat muted-stat"><div class="k">Owning truly costs you</div><div class="v tnum" id="s2-v">—</div></div>
+    </div>
+    <div class="card chartcard">
+      <div class="barlabels"><h3>Rent vs buy over time</h3><span id="chart-cap">true cost so far, each year</span></div>
+      <div class="chart" id="chart"></div>
+      <div class="legend"><span><i class="dot rent"></i> Renting</span><span><i class="dot buy"></i> Buying</span><span><i class="dot be"></i> Break-even</span></div>
+    </div>
+    <div class="magic" id="magic"><span class="spark">✨</span><p id="magic-text">—</p></div>
+    <p class="disclaimer">A simple estimate using typical assumptions — your real numbers will vary. Not financial advice.</p>
+<script>
+  function num(id){var el=document.getElementById(id);if(!el)return 0;var raw=(el.value||"").replace(/[^0-9.]/g,"");var v=parseFloat(raw);return isFinite(v)?v:0;}
+  function money(n){if(!isFinite(n))n=0;return "$"+Math.round(n).toLocaleString("en-US");}
+  function roundNice(n){n=Math.abs(n);if(n>=100000)return Math.round(n/1000)*1000;if(n>=10000)return Math.round(n/500)*500;
+    if(n>=1000)return Math.round(n/100)*100;return Math.round(n/50)*50;}
+  var downMode="amt";
+  function setDownMode(m){if(m===downMode)return;var price=num("price");var el=document.getElementById("down");var cur=num("down");
+    if(m==="pct"){var pct=price>0?(cur/price)*100:0;el.value=(Math.round(pct*10)/10).toString();}
+    else{var amt=price*(cur/100);el.value=Math.round(amt).toLocaleString("en-US");}
+    downMode=m;document.querySelectorAll("#downseg button").forEach(function(b){b.classList.toggle("on",b.dataset.mode===m);});
+    document.getElementById("down-pre").style.display=(m==="amt")?"":"none";document.getElementById("down-post").style.display=(m==="pct")?"":"none";
+    el.classList.toggle("has-pre",m==="amt");el.classList.toggle("has-post",m==="pct");compute();}
+  function downPayment(){var price=num("price");if(downMode==="pct")return price*(num("down")/100);return num("down");}
+  function monthlyPI(loan,annualRate,years){if(loan<=0)return 0;var r=annualRate/100/12;var n=Math.round(years*12);
+    if(n<=0)return 0;if(r===0)return loan/n;return loan*r/(1-Math.pow(1+r,-n));}
+  function balanceAfter(loan,annualRate,years,m){if(loan<=0)return 0;var r=annualRate/100/12;var n=Math.round(years*12);
+    if(m>=n)return 0;if(r===0)return Math.max(0,loan*(1-m/n));var pay=monthlyPI(loan,annualRate,years);
+    var bal=loan*Math.pow(1+r,m)-pay*(Math.pow(1+r,m)-1)/r;return Math.max(0,bal);}
+  function compute(animate){
+    var rent0=num("rent");var price=num("price");var down=Math.min(downPayment(),price);var loan=Math.max(0,price-down);
+    var rate=num("rate");var stay=Math.max(1,Math.round(num("years")));
+    var rentGrow=num("rentGrow")/100;var appr=num("appr")/100;var taxPct=num("tax")/100;var insPct=num("ins")/100;
+    var upkeepPct=num("upkeep")/100;var loanYears=Math.max(1,num("loanyears"));var buyCost=num("buycost")/100;var sellCost=num("sellcost")/100;
+    var dnote=document.getElementById("down-note");
+    if(price>0){var pct=(down/price)*100;dnote.textContent="That's "+(Math.round(pct*10)/10)+"% down"+(downMode==="pct"?" ("+money(down)+").":".");}else{dnote.textContent="";}
+    var answer=document.getElementById("answer");var eyebrow=document.getElementById("ans-eyebrow");
+    var big=document.getElementById("ans-big");var lede=document.getElementById("ans-lede");
+    if(price<=0||rent0<=0){answer.classList.remove("warn");eyebrow.textContent="Fill in rent and a home price";big.textContent="—";lede.textContent="";
+      document.getElementById("s1-v").textContent="—";document.getElementById("s2-v").textContent="—";drawChart([],[],0,0);setBreakeven(null,0);setMagic(null);return;}
+    var pi=monthlyPI(loan,rate,loanYears);var HORIZON=Math.max(stay,30);var rentCum=[0];var buyCum=[0];var buyNet=[0];
+    var rentSpent=0;var buySpent=down+price*buyCost;
+    for(var y=1;y<=HORIZON;y++){var rentThisYear=rent0*12*Math.pow(1+rentGrow,y-1);rentSpent+=rentThisYear;rentCum[y]=rentSpent;
+      var homeVal=price*Math.pow(1+appr,y-1);var piYear=pi*12;var taxYear=homeVal*taxPct;var insYear=homeVal*insPct;var upYear=homeVal*upkeepPct;
+      buySpent+=piYear+taxYear+insYear+upYear;buyCum[y]=buySpent;
+      var valEnd=price*Math.pow(1+appr,y);var balEnd=balanceAfter(loan,rate,loanYears,y*12);var equity=valEnd*(1-sellCost)-balEnd;
+      buyNet[y]=buySpent-equity;}
+    var beYear=null;for(var y2=1;y2<=HORIZON;y2++){if(buyNet[y2]<=rentCum[y2]){beYear=y2;break;}}
+    var rentAtStay=rentCum[stay];var buyAtStay=buyNet[stay];var gap=rentAtStay-buyAtStay;
+    document.getElementById("s1-v").textContent=money(rentAtStay);document.getElementById("s2-v").textContent=money(buyAtStay);
+    var buyingAhead=gap>0;
+    if(buyingAhead){answer.classList.remove("warn");eyebrow.textContent="Over your "+stay+" years in the home";
+      big.innerHTML="Buying could leave you about <b>"+money(roundNice(gap))+"</b> ahead of renting.";
+      lede.innerHTML="Renting that whole time costs about <b>"+money(rentAtStay)+"</b>; owning truly costs about <b>"+money(buyAtStay)+"</b> once you sell and pocket your equity.";}
+    else{answer.classList.add("warn");eyebrow.textContent="Over your "+stay+" years in the home";
+      big.innerHTML="Renting likely leaves you about <b>"+money(roundNice(-gap))+"</b> ahead.";
+      if(beYear&&beYear>stay){lede.innerHTML="You'd need to stay until about <b>year "+beYear+"</b> for buying to pull ahead — longer than you plan to.";}
+      else{lede.innerHTML="At these numbers, buying doesn't catch up within a normal holding period. Renting is the smarter money here.";}}
+    setBreakeven(beYear,stay);setMagic({beYear:beYear,stay:stay,buyNet:buyNet,rentCum:rentCum,gap:gap,buyingAhead:buyingAhead},animate);
+    drawChart(rentCum,buyNet,stay,beYear);}
+  function setBreakeven(beYear,stay){var box=document.getElementById("breakeven");var ico=document.getElementById("be-ico");var text=document.getElementById("be-text");
+    box.classList.remove("amber","red");
+    if(beYear==null){box.classList.add("red");ico.textContent="∞";text.innerHTML="Buying doesn't pull ahead within 30 years at these numbers — <b>renting wins</b>.";return;}
+    ico.textContent=beYear;
+    if(beYear<=stay){text.innerHTML="Buying pulls ahead after about <b>year "+beYear+"</b> — every year after that, you're further ahead.";}
+    else{box.classList.add("amber");text.innerHTML="Buying only pulls ahead after about <b>year "+beYear+"</b> — that's after you plan to move.";}}
+  function setMagic(d,animate){var box=document.getElementById("magic");var text=document.getElementById("magic-text");
+    if(!d){box.classList.add("idle");text.textContent="Enter your numbers above to see your rent-vs-buy turning point.";return;}
+    var beYear=d.beYear,stay=d.stay,buyNet=d.buyNet,rentCum=d.rentCum,gap=d.gap,buyingAhead=d.buyingAhead;
+    if(!buyingAhead){box.classList.add("idle");
+      if(stay<=3&&beYear&&beYear>stay){text.innerHTML="If you'll move within ~"+stay+" years, renting is likely the smarter money.";}
+      else if(beYear&&beYear>stay){text.innerHTML="Stay until about <b>year "+beYear+"</b> and buying starts to win — short of that, keep renting.";}
+      else{text.innerHTML="Renting is the smarter money at these numbers.";}return;}
+    box.classList.remove("idle");var extra=2;var future=Math.min(stay+extra,buyNet.length-1);
+    var gapNow=rentCum[stay]-buyNet[stay];var gapLater=rentCum[future]-buyNet[future];var moreAhead=gapLater-gapNow;
+    if(future>stay&&moreAhead>0){var yrsMore=future-stay;
+      text.innerHTML="Stay just <b>"+yrsMore+" more year"+(yrsMore===1?"":"s")+"</b> and buying pulls about <b>"+money(roundNice(moreAhead))+"</b> further ahead.";}
+    else{text.innerHTML="The longer you stay, the further buying pulls ahead.";}
+    if(animate){box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");}}
+  function drawChart(rentCum,buyNet,stay,beYear){var host=document.getElementById("chart");
+    var W=520,H=200,padL=8,padR=8,padT=14,padB=26;
+    if(!rentCum.length){host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"></svg>';return;}
+    var lastYr=Math.min(Math.max(stay,beYear||stay)+1,rentCum.length-1);var years=lastYr;
+    var xs=function(y){return padL+(y/years)*(W-padL-padR);};
+    var maxV=0;for(var y=1;y<=years;y++){maxV=Math.max(maxV,rentCum[y],buyNet[y]);}
+    var minV=0;for(var y3=1;y3<=years;y3++){minV=Math.min(minV,buyNet[y3]);}
+    var span=(maxV-minV)||1;var ys=function(v){return padT+(1-(v-minV)/span)*(H-padT-padB);};
+    function path(arr){var d="";for(var y4=0;y4<=years;y4++){d+=(y4===0?"M":"L")+xs(y4).toFixed(1)+" "+ys(arr[y4]).toFixed(1)+" ";}return d.trim();}
+    var zeroY=ys(0);var rentPath=path(rentCum);var buyPath=path(buyNet);var beMark="";
+    if(beYear&&beYear<=years){var bx=xs(beYear);
+      beMark='<line x1="'+bx.toFixed(1)+'" y1="'+padT+'" x2="'+bx.toFixed(1)+'" y2="'+(H-padB)+'" stroke="#1E1A16" stroke-width="1.5" stroke-dasharray="4 4" opacity=".45"/>'
+        +'<circle cx="'+bx.toFixed(1)+'" cy="'+ys(buyNet[beYear]).toFixed(1)+'" r="4.5" fill="#1E1A16"/>'
+        +'<text x="'+bx.toFixed(1)+'" y="'+(H-padB+18)+'" text-anchor="middle" font-size="11" fill="#6B635A" font-family="Inter,sans-serif">yr '+beYear+'</text>';}
+    var stayMark="";if(stay<=years){var sx=xs(stay);
+      stayMark='<circle cx="'+sx.toFixed(1)+'" cy="'+ys(rentCum[stay]).toFixed(1)+'" r="3.5" fill="#C0392B"/>'
+        +'<circle cx="'+sx.toFixed(1)+'" cy="'+ys(buyNet[stay]).toFixed(1)+'" r="3.5" fill="#1A8F5A"/>';}
+    host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Rent versus buy cumulative cost over time">'
+      +'<line x1="'+padL+'" y1="'+zeroY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+zeroY.toFixed(1)+'" stroke="#EBE3D2" stroke-width="1"/>'
+      +beMark+'<path d="'+rentPath+'" fill="none" stroke="#C0392B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'
+      +'<path d="'+buyPath+'" fill="none" stroke="#1A8F5A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+stayMark+'</svg>';}
+  function formatThousands(el){var start=el.selectionStart;var before=el.value;var digits=before.replace(/[^0-9]/g,"");
+    if(digits===""){el.value="";return;}var formatted=parseInt(digits,10).toLocaleString("en-US");el.value=formatted;
+    var diff=formatted.length-before.length;var pos=Math.max(0,(start||formatted.length)+diff);try{el.setSelectionRange(pos,pos);}catch(e){}}
+  ["rent","price"].forEach(function(id){var el=document.getElementById(id);el.addEventListener("input",function(){formatThousands(el);compute(true);});});
+  document.getElementById("down").addEventListener("input",function(){var el=document.getElementById("down");if(downMode==="amt")formatThousands(el);compute(true);});
+  ["rate","years","rentGrow","appr","tax","ins","upkeep","loanyears","buycost","sellcost"].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.addEventListener("input",function(){compute(true);});});
+  compute();
+</script></div></div></section><section class='sec' id='early-access'><div class='wrap'><div class='wl reveal'><div class='key'>Founding access</div><h2>Be first when we open the doors.</h2><p>Founding members lock in <span class='price'>$19.99/mo</span> for a full year — rising to $49.99/mo soon. No spam, just your invite.</p><form name='waitlist' method='POST' data-netlify='true' netlify-honeypot='bot-field' action='/thanks.html'><input type='hidden' name='form-name' value='waitlist' /><p style='display:none'><label>Leave blank: <input name='bot-field' /></label></p><input type='email' name='email' placeholder='you@email.com' required aria-label='Your email address' /><button type='submit'>Join the waitlist →</button></form><p class='fine'>We email you when your city opens. Unsubscribe anytime.</p></div></div></section><div class='rule gold'></div><footer><div class='wrap'><div class='foot-grid'><a class='logo' href='index.html'><span class='mark'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg></span><b>Underlisted</b></a><nav class='foot-links'><a href='index.html'>Deals</a><a href='free-tools.html'>Free tools</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html'>Learn the basics</a><a href='index.html#early-access'>Get access</a></nav></div><p class='disclaim'>Estimates only — a screening tool, not financial or investment advice. Always confirm with a lender and an inspection. Fair Housing: our scoring never uses demographic or neighborhood-quality signals.</p></div></footer>
+<script>
+ (function(){
+   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+   window.addEventListener("load", function(){
+     var arc = document.getElementById("arcF");
+     if(arc){ var pct = parseFloat(arc.getAttribute("data-pct")||"0.84");
+       if(reduce){arc.style.transition="none";}
+       requestAnimationFrame(function(){ arc.style.strokeDashoffset = (251.2*(1-pct)).toFixed(1); }); }
+   });
+   if(reduce){ document.querySelectorAll(".reveal").forEach(function(e){e.classList.add("in")}); return; }
+   var io = new IntersectionObserver(function(es){
+     es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+   },{threshold:.14});
+   document.querySelectorAll(".reveal:not(.in)").forEach(function(e){io.observe(e)});
+ })();
+</script></body></html>

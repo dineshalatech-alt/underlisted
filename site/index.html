@@ -1,72 +1,1677 @@
-<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Underlisted — under-priced & foreclosure homes across the U.S.</title><meta name='description' content='Find under-priced and foreclosure homes across the U.S., scored 0–100 with value, rent, cash-needed, and fire/flood insurance risk.'>
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Underlisted — the homes worth buying, made obvious</title><meta name='description' content='Every home in America, scored in plain English. Green means a real deal — with fire/flood insurance risk, the true monthly cost, and the real cash you'd need.'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
 <style>
- body{margin:0;background:#F2F4F5;color:#1F2933;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
- .wrap{max-width:900px;margin:0 auto;padding:22px}
- a{color:#0F6E56}
- .hero{background:linear-gradient(135deg,#0F6E56,#1D9E75);color:#fff;border-radius:18px;padding:26px 22px}
- .hero h1{margin:.2rem 0;font-size:1.8rem} .hero p{color:#EAFBF4;margin:.2rem 0}
- /* Video hero: the owner's animation as a full-bleed background with a warm
-    gradient scrim so the headline + CTA stay crisp over any video frame. */
- .hero-video{position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(135deg,#0F6E56,#1D9E75);
-   color:#fff;min-height:360px;display:flex;align-items:flex-end;
-   box-shadow:0 18px 50px rgba(15,110,86,.28)}
+ :root{
+   --ivory:#FBF7EF; --ivory-2:#F6F0E4; --surface:#FFFDF8; --surface-2:#FCF8F0;
+   --ink:#1E1A16; --ink-soft:#3A332B; --muted:#6B635A; --faint:#938A7E;
+   --hair:rgba(26,106,72,.26); --hair-soft:rgba(30,26,22,.10);
+   --gold:#1A6A48; --gold-2:#14533A; --gold-bright:#1F7A53; --gold-deep:#0E3A2A;
+   --good:#1A8F5A; --good-soft:rgba(26,143,90,.12);
+   --okay:#B5780A; --okay-soft:rgba(181,120,10,.13);
+   --weak:#C0392B; --weak-soft:rgba(192,57,43,.11);
+   /* BRICK RED from the new logo's roof — the secondary brand accent, reserved for
+      tasteful editorial / load-bearing emphasis only. Distinct from the brighter
+      "walk away" deal-score red so the two never get confused. */
+   --deep-red:#A8201C;
+   --deep-red-2:#8E1B18;
+   --r:16px; --r-lg:22px;
+   --shadow:0 30px 64px -32px rgba(60,44,20,.30);
+   --shadow-sm:0 14px 30px -18px rgba(60,44,20,.26);
+   /* ── UNIFIED CARD SYSTEM (one designed surface across map tiles + tool cards) ──
+      every card shares the same radius, hairline, soft elegant shadow, and the same
+      deeper shadow on hover. Hover-lift is a single shared transform/duration. */
+   --r-card:19px;
+   --card-shadow:0 18px 44px -26px rgba(60,44,20,.32), 0 2px 8px -4px rgba(60,44,20,.14);
+   --card-shadow-hover:0 30px 60px -28px rgba(60,44,20,.40), 0 4px 12px -5px rgba(60,44,20,.16);
+   --lift:translateY(-3px);
+   --ease-card:cubic-bezier(.22,.61,.36,1);
+   /* modular vertical-rhythm scale for section padding (top/bottom) */
+   --sp-1:clamp(40px,6vw,58px);   /* tight  */
+   --sp-2:clamp(58px,8vw,82px);   /* normal */
+   --sp-3:clamp(80px,11vw,118px); /* roomy  */
+   --maxw:1140px;
+ }
+ *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+ /* accessibility: a clean gold focus ring on every interactive element (keyboard
+    users see exactly where they are; mouse users don't get a ring on click) */
+ a:focus-visible,button:focus-visible,input:focus-visible,
+ [tabindex]:focus-visible,.tool:focus-visible{outline:2px solid var(--gold);
+   outline-offset:3px;border-radius:6px}
+ /* respect reduced-motion: no hover-lift transforms, no smooth-scroll for those users */
+ @media(prefers-reduced-motion:reduce){
+   html{scroll-behavior:auto}
+   *{transition-duration:.001ms!important;animation-duration:.001ms!important}
+ }
+ html{scroll-behavior:smooth}
+ body{margin:0;font-family:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+   color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+   background:
+     radial-gradient(1100px 620px at 84% -8%, rgba(26,106,72,.10), transparent 58%),
+     radial-gradient(1000px 700px at 8% 4%, rgba(26,106,72,.06), transparent 56%),
+     var(--ivory);}
+ .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+ @media(max-width:560px){.wrap{padding:0 18px}}
+ .tnum{font-feature-settings:"tnum" 1,"lnum" 1;font-variant-numeric:tabular-nums}
+ h1,h2,h3,h4,.display{font-family:"Cormorant Garamond",Georgia,serif;color:var(--ink)}
+ em{font-style:italic}
+ a{color:var(--gold-2)}
+
+ /* ===== HEADER / NAV ===== */
+ header{position:sticky;top:0;z-index:50;background:rgba(251,247,239,.85);
+   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+   border-bottom:1px solid var(--hair)}
+ .bar{display:flex;align-items:center;gap:16px;height:68px}
+ .logo{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+ .logo .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold-deep));
+   box-shadow:0 8px 18px -8px rgba(14,58,42,.5), inset 0 1px 0 rgba(255,255,255,.45)}
+ .logo .mark svg{width:21px;height:21px;color:#FFFBF1}
+ .logo b{font-family:"Inter";font-weight:700;font-size:1.16rem;letter-spacing:-.01em;color:var(--ink)}
+ .navlinks{margin-left:auto;display:flex;align-items:center;gap:30px}
+ .navlinks a{font-family:"Inter";text-decoration:none;color:var(--muted);font-weight:500;font-size:.93rem;transition:color .2s}
+ .navlinks a:hover,.navlinks a.here{color:var(--ink)}
+ .navlinks a.here{border-bottom:2px solid var(--gold);padding-bottom:3px}
+ .btn-top{padding:10px 20px !important;border-radius:11px;color:#FFFBF1 !important;font-weight:600;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold));
+   box-shadow:0 12px 24px -12px rgba(14,58,42,.5)}
+ .btn-top:hover{color:#FFFBF1 !important}
+ @media(max-width:760px){.navlinks a:not(.btn-top){display:none}}
+
+ .rule{height:1px;background:linear-gradient(90deg,transparent,var(--hair-soft) 50%,transparent)}
+ .rule.gold{background:linear-gradient(90deg,transparent,rgba(26,106,72,.55) 50%,transparent)}
+
+ /* ===== buttons ===== */
+ /* PRIMARY (gold) — one consistent treatment shared with .zipform button + .wl
+    button: gold gradient, soft warm shadow, a 2px lift that deepens on hover and
+    a gentle press on :active. SECONDARY (.btn-line / ghost) is the calm outline. */
+ .btn-fill{font-family:"Inter";display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+   padding:15px 28px;border-radius:13px;font-weight:600;font-size:1rem;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 18px 34px -16px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .btn-fill:hover{transform:translateY(-2px);box-shadow:0 24px 42px -16px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .btn-fill:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.btn-fill:hover,.btn-fill:active{transform:none}}
+ .btn-fill svg{width:18px;height:18px}
+ .btn-line{font-family:"Inter";display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+   padding:15px 24px;border-radius:13px;font-weight:600;font-size:1rem;color:var(--ink);
+   border:1px solid var(--hair);background:var(--surface);transition:border-color .2s,background .2s}
+ .btn-line:hover{border-color:rgba(26,106,72,.6);background:var(--surface-2)}
+ .btn-line .ar{color:var(--gold-2)}
+
+ /* ===== HERO (masthead) ===== */
+ .masthead{padding:74px 0 30px;text-align:center;position:relative}
+ .dateline{display:inline-flex;align-items:center;gap:10px;font-family:"Inter";
+   font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2);
+   border:1px solid var(--hair);border-radius:999px;padding:7px 16px;margin-bottom:26px;background:var(--surface)}
+ .dateline .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 10px rgba(26,143,90,.7)}
+ .masthead h1{font-weight:500;font-size:clamp(2.9rem,7vw,5.4rem);line-height:1.02;letter-spacing:.005em;margin:0 auto;max-width:14ch}
+ .masthead h1 em{color:var(--gold);font-weight:600}
+ .lede{font-family:"Inter";color:var(--muted);font-size:clamp(1.04rem,2.1vw,1.22rem);max-width:60ch;margin:24px auto 0;line-height:1.62}
+ .lede b{color:var(--ink);font-weight:600}
+ .cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:34px}
+ .trustrow{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;margin-top:30px;
+   font-family:"Inter";font-size:.86rem;color:var(--muted)}
+ .trustrow span{display:inline-flex;align-items:center;gap:8px}
+ .trustrow svg{width:16px;height:16px;color:var(--good)}
+
+ /* ===== HERO VIDEO (Kling map) — works as video OR elegant still ===== */
+ .hero-video{position:relative;overflow:hidden;border-radius:var(--r-lg);margin:46px auto 0;max-width:960px;
+   min-height:300px;display:flex;align-items:flex-end;border:1px solid var(--hair);
+   background:radial-gradient(120% 110% at 50% -10%, #FBF3E1, var(--surface) 72%);box-shadow:var(--shadow)}
  .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
  .hero-video .scrim{position:absolute;inset:0;z-index:1;
-   background:linear-gradient(180deg,rgba(15,110,86,.10) 0%,rgba(15,110,86,.30) 45%,rgba(11,42,33,.82) 100%)}
- .hero-video .hero-content{position:relative;z-index:2;padding:30px 26px;max-width:640px}
- .hero-video h1{margin:.1rem 0;font-size:2.3rem;line-height:1.12;
-   text-shadow:0 2px 18px rgba(0,0,0,.35)}
- .hero-video p{color:#F1FBF7;margin:.5rem 0 0;font-size:1.08rem;
-   text-shadow:0 1px 10px rgba(0,0,0,.35)}
- .hero-video .cta{margin-top:16px;font-size:1.05rem;padding:13px 22px;
-   box-shadow:0 8px 22px rgba(29,158,117,.5)}
- @media (max-width:640px){
-   .hero-video{min-height:300px}
-   .hero-video h1{font-size:1.7rem}
-   .hero-video .hero-content{padding:22px 18px}
+   background:linear-gradient(180deg,rgba(20,14,4,.06) 0%,rgba(20,14,4,.30) 48%,rgba(20,14,4,.74) 100%)}
+ .hero-video .vcontent{position:relative;z-index:2;padding:28px 30px;max-width:560px;color:#FFFDF8}
+ .hero-video .vcontent h3{font-family:"Cormorant Garamond",serif;font-weight:600;color:#FFFDF8;
+   font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.1;margin:0;text-shadow:0 2px 16px rgba(0,0,0,.45)}
+ .hero-video .vcontent p{font-family:"Inter";color:rgba(255,253,248,.92);margin:8px 0 0;font-size:.98rem;
+   text-shadow:0 1px 10px rgba(0,0,0,.4)}
+
+ /* ===== THE DEAL DIAL — specimen plate ===== */
+ .plate{display:grid;grid-template-columns:1fr 1.15fr;gap:0;margin:54px auto 0;max-width:960px;
+   background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-lg);overflow:hidden;
+   box-shadow:var(--shadow);text-align:left}
+ @media(max-width:780px){.plate{grid-template-columns:1fr}}
+ .dial-side{position:relative;padding:34px 30px 30px;display:flex;flex-direction:column;align-items:center;
+   background:radial-gradient(120% 110% at 50% -4%, #FBF3E1, #FFFDF8 72%);border-right:1px solid var(--hair)}
+ @media(max-width:780px){.dial-side{border-right:0;border-bottom:1px solid var(--hair)}}
+ .dial-side::before{content:"";position:absolute;left:50%;top:40%;width:320px;height:320px;
+   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+   background:radial-gradient(circle, rgba(26,106,72,.20), rgba(26,106,72,.06) 46%, transparent 70%)}
+ .dial-side .tag{position:relative;font-family:"Inter";font-size:.66rem;font-weight:600;
+   letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:16px}
+ .dial{position:relative;width:240px;max-width:82%;margin:0 auto}
+ .dial svg{width:100%;height:auto;filter:drop-shadow(0 6px 16px rgba(26,143,90,.18))}
+ .dial .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:8%}
+ .dial .score{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:4.1rem;line-height:1;color:var(--ink)}
+ .dial .score .of{font-family:"Inter";font-size:.95rem;color:var(--muted);font-weight:500}
+ .dial .verdict{font-family:"Inter";margin-top:2px;font-weight:700;font-size:.78rem;letter-spacing:.14em;color:var(--good)}
+ .scale{position:relative;display:flex;gap:16px;margin-top:18px;font-family:"Inter";font-size:.72rem;color:var(--muted)}
+ .scale span{display:inline-flex;align-items:center;gap:6px}
+ .scale i{width:9px;height:9px;border-radius:50%;display:inline-block}
+ .read-side{padding:32px 32px 30px;background:var(--surface)}
+ .read-side .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.85rem;line-height:1.1;color:var(--ink)}
+ .read-side .sub{font-family:"Inter";color:var(--muted);font-size:.88rem;margin-top:3px}
+ .specrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--hair-soft)}
+ .specrow:last-child{border-bottom:0}
+ .specrow .k{font-family:"Inter";display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:.9rem}
+ .specrow .k svg{width:17px;height:17px;color:var(--gold);opacity:.9}
+ .specrow .v{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;letter-spacing:.01em;color:var(--ink)}
+ .specrow .v.good{color:var(--good)} .specrow .v.okay{color:var(--okay)} .specrow .v.weak{color:var(--weak)}
+
+ /* ===== SECTION FRAME ===== */
+ /* one modular rhythm: every section breathes on --sp-2; stacked sections that
+    would otherwise double up (e.g. free-tools -> waitlist) collapse the seam so
+    there's no dead band between them. */
+ .sec{padding:var(--sp-2) 0}
+ /* the homepage free-tools section sits directly above the waitlist; their two
+    full paddings used to stack into a dead band. Collapse the seam so it reads
+    as ONE comfortable gap. (Scoped to these two IDs — other pages untouched.) */
+ #early-access{padding-top:0}
+ .sec-head{text-align:center;max-width:760px;margin:0 auto 50px}
+ .kicker{font-family:"Inter";font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:16px}
+ .sec-head h2{font-weight:500;font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.08;letter-spacing:.005em;margin:0}
+ .sec-head h2 em{color:var(--gold)}
+ .sec-head p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:54ch}
+
+ /* ===== WHY — editorial numbered register ===== */
+ .why-list{max-width:880px;margin:0 auto}
+ .why-item{display:grid;grid-template-columns:auto 50px 1fr auto;gap:20px 22px;align-items:start;
+   padding:26px 6px;border-top:1px solid var(--hair-soft);transition:background .25s}
+ .why-item:last-child{border-bottom:1px solid var(--hair-soft)}
+ .why-item:hover{background:linear-gradient(90deg,rgba(26,106,72,.06),transparent 72%)}
+ @media(max-width:640px){.why-item{grid-template-columns:auto 1fr;gap:12px 16px}}
+ .why-item .no{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;font-size:1.9rem;color:var(--gold);line-height:1.1;padding-top:2px}
+ .why-item .ico{width:50px;height:50px;border-radius:14px;flex:none;display:grid;place-items:center;
+   background:linear-gradient(155deg,rgba(26,106,72,.16),rgba(26,106,72,.05));border:1px solid var(--hair)}
+ .why-item .ico svg{width:25px;height:25px;color:var(--gold-2)}
+ @media(max-width:640px){.why-item .ico{display:none}}
+ .why-item .txt h3{font-weight:600;font-size:1.6rem;line-height:1.15;margin:0 0 5px;color:var(--ink)}
+ .why-item .txt p{font-family:"Inter";color:var(--muted);font-size:.97rem;margin:0;max-width:54ch}
+ .why-item .seal{align-self:center;font-family:"Inter";font-size:.72rem;font-weight:600;letter-spacing:.02em;
+   color:var(--gold-2);background:rgba(26,106,72,.1);border:1px solid var(--hair);padding:6px 13px;border-radius:999px;white-space:nowrap}
+ @media(max-width:640px){.why-item .seal{display:none}}
+
+ /* ===== WHAT YOU SEE — deal card on warm band ===== */
+ .glance-wrap{background:linear-gradient(180deg,var(--ivory-2),var(--ivory))}
+ .glance-card{max-width:920px;margin:0 auto;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-lg);padding:clamp(24px,4vw,40px);box-shadow:var(--shadow);position:relative;overflow:hidden}
+ .glance-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+   background:linear-gradient(90deg,var(--good),var(--okay) 50%,var(--weak))}
+ .glance-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--hair-soft)}
+ .glance-top .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.9rem;color:var(--ink)}
+ .glance-top .meta{font-family:"Inter";color:var(--muted);font-size:.9rem}
+ .glance-top .chip{margin-left:auto;font-family:"Inter";font-size:.78rem;font-weight:600;color:var(--good);
+   background:var(--good-soft);border:1px solid rgba(26,143,90,.32);padding:6px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px}
+ .glance-top .chip svg{width:14px;height:14px}
+ .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+ @media(max-width:680px){.stat-grid{grid-template-columns:1fr 1fr;gap:26px 20px}}
+ .stat .l{font-family:"Inter";font-size:.8rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+ .stat .l svg{width:16px;height:16px;color:var(--gold);opacity:.9}
+ .stat .v{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.05rem;line-height:1;color:var(--ink)}
+ .stat .v.good{color:var(--good)} .stat .v.okay{color:var(--okay)} .stat .v.weak{color:var(--weak)}
+ .stat .f{font-family:"Inter";font-size:.76rem;color:var(--faint);margin-top:8px}
+
+ /* ===== FREE TOOLS ===== */
+ .tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:960px;margin:0 auto}
+ @media(max-width:760px){.tools-grid{grid-template-columns:1fr 1fr}}
+ .tool{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+   text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-card);padding:30px 22px;text-align:center;box-shadow:var(--card-shadow);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card),border-color .18s}
+ .tool:hover{transform:var(--lift);box-shadow:var(--card-shadow-hover);border-color:rgba(26,106,72,.5)}
+ @media(prefers-reduced-motion:reduce){.tool:hover{transform:none}}
+ .tool .ico{width:46px;height:46px;border-radius:13px;margin:0 auto 15px;display:grid;place-items:center;
+   background:linear-gradient(155deg,rgba(26,106,72,.18),rgba(26,106,72,.05));border:1px solid var(--hair)}
+ .tool .ico svg{width:24px;height:24px;color:var(--gold-2)}
+ /* illustrated raster icon variant (gold-ringed full-colour art): bigger, no tint
+    frame, a soft drop-shadow for depth — premium without the line-icon chrome. */
+ .tool .ico.illus,.hub-card .ico.illus{background:transparent;border:0;overflow:visible}
+ .tool .ico.illus{width:62px;height:62px;border-radius:0}
+ .tool .ico.illus img{width:62px;height:62px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .hub-card .ico.illus{width:66px;height:66px;border-radius:0}
+ .hub-card .ico.illus img{width:66px;height:66px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .tool h4{font-weight:600;font-size:1.28rem;margin:0 0 4px;line-height:1.15;color:var(--ink)}
+ .tool p{font-family:"Inter";font-size:.84rem;color:var(--muted);line-height:1.5;margin:0}
+ .tool h4{margin-top:2px}
+ .tool .free{font-family:"Inter";margin-top:auto;padding-top:14px;display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+ .tool .freebadge{margin-top:auto;padding-top:14px}
+
+ /* ===== EVERYTHING-YOU-GET — static full-colour feature grid (#why-grid) =====
+    Always-visible companion to the spinning constellation: this is where the
+    full-colour illustrated art is shown at its best, in a calm premium grid. */
+ .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;margin:0 auto}
+ @media(max-width:820px){.fgrid{grid-template-columns:1fr 1fr}}
+ @media(max-width:520px){.fgrid{grid-template-columns:1fr}}
+ .fcard{display:flex;align-items:flex-start;gap:18px;text-align:left;
+   background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);
+   padding:24px 22px;box-shadow:var(--card-shadow);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card),border-color .18s}
+ .fcard:hover{transform:var(--lift);box-shadow:var(--card-shadow-hover);border-color:rgba(26,106,72,.5)}
+ @media(prefers-reduced-motion:reduce){.fcard:hover{transform:none}}
+ .fcard .fico{flex:0 0 auto;width:58px;height:58px;display:grid;place-items:center}
+ .fcard .fico img{width:58px;height:58px;display:block;
+   filter:drop-shadow(0 6px 13px rgba(60,44,20,.20))}
+ .fcard .fbody{min-width:0}
+ .fcard h4{font-weight:600;font-size:1.18rem;margin:2px 0 4px;line-height:1.18;color:var(--ink)}
+ .fcard p{font-family:"Inter";font-size:.84rem;color:var(--muted);line-height:1.5;margin:0}
+ /* anchor cards (e.g. credit → learn page) shouldn't look like dead links */
+ a.fcard{text-decoration:none;color:inherit}
+
+ /* ===== CITY / REPORT — page hero + listing cards ===== */
+ .pagehero{text-align:center;max-width:760px;margin:54px auto 8px}
+ .pagehero h1{font-weight:500;font-size:clamp(2.3rem,5vw,3.6rem);line-height:1.06;letter-spacing:.005em;margin:0 auto;max-width:18ch}
+ .pagehero h1 em{color:var(--gold)}
+ .pagehero p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:56ch}
+ .pagehero .cta-row{margin-top:26px}
+ .deal-list{max-width:820px;margin:40px auto 0;display:flex;flex-direction:column;gap:14px}
+ .lcard{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow-sm);transition:transform .18s,border-color .2s}
+ .lcard:hover{transform:translateY(-2px);border-color:rgba(26,106,72,.5)}
+ .lcard .gauge{width:60px;height:60px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;position:relative}
+ .lcard .gauge .ring{position:absolute;inset:0;border-radius:50%}
+ .lcard .gauge .num{position:relative;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.55rem;color:var(--ink)}
+ .lcard .body{flex:1;min-width:0}
+ .lcard .price{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.65rem;line-height:1;color:var(--ink)}
+ .lcard .addr{font-family:"Inter";font-weight:600;font-size:.98rem;color:var(--ink-soft);margin-top:3px}
+ .lcard .pills{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}
+ .pill{font-family:"Inter";display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+   padding:4px 11px;font-size:.76rem;font-weight:600}
+ .pill.good{background:var(--good-soft);color:var(--good);border:1px solid rgba(26,143,90,.3)}
+ .pill.warn{background:var(--weak-soft);color:var(--weak);border:1px solid rgba(192,57,43,.28)}
+ .lcard .trend{font-family:"Inter";font-size:.8rem;color:var(--faint);margin-top:7px}
+ .pagelinks{max-width:820px;margin:32px auto 0;font-family:"Inter";font-size:.95rem;text-align:center}
+ .pagelinks a{color:var(--gold-2);text-decoration:none;font-weight:600}
+ .pagelinks a:hover{text-decoration:underline}
+
+ /* ===== LEARN — editorial glossary on ivory ===== */
+ .learn-intro{max-width:780px;margin:54px auto 10px;text-align:center}
+ .learn-intro .learn-kicker{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap}
+ .learn-intro .learn-kicker .freebadge{text-transform:uppercase;letter-spacing:.16em}
+ .learn-intro h1{font-weight:500;font-size:clamp(2.3rem,5vw,3.5rem);line-height:1.06;margin:0}
+ .learn-intro h1 em{color:var(--gold)}
+ .learn-intro p{font-family:"Inter";color:var(--muted);font-size:1.05rem;margin:16px auto 0;max-width:58ch;line-height:1.6}
+ .toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:820px;margin:24px auto 10px}
+ .toc a{font-family:"Inter";display:inline-block;background:var(--surface);border:1px solid var(--hair);
+   border-radius:999px;padding:7px 14px;font-size:.85rem;font-weight:600;color:var(--gold-2);text-decoration:none;transition:background .2s,border-color .2s}
+ .toc a:hover{background:var(--surface-2);border-color:rgba(26,106,72,.55)}
+ .term-list{max-width:780px;margin:30px auto 0;display:flex;flex-direction:column;gap:16px}
+ .term{background:var(--surface);border:1px solid var(--hair);border-left:4px solid var(--gold);
+   border-radius:var(--r);padding:22px 24px;scroll-margin-top:84px;box-shadow:var(--shadow-sm)}
+ .term h2{font-weight:600;font-size:1.55rem;margin:0 0 8px;display:flex;align-items:center;gap:11px;color:var(--ink)}
+ .term .ic{font-size:1.35rem;line-height:1}
+ .term p{font-family:"Inter";margin:.4rem 0;color:var(--ink-soft);line-height:1.6;font-size:1rem}
+ .term p b{color:var(--ink);font-weight:600}
+ .term .eg{font-family:"Inter";background:var(--surface-2);border:1px dashed var(--hair);border-radius:12px;
+   padding:11px 14px;margin:.7rem 0 .1rem;color:var(--ink-soft);font-size:.95rem}
+ .term .eg b{color:var(--gold-2)}
+ .term.warnterm{border-left-color:var(--okay)}
+ .term.warnterm .eg b{color:var(--okay)}
+ .scorekey{display:flex;gap:8px;flex-wrap:wrap;margin:.6rem 0 .2rem}
+ .scorekey span{font-family:"Inter";display:inline-flex;align-items:center;gap:7px;border-radius:999px;
+   padding:5px 13px;font-weight:600;font-size:.85rem;color:#fff}
+ .scorekey .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.9);display:inline-block}
+
+ /* ===== FORECLOSURE JOURNEY — four-stage explainer on ivory ===== */
+ .fjourney{max-width:820px;margin:0 auto;scroll-margin-top:84px}
+ .fjourney .fj-head{text-align:center;max-width:680px;margin:0 auto 8px}
+ .fjourney .fj-head .kicker{display:inline-flex;align-items:center;gap:9px;font-family:"Inter";font-size:.72rem;
+   font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:14px}
+ .fjourney .fj-head .kicker::before,.fjourney .fj-head .kicker::after{content:"";width:24px;height:1px;
+   background:linear-gradient(90deg,transparent,var(--gold))}
+ .fjourney .fj-head .kicker::after{transform:scaleX(-1)}
+ .fjourney .fj-head h2{font-weight:500;font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.08;margin:0;color:var(--ink)}
+ .fjourney .fj-head h2 em{color:var(--gold);font-style:italic}
+ .fjourney .fj-head p{font-family:"Inter";color:var(--muted);font-size:1.02rem;line-height:1.6;margin:14px auto 0;max-width:54ch}
+ /* the vertical journey — a gold spine threading the stages */
+ .fj-steps{position:relative;margin:38px auto 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:18px}
+ .fj-steps::before{content:"";position:absolute;left:23px;top:18px;bottom:42px;width:2px;
+   background:linear-gradient(180deg,var(--gold),rgba(26,106,72,.25));border-radius:2px}
+ .fj-step{position:relative;background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);
+   padding:22px 24px 22px 70px;scroll-margin-top:84px;box-shadow:var(--shadow-sm);
+   border-left:4px solid var(--stage,var(--gold))}
+ .fj-step .num{position:absolute;left:8px;top:20px;width:32px;height:32px;border-radius:50%;
+   display:flex;align-items:center;justify-content:center;font-family:"Inter";font-weight:700;font-size:.95rem;
+   color:#fff;background:var(--stage,var(--gold));box-shadow:0 0 0 5px var(--surface),0 6px 14px -6px rgba(60,44,20,.5)}
+ .fj-step h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.5rem;line-height:1.1;
+   margin:0;color:var(--ink);display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+ .fj-step h3 .chip{font-family:"Inter";font-weight:600;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+   padding:4px 10px;border-radius:999px;background:var(--stage-soft,var(--okay-soft));color:var(--stage,var(--gold-2));
+   white-space:nowrap}
+ .fj-step p{font-family:"Inter";color:var(--ink-soft);line-height:1.62;font-size:1rem;margin:.6rem 0 0}
+ .fj-step p b{color:var(--ink);font-weight:600}
+ .fj-step.warm{--stage:var(--good);--stage-soft:var(--good-soft)}
+ .fj-step.caution{--stage:var(--okay);--stage-soft:var(--okay-soft)}
+ .fj-step.early{--stage:var(--gold);--stage-soft:rgba(26,106,72,.13)}
+ /* why-this-matters payoff panel */
+ .fj-why{max-width:820px;margin:24px auto 0;background:radial-gradient(120% 150% at 50% -10%, #FCF3DF, var(--surface) 62%);
+   border:1px solid rgba(26,106,72,.4);border-radius:var(--r-lg);padding:26px 28px;text-align:center;
+   box-shadow:0 30px 64px -38px rgba(60,44,20,.30)}
+ .fj-why h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.6rem;margin:0;color:var(--ink)}
+ .fj-why p{font-family:"Inter";color:var(--ink-soft);font-size:1.02rem;line-height:1.6;margin:10px auto 0;max-width:58ch}
+ .fj-why p b{color:var(--gold-2)}
+ .fj-caveat{font-family:"Inter";display:flex;align-items:flex-start;gap:10px;max-width:760px;margin:16px auto 0;
+   background:var(--okay-soft);border:1px solid rgba(181,120,10,.3);border-radius:12px;padding:12px 16px;
+   color:var(--ink-soft);font-size:.92rem;line-height:1.5;text-align:left}
+ .fj-caveat .ic{color:var(--okay);font-size:1.1rem;line-height:1.3;flex:none}
+ @media(max-width:560px){
+   .fj-step{padding:20px 18px 20px 56px}
+   .fj-step .num{left:6px;width:28px;height:28px;font-size:.85rem}
+   .fj-steps::before{left:19px}
  }
- .card{background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:14px;margin:12px 0;display:flex;gap:14px;align-items:center}
- .gauge{width:54px;height:54px;border-radius:12px;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex:0 0 auto}
- .price{font-size:1.25rem;font-weight:800;color:#0F6E56}
- .muted{color:#667085;font-size:.9rem}
- .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:700;margin-right:6px}
- .good{background:#E1F5EE;color:#0F6E56} .warn{background:#FBE9E4;color:#C0392B}
- .cta{display:inline-block;background:#1D9E75;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-weight:700;margin-top:8px}
- .grid a{display:block;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:14px;margin:8px 0;text-decoration:none;color:#1F2933;font-weight:700}
- .waitlist{background:#E1F5EE;border:1px solid #C7EBDD;border-radius:16px;padding:20px;margin:18px 0;text-align:center}
- .waitlist h3{margin:.2rem 0;color:#0F6E56;font-size:1.25rem}
- .waitlist p{color:#1F2933;margin:.3rem 0 .9rem}
- .waitlist form{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
- .waitlist input[type=email]{flex:1;min-width:220px;padding:12px;border:1px solid #0F6E56;border-radius:10px;font-size:1rem}
- .waitlist button{background:#1D9E75;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer}
- .foot{color:#9AA4AC;font-size:.8rem;margin:24px 0;text-align:center}
- /* Top nav — same on every page so people can always find "Learn the basics". */
- .nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:6px 2px 14px}
- .nav .brand{font-weight:800;font-size:1.15rem;color:#0F6E56;text-decoration:none;margin-right:auto}
- .nav a{text-decoration:none;color:#1F2933;font-weight:600;font-size:.96rem}
- .nav a:hover{color:#0F6E56}
- .nav a.here{color:#0F6E56;border-bottom:2px solid #1D9E75;padding-bottom:2px}
- /* Learn page — warm, friendly teaching cards. */
- .learn-intro{background:#FFF8EE;border:1px solid #F3E2C4;border-radius:16px;padding:20px 22px;margin:8px 0 18px}
- .learn-intro h1{margin:.1rem 0 .4rem;font-size:1.85rem;color:#0F6E56}
- .learn-intro p{margin:.3rem 0;color:#1F2933;font-size:1.05rem;line-height:1.5}
- .toc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
- .toc a{display:inline-block;background:#fff;border:1px solid #E4E7EC;border-radius:999px;
-   padding:7px 13px;font-size:.88rem;font-weight:600;color:#0F6E56;text-decoration:none}
- .toc a:hover{background:#E1F5EE;border-color:#C7EBDD}
- .term{background:#fff;border:1px solid #E4E7EC;border-left:5px solid #1D9E75;border-radius:14px;
-   padding:16px 18px;margin:12px 0;scroll-margin-top:14px}
- .term h2{margin:.1rem 0 .5rem;font-size:1.22rem;color:#1F2933;display:flex;align-items:center;gap:9px}
- .term .ic{font-size:1.3rem;line-height:1}
- .term p{margin:.35rem 0;color:#1F2933;line-height:1.55;font-size:1.02rem}
- .term .eg{background:#F6FBF9;border:1px dashed #BFE6D6;border-radius:10px;padding:9px 12px;
-   margin:.6rem 0 .1rem;color:#33524A;font-size:.97rem}
- .term .eg b{color:#0F6E56}
- .term.warnterm{border-left-color:#E08A00}
- .term.warnterm .eg{background:#FFF8EE;border-color:#F3D9A8;color:#6b5320}
- .term.warnterm .eg b{color:#E08A00}
- .scorekey{display:flex;gap:8px;flex-wrap:wrap;margin:.5rem 0 .2rem}
- .scorekey span{display:inline-flex;align-items:center;gap:7px;border-radius:999px;
-   padding:5px 12px;font-weight:700;font-size:.9rem;color:#fff}
- .scorekey .dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.85);display:inline-block}
-</style></head><body><div class='wrap'><nav class='nav'><a class='brand' href='index.html'>Underlisted</a><a href='index.html' class='here'>Deals</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html'>Learn the basics</a><a href='index.html#early-access'>Get early access</a></nav><div class='hero-video'><video autoplay muted loop playsinline preload='auto' aria-label='Underlisted — finding under-priced U.S. homes'><source src='assets/hero.mp4' type='video/mp4'></video><div class='scrim'></div><div class='hero-content'><h1>Find under-priced U.S. homes</h1><p>Every home gets a plain-English deal score (0–100) — with fire/flood insurance risk and the cash you'd really need. No spreadsheets.</p><a class='cta' href='#early-access'>Get early access →</a></div></div><p style='margin:6px 0'><a href='report-underpriced.html'>See the most underpriced homes right now →</a></p><p style='margin:6px 0'><a href='learn.html'>New to all this? Learn the basics in plain English (free) →</a></p><h3>Deals by city</h3><div class='grid'><a href='deals-in-atlanta.html'>Best deals in Atlanta <span class='muted'>(1 homes)</span></a><a href='deals-in-cleveland.html'>Best deals in Cleveland <span class='muted'>(1 homes)</span></a><a href='deals-in-sacramento.html'>Best deals in Sacramento <span class='muted'>(8 homes)</span></a></div><div class='waitlist' id='early-access'><h3>🔑 Get early access</h3><p>Be first in line when we open up — and lock in <b>$12.99/mo for a year</b> (the price is rising to $44.99 soon). No spam, just your invite.</p><form name='waitlist' method='POST' data-netlify='true' netlify-honeypot='bot-field' action='/thanks.html'><input type='hidden' name='form-name' value='waitlist'/><p style='display:none'><label>Leave blank: <input name='bot-field'/></label></p><input type='email' name='email' placeholder='you@email.com' required/><button type='submit'>Join the waitlist →</button></form></div><p class='foot'>Estimates only — a screening tool, not advice. Fair Housing: scoring never uses demographic or neighborhood-quality signals.</p></div></body></html>
+
+ /* ===== WAITLIST — gold-bordered coupon ===== */
+ .wl{max-width:800px;margin:0 auto;text-align:center;
+   background:radial-gradient(120% 150% at 50% -10%, #FCF3DF, var(--surface) 60%);
+   border:1px solid rgba(26,106,72,.4);border-radius:var(--r-lg);padding:clamp(36px,5vw,60px);
+   position:relative;overflow:hidden;box-shadow:0 36px 72px -38px rgba(60,44,20,.34)}
+ .wl::before{content:"";position:absolute;inset:0;pointer-events:none;
+   background:radial-gradient(70% 60% at 18% 0%, rgba(26,106,72,.14), transparent 56%),
+              radial-gradient(70% 70% at 86% 110%, rgba(26,106,72,.10), transparent 58%)}
+ .wl::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+   background:linear-gradient(90deg,transparent,var(--gold) 50%,transparent);opacity:.8}
+ .wl > *{position:relative;z-index:1}
+ .wl .key{display:inline-flex;align-items:center;gap:10px;font-family:"Inter";font-size:.72rem;font-weight:600;
+   letter-spacing:.22em;text-transform:uppercase;color:var(--gold-2);margin-bottom:18px}
+ .wl .key::before,.wl .key::after{content:"";width:24px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+ .wl .key::after{transform:scaleX(-1)}
+ .wl h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.06;letter-spacing:.005em;margin:0;color:var(--ink)}
+ .wl p{font-family:"Inter";color:var(--muted);max-width:48ch;margin:16px auto 4px;font-size:1.04rem}
+ .wl .price{color:var(--gold-2);font-weight:700}
+ .wl form{max-width:500px;margin:30px auto 0;display:flex;flex-wrap:wrap;gap:12px}
+ .wl input[type=email]{flex:1 1 240px;min-width:0;padding:16px 18px;border-radius:13px;
+   border:1px solid rgba(30,26,22,.18);background:var(--surface);color:var(--ink);
+   font-family:"Inter";font-size:1rem;min-height:44px;transition:border-color .2s,box-shadow .2s}
+ .wl input::placeholder{color:var(--faint)}
+ .wl input:focus{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+ .wl button{flex:0 0 auto;border:0;cursor:pointer;font-family:"Inter";padding:16px 28px;border-radius:13px;
+   font-weight:600;font-size:1rem;min-height:44px;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .wl button:hover{transform:translateY(-2px);box-shadow:0 20px 36px -14px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .wl button:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.wl button:hover,.wl button:active{transform:none}}
+ .wl .fine{font-family:"Inter";margin-top:18px;font-size:.8rem;color:var(--faint)}
+
+ /* ===== FOOTER ===== */
+ footer{padding:46px 0 60px}
+ .foot-grid{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center}
+ .foot-links{display:flex;flex-wrap:wrap;gap:24px;margin-left:auto}
+ .foot-links a{font-family:"Inter";text-decoration:none;color:var(--muted);font-size:.9rem;transition:color .2s}
+ .foot-links a:hover{color:var(--gold-2)}
+ .disclaim{font-family:"Inter";margin-top:26px;font-size:.76rem;color:var(--faint);line-height:1.7;max-width:74ch}
+
+ /* ===== BEST-DEALS BANNER — editorial headline + HOW + count + ZIP box ===== */
+ /* SEAMLESS HERO HAND-OFF (lightened 2026-06-21, owner: "keep it sunny"):
+    the cinematic hero now ends on a LIGHT warm cream (.ch-fade → rgba(238,229,213,.95)),
+    not near-black. So this section STARTS at that same warm cream and settles into
+    ivory over a short, gentle band. The eye finds no hard line — the bright hero
+    foot melts straight into the warm page as ONE continuous surface, with no dark
+    band reintroduced. The section's real content sits below the blend, on ivory. */
+ .best-wrap{background:
+     linear-gradient(180deg,
+       rgb(238,229,213) 0,
+       var(--ivory-2) 64px,
+       var(--ivory) 140px,
+       var(--ivory) 100%)}
+ /* extra top padding so the headline never lands inside the dark blend band */
+ .best-wrap>.sec{padding-top:clamp(150px,18vh,220px)}
+ .best{max-width:980px;margin:0 auto;text-align:center}
+ .best .kicker{margin-bottom:18px}
+ .best h2{font-weight:500;font-size:clamp(2.2rem,5.4vw,3.7rem);line-height:1.08;
+   letter-spacing:.004em;margin:0 auto;max-width:20ch}
+ /* RED used TASTEFULLY — only on the load-bearing words, never the whole block,
+    so it stays luxe and doesn't fight the deal-score "walk away" red. */
+ .best h2 .red{color:var(--deep-red);font-weight:600}
+ .best h2 em{color:var(--gold);font-weight:600;font-style:italic}
+ .best .how{font-family:"Inter";color:var(--ink-soft);font-size:clamp(1.02rem,2vw,1.14rem);
+   line-height:1.64;max-width:60ch;margin:22px auto 0}
+ .best .how b{color:var(--ink);font-weight:600}
+ .best .how .src{color:var(--gold-2);font-weight:600}
+
+ /* live count stat — big calm Cormorant number with a gold halo */
+ .countstat{position:relative;display:inline-flex;flex-direction:column;align-items:center;
+   margin:34px auto 0;padding:6px 30px}
+ .countstat::before{content:"";position:absolute;left:50%;top:46%;width:300px;height:160px;
+   transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;
+   background:radial-gradient(circle, rgba(26,106,72,.18), transparent 68%)}
+ .countstat .num{position:relative;font-family:"Cormorant Garamond",serif;font-weight:600;
+   font-size:clamp(3rem,9vw,5rem);line-height:1;letter-spacing:.005em;color:var(--ink)}
+ .countstat .cap{position:relative;font-family:"Inter";font-size:.78rem;font-weight:600;
+   letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2);margin-top:10px}
+
+ /* ZIP / city box — inviting, mobile-first, hands off to the live app */
+ .ziphunt{max-width:560px;margin:34px auto 0}
+ .ziphunt .prompt{font-family:"Inter";color:var(--muted);font-size:.96rem;margin:0 0 14px}
+ .zipform{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+ .zipform .zipwrap{position:relative;flex:1 1 260px;min-width:0;display:flex;align-items:center}
+ .zipform .zipwrap svg{position:absolute;left:16px;width:18px;height:18px;color:var(--gold);opacity:.85;pointer-events:none}
+ .zipform input{width:100%;font-family:"Inter";font-size:1.02rem;color:var(--ink);
+   background:var(--surface);border:1px solid rgba(30,26,22,.18);border-radius:13px;
+   padding:16px 18px 16px 44px;min-height:44px;transition:border-color .2s,box-shadow .2s}
+ .zipform input::placeholder{color:var(--faint)}
+ .zipform input:focus{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+ .zipform button{flex:0 0 auto;border:0;cursor:pointer;font-family:"Inter";padding:16px 26px;
+   border-radius:13px;font-weight:600;font-size:1rem;min-height:44px;color:#FFFBF1;
+   display:inline-flex;align-items:center;gap:8px;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card)}
+ .zipform button:hover{transform:translateY(-2px);box-shadow:0 20px 36px -14px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .zipform button:active{transform:translateY(-1px) scale(.99)}
+ @media(prefers-reduced-motion:reduce){.zipform button:hover,.zipform button:active{transform:none}}
+ .zipform button svg{width:18px;height:18px}
+ .ziphunt .zipfine{font-family:"Inter";margin-top:12px;font-size:.78rem;color:var(--faint)}
+ @media(max-width:460px){.zipform button{flex:1 1 100%;justify-content:center}}
+
+ /* ===== "FREE" BADGE — ONE classy seal, reused everywhere we give value away ===== */
+ .freebadge{display:inline-flex;align-items:center;gap:6px;font-family:"Inter";
+   font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+   color:var(--good);background:linear-gradient(180deg,rgba(26,143,90,.10),rgba(26,106,72,.07));
+   border:1px solid rgba(26,143,90,.34);border-radius:999px;padding:5px 12px 5px 10px;
+   line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+ .freebadge .fdot{width:6px;height:6px;border-radius:50%;background:var(--good);
+   box-shadow:0 0 8px rgba(26,143,90,.7);flex:none}
+ .freebadge.big{font-size:.74rem;letter-spacing:.18em;padding:7px 16px 7px 13px;gap:8px}
+ .freebadge.big .fdot{width:7px;height:7px}
+
+ /* ===== LOCKED TEASER — "a taste of the paid magic, behind glass" ===== */
+ .teaser-wrap{background:linear-gradient(180deg,var(--ivory),var(--ivory-2))}
+ .teaser-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:940px;margin:0 auto}
+ @media(max-width:780px){.teaser-grid{grid-template-columns:1fr;max-width:460px}}
+ .tcard{position:relative;background:var(--surface);border:1px solid var(--hair);
+   border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+ .tcard .sample-tag{position:absolute;top:14px;right:14px;z-index:4;font-family:"Inter";
+   font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2);
+   background:rgba(251,247,239,.9);border:1px solid var(--hair);border-radius:999px;padding:5px 11px;
+   backdrop-filter:blur(4px)}
+ /* the FREE / visible top of the card */
+ .tcard .open{padding:24px 24px 18px;border-bottom:1px solid var(--hair-soft)}
+ .tcard .open .addr{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.7rem;
+   line-height:1.1;color:var(--ink);max-width:80%}
+ .tcard .open .meta{font-family:"Inter";color:var(--muted);font-size:.86rem;margin-top:5px}
+ .tcard .open .teaserline{font-family:"Inter";color:var(--ink-soft);font-size:.92rem;margin-top:12px;
+   display:inline-flex;align-items:center;gap:7px}
+ .tcard .open .teaserline svg{width:15px;height:15px;color:var(--gold);flex:none}
+ /* the LOCKED / paid rows — real-looking numbers blurred behind frosted glass */
+ .tlocked{position:relative;padding:20px 24px 24px}
+ .tlocked .lrow{display:flex;align-items:center;justify-content:space-between;gap:14px;
+   padding:13px 0;border-bottom:1px solid var(--hair-soft)}
+ .tlocked .lrow:last-child{border-bottom:0}
+ .tlocked .lrow .lk{font-family:"Inter";display:inline-flex;align-items:center;gap:9px;
+   color:var(--muted);font-size:.88rem}
+ .tlocked .lrow .lk svg{width:16px;height:16px;color:var(--gold);opacity:.9}
+ .tlocked .lrow .lv{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;
+   letter-spacing:.01em;color:var(--ink)}
+ .tlocked .lrow .lv.good{color:var(--good)} .tlocked .lrow .lv.okay{color:var(--okay)}
+ /* the frost: blur the numbers, dim them, kill selection — genuinely hidden */
+ .tlocked .blurfield{filter:blur(7px);opacity:.85;user-select:none;pointer-events:none;
+   -webkit-user-select:none}
+ /* glass overlay with the lock + unlock CTA */
+ .tlocked .glass{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+   align-items:center;justify-content:center;text-align:center;gap:12px;padding:22px;
+   background:linear-gradient(180deg,rgba(251,247,239,.36),rgba(251,247,239,.72));
+   backdrop-filter:blur(2.5px) saturate(1.05);-webkit-backdrop-filter:blur(2.5px) saturate(1.05)}
+ .tlocked .glass .lockwrap{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+   background:linear-gradient(155deg,var(--gold-bright),var(--gold-deep));
+   box-shadow:0 12px 26px -12px rgba(14,58,42,.6), inset 0 1px 0 rgba(255,255,255,.45)}
+ .tlocked .glass .lockwrap svg{width:24px;height:24px;color:#FFFBF1}
+ .tlocked .glass .gline{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.28rem;
+   line-height:1.2;color:var(--ink);max-width:26ch}
+ .tlocked .glass .unlock{font-family:"Inter";display:inline-flex;align-items:center;gap:8px;
+   text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:600;font-size:.95rem;color:#FFFBF1;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold) 78%);
+   box-shadow:0 14px 28px -14px rgba(14,58,42,.55), inset 0 1px 0 rgba(255,255,255,.4);transition:transform .18s}
+ .tlocked .glass .unlock:hover{transform:translateY(-2px);color:#FFFBF1}
+ .tlocked .glass .unlock svg{width:16px;height:16px}
+ .tlocked .glass .gfine{font-family:"Inter";font-size:.74rem;color:var(--muted)}
+ .teaser-foot{text-align:center;max-width:620px;margin:34px auto 0;font-family:"Inter";
+   font-size:.9rem;color:var(--muted)}
+ .teaser-foot a{color:var(--gold-2);font-weight:600;text-decoration:none}
+ .teaser-foot a:hover{text-decoration:underline}
+
+ /* reveal */
+ .reveal{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease}
+ .reveal.in{opacity:1;transform:none}
+ @media(prefers-reduced-motion:reduce){
+   .reveal{opacity:1;transform:none;transition:none}
+   #arcF{transition:none!important}
+   html{scroll-behavior:auto}
+ }
+
+ /* ===================================================================
+    THE FEATURE GALAXY — dark constellation of everything you get.
+    Lifted from design_preview/feature_orbit.html (owner-approved 2026-06-18)
+    and folded into the Ivory & Gold brand. The site :root already defines
+    --ivory/--ink/--gold*/--good/--okay/--weak/--r/--r-lg, so we DO NOT
+    redefine them here — only the NEW dark-field tokens this section needs.
+    =================================================================== */
+ :root{
+   --teal:#3FB8A0;            /* cool counterpart to the gold — glow accent only */
+   --ink-deep:#13100B;        /* warm charcoal / deep ink */
+   --ink-deep-2:#1C1711;
+   --g-card:rgba(36,29,20,.78);
+   --g-line:rgba(46,140,98,.30);
+ }
+
+ .galaxy{position:relative;overflow:hidden;padding:84px 24px 92px;
+   /* pull up under the hero's blurred fade and blend the top edge dark→dark so
+      there is NO seam between the cover photo and the constellation (2026-06-20) */
+   margin-top:-1px;
+   /* CLASSICAL LUXURY BACKGROUND IMAGE SLOT ──────────────────────────
+      A single owner-supplied photo (site/assets/galaxy_bg.jpg) sits BEHIND
+      the constellation, ALWAYS under a heavy dark scrim so the gold/teal
+      nodes + white text stay readable. The warm-ink gradient is layered
+      ON TOP of the image as the scrim AND doubles as a tasteful fallback
+      when galaxy_bg.jpg is absent — so it looks intentional with OR
+      without the file. Recommended image: 2000×1400px landscape, dark/moody
+      (classical architecture, marble, night sky). */
+   background-color:var(--ink-deep);
+   background-image:
+     radial-gradient(900px 520px at 50% 8%, rgba(46,140,98,.16), transparent 60%),
+     radial-gradient(680px 520px at 12% 96%, rgba(63,184,160,.10), transparent 62%),
+     radial-gradient(680px 520px at 92% 70%, rgba(46,140,98,.07), transparent 60%),
+     linear-gradient(180deg, rgba(28,23,17,.82) 0%, rgba(19,16,11,.90) 58%, rgba(15,12,8,.95) 100%),
+     url('assets/galaxy_bg.jpg');
+   background-size:auto,auto,auto,auto,cover;
+   background-position:center;background-repeat:no-repeat}
+ /* faint starfield + texture (sits above the bg image, below content) */
+ .galaxy::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+   background-image:
+     radial-gradient(1.4px 1.4px at 18% 24%, rgba(255,247,225,.55), transparent),
+     radial-gradient(1.2px 1.2px at 72% 16%, rgba(255,247,225,.40), transparent),
+     radial-gradient(1.3px 1.3px at 41% 78%, rgba(255,247,225,.42), transparent),
+     radial-gradient(1.1px 1.1px at 86% 52%, rgba(255,247,225,.35), transparent),
+     radial-gradient(1.2px 1.2px at 9% 64%, rgba(255,247,225,.30), transparent),
+     radial-gradient(1.1px 1.1px at 60% 90%, rgba(255,247,225,.32), transparent)}
+ /* top-edge blend: a short dark wash matching the hero's bottom fade colour,
+    resolving into the galaxy's own warm dark — kills any step where the cover
+    meets the constellation. Sits above the bg, below the content/starfield. */
+ .galaxy::after{content:"";position:absolute;left:0;right:0;top:0;height:160px;
+   z-index:1;pointer-events:none;
+   background:linear-gradient(180deg, rgba(14,15,20,1) 0%, rgba(14,15,20,.72) 34%,
+     rgba(15,12,8,.30) 70%, transparent 100%)}
+ .galaxy-inner{position:relative;z-index:2;max-width:1100px;margin:0 auto}
+
+ .g-head{text-align:center;margin:0 auto 14px;max-width:64ch}
+ .g-tag{display:inline-flex;align-items:center;gap:9px;font-family:"Inter";font-size:.7rem;
+   font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-bright);
+   border:1px solid rgba(46,140,98,.4);border-radius:999px;padding:7px 16px;
+   background:rgba(46,140,98,.07)}
+ .g-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--good);
+   box-shadow:0 0 10px rgba(26,143,90,.9)}
+ .g-head h2{font-family:"Cormorant Garamond",Georgia,serif;color:#FBF3E1;font-weight:500;
+   font-size:clamp(2.1rem,5.2vw,3.4rem);line-height:1.04;letter-spacing:.005em;margin:20px 0 0}
+ .g-head h2 em{color:var(--gold-bright);font-style:italic;font-weight:600}
+ .g-head p{font-family:"Inter";color:rgba(251,243,225,.66);font-size:clamp(1rem,2vw,1.12rem);
+   max-width:54ch;margin:16px auto 0;line-height:1.6}
+ .g-hint{font-family:"Inter";font-size:.8rem;color:rgba(251,243,225,.45);margin-top:10px;font-style:italic}
+
+ /* ===== ORBIT STAGE (desktop / tablet) ===== */
+ .stage{position:relative;width:min(560px,90vw);height:min(560px,90vw);margin:48px auto 10px}
+ .orbit-field{position:absolute;inset:0;animation:gspin 60s linear infinite;transform-origin:50% 50%}
+ @keyframes gspin{to{transform:rotate(360deg)}}
+ .stage.paused .orbit-field{animation-play-state:paused}
+ .ring{position:absolute;left:50%;top:50%;border-radius:50%;
+   border:1px solid rgba(46,140,98,.14);transform:translate(-50%,-50%);pointer-events:none}
+ .ring.r1{width:62%;height:62%}
+ .ring.r2{width:96%;height:96%;border-style:dashed;border-color:rgba(46,140,98,.10)}
+
+ /* center hub — the Deal Dial mark, pulsing */
+ .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+   width:148px;height:148px;border-radius:50%;display:grid;place-items:center;z-index:6;
+   cursor:pointer;border:0;padding:0;background:transparent}
+ .hub .glow{position:absolute;inset:-46px;border-radius:50%;
+   background:radial-gradient(circle,rgba(26,143,90,.40),rgba(26,143,90,.10) 48%,transparent 70%);
+   animation:gbreathe 4.6s ease-in-out infinite}
+ @keyframes gbreathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.14);opacity:1}}
+ /* the central Deal-Score dial reads GREEN (good) — reinforcing "green = a good
+    deal" — on a calm ivory face, ringed by a thin gold luxury band. */
+ .hub .disc{position:relative;width:148px;height:148px;border-radius:50%;
+   background:radial-gradient(120% 120% at 38% 30%, #FFFDF6, #FBF4E1 70%, #F3E8CC 100%);
+   box-shadow:0 0 0 2px var(--gold-bright), 0 0 0 4px rgba(255,247,225,.30),
+     inset 0 2px 10px rgba(255,255,255,.7), inset 0 -10px 26px rgba(26,143,90,.12),
+     0 24px 50px -14px rgba(26,143,90,.4);
+   display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--good)}
+ .hub .disc .ring-svg{position:absolute;inset:9px;width:auto;height:auto}
+ .hub .disc .num{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.55rem;line-height:1;color:#127A4A}
+ .hub .disc .lbl{font-family:"Inter";font-weight:700;font-size:.56rem;letter-spacing:.18em;
+   text-transform:uppercase;margin-top:1px;color:#1A8F5A}
+
+ /* nodes — positioned by JS via transform; counter-rotated to stay upright */
+ .node{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;z-index:5}
+ .node .spin-fix{animation:gspin-rev 60s linear infinite;transform-origin:50% 50%;
+   width:100%;height:100%;border-radius:50%}
+ .stage.paused .node .spin-fix{animation-play-state:paused}
+ @keyframes gspin-rev{to{transform:rotate(-360deg)}}
+ .node button{all:unset;cursor:pointer;display:block;width:96px;height:96px;border-radius:50%}
+ .node .bubble{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
+   background:radial-gradient(120% 120% at 40% 32%, rgba(48,40,28,.96), rgba(28,23,16,.96));
+   border:1px solid var(--g-line);
+   box-shadow:0 14px 34px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,247,225,.10);
+   transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+ .node .bubble::after{content:"";position:absolute;inset:-9px;border-radius:50%;
+   background:radial-gradient(circle, rgba(46,140,98,.34), transparent 68%);opacity:0;
+   transition:opacity .3s;animation:gnodepulse 5s ease-in-out infinite}
+ @keyframes gnodepulse{0%,100%{opacity:.18}50%{opacity:.42}}
+ .node .bubble svg{width:34px;height:34px;color:var(--gold-bright);position:relative;z-index:2}
+ .node .cap{position:absolute;top:104px;left:50%;transform:translateX(-50%);white-space:nowrap;
+   font-family:"Inter";font-size:.72rem;font-weight:600;color:rgba(251,243,225,.78);
+   text-shadow:0 1px 8px rgba(0,0,0,.6);text-align:center}
+ .node button:hover .bubble,.node button:focus-visible .bubble{transform:scale(1.1);
+   border-color:rgba(46,140,98,.75);box-shadow:0 18px 40px -12px rgba(46,140,98,.5)}
+ .node button:focus-visible .bubble{outline:2px solid var(--gold-bright);outline-offset:3px}
+ .node.active .bubble{background:radial-gradient(120% 120% at 40% 32%, #6FD49F, var(--gold) 58%, var(--gold-deep));
+   border-color:rgba(255,247,225,.6);box-shadow:0 20px 46px -10px rgba(46,140,98,.72)}
+ .node.active .bubble svg{color:#FFFBF1}
+ .node.active .bubble::after{opacity:.7}
+ .node.related .bubble{border-color:rgba(63,184,160,.65);box-shadow:0 16px 38px -12px rgba(63,184,160,.45)}
+ .node.related .bubble svg{color:var(--teal)}
+ .stage.has-active .node:not(.active):not(.related) .bubble{opacity:.4}
+
+ /* MEANING-COLOURED constellation icons (owner: all-gold is hard to scan fast).
+    GREEN = the deal/found · RED = a warning · BLUE = a money tool. Brighter,
+    on-dark variants so they read cleanly over the deep field. Gold stays the
+    section accent. */
+ .node.mc-green .bubble svg{color:#5FD89C}
+ .node.mc-red   .bubble svg{color:#E8917F}
+ .node.mc-blue  .bubble svg{color:#7FB4E6}
+ .node.mc-green .bubble{border-color:rgba(95,216,156,.40)}
+ .node.mc-red   .bubble{border-color:rgba(232,145,127,.40)}
+ .node.mc-blue  .bubble{border-color:rgba(127,180,230,.40)}
+ .node.mc-green .bubble::after{background:radial-gradient(circle, rgba(95,216,156,.26), transparent 68%)}
+ .node.mc-red   .bubble::after{background:radial-gradient(circle, rgba(232,145,127,.26), transparent 68%)}
+ .node.mc-blue  .bubble::after{background:radial-gradient(circle, rgba(127,180,230,.26), transparent 68%)}
+ /* keep the ACTIVE (gold-filled) state legible: dark glyph on the gold disc */
+ .node.active .bubble svg{color:#2A1E08 !important}
+
+ /* ===== detail card (popover) ===== */
+ .gdetail{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);
+   width:min(340px,86vw);z-index:9;opacity:0;pointer-events:none;
+   transition:opacity .28s ease, transform .28s ease}
+ .gdetail.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+ .gdetail .card{position:relative;background:#FFFDF8;border:1px solid var(--g-line);
+   border-radius:var(--r-lg);padding:24px 24px 22px;text-align:left;
+   box-shadow:0 40px 80px -24px rgba(0,0,0,.7), 0 0 0 1px rgba(46,140,98,.18)}
+ .gdetail .card::before{content:"";position:absolute;inset:0;border-radius:var(--r-lg);
+   background:radial-gradient(120% 90% at 50% -10%, rgba(46,140,98,.12), transparent 60%);pointer-events:none}
+ .gdetail .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+   background:linear-gradient(150deg,var(--gold-bright),var(--gold-deep));margin-bottom:14px;
+   box-shadow:0 10px 22px -10px rgba(14,58,42,.6),inset 0 1px 0 rgba(255,255,255,.45);position:relative}
+ .gdetail .ic svg{width:24px;height:24px;color:#FFFBF1}
+ /* meaning-tinted icon tile in the popover (matches the node colour) */
+ .gdetail .card.mc-green .ic{background:linear-gradient(150deg,#2FB873,#147A4A)}
+ .gdetail .card.mc-red   .ic{background:linear-gradient(150deg,#D75A47,#A22C20)}
+ .gdetail .card.mc-blue  .ic{background:linear-gradient(150deg,#4A8FCC,#235E94)}
+ .gdetail h3{font-family:"Cormorant Garamond",serif;font-weight:600;color:var(--ink);
+   font-size:1.6rem;line-height:1.1;margin:0;position:relative}
+ .gdetail .what{font-family:"Inter";font-size:.94rem;color:var(--ink-soft);line-height:1.58;margin:10px 0 0;position:relative}
+ .gdetail .chip{display:inline-flex;align-items:center;gap:7px;margin-top:14px;
+   font-family:"Inter";font-size:.74rem;font-weight:600;letter-spacing:.04em;
+   padding:6px 12px;border-radius:999px;position:relative}
+ .gdetail .chip.good{background:rgba(26,143,90,.12);color:var(--good)}
+ .gdetail .chip.okay{background:rgba(181,120,10,.13);color:var(--okay)}
+ .gdetail .chip.weak{background:rgba(192,57,43,.11);color:var(--weak)}
+ /* "See how it works →" link on each card */
+ .gdetail .seemore{display:inline-flex;align-items:center;gap:6px;margin-top:16px;
+   font-family:"Inter";font-size:.86rem;font-weight:600;color:var(--gold-2);text-decoration:none;
+   position:relative;transition:gap .18s}
+ .gdetail .seemore:hover{gap:10px;text-decoration:underline}
+ .gdetail .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;border-radius:50%;
+   background:rgba(30,26,22,.06);color:var(--muted);cursor:pointer;display:grid;place-items:center;z-index:2}
+ .gdetail .x:hover{background:rgba(30,26,22,.12);color:var(--ink)}
+ .gdetail .x svg{width:15px;height:15px}
+
+ /* ===== MOBILE FALLBACK — stacked feature cards ===== */
+ .glist{display:none;max-width:540px;margin:30px auto 0;gap:14px;flex-direction:column}
+ .fcard{display:block;text-align:left;width:100%;
+   background:var(--g-card);border:1px solid var(--g-line);border-radius:var(--r);
+   padding:17px 18px;color:#FBF3E1;box-shadow:0 16px 36px -22px rgba(0,0,0,.7)}
+ .fcard .frow{display:flex;gap:15px;align-items:flex-start}
+ .fcard .fic{flex:0 0 46px;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+   background:radial-gradient(120% 120% at 40% 30%, rgba(46,140,98,.22), rgba(28,23,16,.9));
+   border:1px solid rgba(46,140,98,.35)}
+ .fcard .fic svg{width:24px;height:24px;color:var(--gold-bright)}
+ /* meaning-coloured icons on the mobile stacked cards too */
+ .fcard.mc-green .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(95,216,156,.20), rgba(28,23,16,.9));border-color:rgba(95,216,156,.35)}
+ .fcard.mc-green .fic svg{color:#5FD89C}
+ .fcard.mc-red .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(232,145,127,.20), rgba(28,23,16,.9));border-color:rgba(232,145,127,.35)}
+ .fcard.mc-red .fic svg{color:#E8917F}
+ .fcard.mc-blue .fic{background:radial-gradient(120% 120% at 40% 30%, rgba(127,180,230,.20), rgba(28,23,16,.9));border-color:rgba(127,180,230,.35)}
+ .fcard.mc-blue .fic svg{color:#7FB4E6}
+ .fcard h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:0;color:#FBF3E1;line-height:1.12}
+ .fcard .what{font-family:"Inter";font-size:.88rem;color:rgba(251,243,225,.66);margin:5px 0 0;line-height:1.5}
+ .fcard .chip{display:inline-flex;margin-top:9px;font-family:"Inter";font-size:.7rem;font-weight:600;
+   padding:4px 11px;border-radius:999px}
+ .fcard .chip.good{background:rgba(26,143,90,.18);color:#5FD89C}
+ .fcard .chip.okay{background:rgba(181,120,10,.20);color:#E9C06A}
+ .fcard .chip.weak{background:rgba(192,57,43,.20);color:#E8917F}
+ .fcard .seemore{display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+   font-family:"Inter";font-size:.84rem;font-weight:600;color:var(--gold-bright);text-decoration:none}
+ .fcard .seemore:hover{text-decoration:underline}
+
+ /* below 760px → drop the orbit, show the premium stacked list */
+ @media(max-width:760px){
+   .galaxy{padding:60px 18px 64px}
+   .stage{display:none}
+   .glist{display:flex}
+   .g-hint{display:none}
+ }
+ @media(prefers-reduced-motion:reduce){
+   .orbit-field,.node .spin-fix,.hub .glow,.node .bubble::after{animation:none !important}
+ }
+</style>
+<style>
+ /* ===== CINEMATIC HERO — scoped under .ch-hero, classes prefixed ch- ===== */
+ .ch-hero{position:relative;min-height:100vh;min-height:100svh;display:flex;
+   flex-direction:column;overflow:hidden;isolation:isolate;background:#0C1320;
+   color:#F6F1E7;--ch-field-tint:12,19,32;--ch-glow:46,140,98;
+   --ch-ease:cubic-bezier(.16,.84,.34,1)}
+ .ch-hero a{text-decoration:none}
+
+ /* 0 · POSTER SURFACE — the couple still (golden hour). Sits at the very bottom
+    of the stack and is what shows for reduced-motion + slow connections (the
+    <video> paints over it once it can autoplay). Switched from hero_house.jpg to
+    hero_couple_poster.jpg so the still fallback matches the video for consistency.
+    Slow Ken-Burns push kept; disabled under reduced-motion below. */
+ .ch-img{position:absolute;inset:0;z-index:0;
+   background-image:url("assets/hero_couple_poster.jpg");
+   background-size:cover;background-position:50% 38%;
+   transform:scale(1.08);will-change:transform;
+   animation:ch-kb 30s ease-in-out infinite alternate}
+ @keyframes ch-kb{from{transform:scale(1.08) translate(0,0)}
+   to{transform:scale(1.15) translate(-1.2%,-1.4%)}}
+
+ /* 0b · the cinematic HERO VIDEO — full-bleed, muted, autoplay, looped. Bottom
+    visible layer: paints over the poster surface, BEHIND every grade/smoke/grain/
+    scrim/fade/text layer (all z-index >= 1). object-fit:cover keeps the frame full.
+    NEW sunny clip (2026-06-21): a wide shot of the WHOLE two-storey house with the
+    couple walking up the path. The house sits centred and slightly HIGH in the frame,
+    so object-position is biased toward centre/upper (50% 38%): on desktop (≈1.6:1 vs
+    the 16:9 source) cover crops the SIDES, full height/roofline kept; the upper bias
+    just guarantees the roofline never clips. On portrait phones cover crops hard to a
+    centre vertical strip — the upper bias keeps the house body + roof in view instead
+    of zooming down to the path/feet. Owner ask: "FULL HOUSE visible at the start." */
+ .ch-vid{position:absolute;inset:0;z-index:0;width:100%;height:100%;
+   object-fit:cover;object-position:50% 38%;pointer-events:none}
+
+ /* 2 · LIGHT warm grade (owner: "keep the picture LIGHT — I like the sunlight").
+    The heavy navy darkening pillar is GONE. What's left is (a) a SOFT, feathered
+    shade pillar ONLY behind the left text column — much lighter than before and
+    fully clear by ~46% of the frame, so ~70%+ of the footage stays bright and
+    sunny; and (b) a faint GOLDEN warmth wash so the sunlit footage reads premium
+    and golden-hour, not flat. No more full-frame navy tint, no dark top/bottom
+    pillars (the seam blend is handled lower, in .ch-scrim/.ch-fade). */
+ .ch-grade{position:absolute;inset:0;z-index:1;pointer-events:none;
+   background:
+     /* localized text-column shade — left only, DEEPER + more defined behind the
+        words (owner: "make the fonts readable"), but still FEATHERED so it fades to
+        clear by ~mid-frame. The left edge is meaningfully darker now (.66 vs .40)
+        so ivory letters always have a calm shadow panel to sit on; by ~50% it's
+        gone, so the lit house / couple / golden sky on the RIGHT stay bright. */
+     /* gentle supporting left feather (lightened 2026-06-21 so it sums with the new
+        single .ch-scrim wash into ONE smooth gradient, not a stacked dark slab). */
+     linear-gradient(90deg, rgba(var(--ch-field-tint),.30) 0%, rgba(var(--ch-field-tint),.22) 24%,
+       rgba(var(--ch-field-tint),.12) 44%, rgba(var(--ch-field-tint),.04) 58%, transparent 70%),
+     /* warm golden-hour wash — adds sunlight glow, no darkening */
+     radial-gradient(120% 90% at 64% 30%, rgba(var(--ch-glow),.10) 0%, transparent 56%)}
+
+ /* 3 · warm light-mist (transform/opacity only => GPU). CUT WAY BACK (owner wants
+    clean sunlight, not haze) — was .28, now a barely-there warm sparkle so the
+    footage stays clean. mix-blend:screen so it only ADDS faint light, never dims. */
+ .ch-smoke{position:absolute;inset:-20% -10%;z-index:2;pointer-events:none;
+   mix-blend-mode:screen;opacity:.12}
+ .ch-smoke span{position:absolute;border-radius:50%;filter:blur(50px);
+   background:radial-gradient(circle at 50% 50%,
+     rgba(var(--ch-glow),.16) 0%, rgba(246,241,231,.10) 40%, rgba(255,255,255,0) 72%);
+   will-change:transform,opacity}
+ .ch-smoke .s1{width:48vw;height:48vw;left:8%;top:46%;animation:ch-drift1 42s var(--ch-ease) infinite}
+ .ch-smoke .s2{width:40vw;height:40vw;left:58%;top:50%;animation:ch-drift2 54s var(--ch-ease) infinite}
+ .ch-smoke .s3{width:34vw;height:34vw;left:34%;top:58%;animation:ch-drift3 48s var(--ch-ease) infinite}
+ .ch-smoke .s4{width:28vw;height:28vw;left:70%;top:30%;animation:ch-drift1 64s var(--ch-ease) infinite reverse}
+ @keyframes ch-drift1{0%{transform:translate(0,0) scale(1);opacity:.30}
+   50%{transform:translate(-6vw,-4vh) scale(1.18);opacity:.55}
+   100%{transform:translate(0,0) scale(1);opacity:.30}}
+ @keyframes ch-drift2{0%{transform:translate(0,0) scale(1.05);opacity:.24}
+   50%{transform:translate(5vw,3vh) scale(.9);opacity:.46}
+   100%{transform:translate(0,0) scale(1.05);opacity:.24}}
+ @keyframes ch-drift3{0%{transform:translate(0,0) scale(.95);opacity:.26}
+   50%{transform:translate(4vw,-5vh) scale(1.2);opacity:.5}
+   100%{transform:translate(0,0) scale(.95);opacity:.26}}
+
+ /* 4 · film grain — all but removed (owner: clean sunlight, no dirt/mood). Was
+    .045 overlay; now a whisper so the image stays crisp and bright. */
+ .ch-grain{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.014;
+   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+   mix-blend-mode:overlay}
+
+ /* 5 · legibility scrim — RADICALLY lightened (owner: keep it sunny, not dark).
+    The center darkening is gone. What remains: (a) a very soft top-left feather
+    that supports the headline without dimming the frame, and (b) a GENTLE, warm
+    bottom fade — no longer a near-black wall. The bottom now lands on a soft warm
+    cream-grey so the sunlit hero melts into the ivory page below with no hard
+    seam (the .best-wrap blend top was lightened to match). The lowest band is a
+    light warm tone, not black, so the picture stays bright top-to-bottom. */
+ /* 5 · legibility scrim — REBUILT 2026-06-21 (owner: "the black background does not
+    work… make it readable, beautiful, elegant"). The old per-region dark BLOBS are
+    gone. In their place: ONE smooth, elegant LEFT-SIDE gradient wash — darkest at the
+    very-left edge, feathering to fully transparent by mid-frame — so the WHOLE left
+    text column (eyebrow → headline → qualifier → kicker → subcopy) sits on a single
+    gentle, even readable wash with NO hard ovals and NO visible edges. The right side
+    (house, couple, garden, golden sky) stays bright and sunny. A faint bottom warm
+    fade still melts the hero into the ivory page below (no hard seam). */
+ .ch-scrim{position:absolute;inset:0;z-index:4;pointer-events:none;
+   background:
+     /* the single elegant left→transparent wash. Smooth multi-stop linear so it reads
+        as one calm gradient, not a panel: firm at the edge for the words, gone by ~52%
+        so the lit right side is untouched. */
+     linear-gradient(90deg,
+       rgba(var(--ch-field-tint),.62) 0%,
+       rgba(var(--ch-field-tint),.54) 16%,
+       rgba(var(--ch-field-tint),.42) 30%,
+       rgba(var(--ch-field-tint),.26) 42%,
+       rgba(var(--ch-field-tint),.12) 52%,
+       transparent 64%),
+     /* gentle warm bottom fade only — melts the hero foot into the ivory page below */
+     linear-gradient(180deg, transparent 0%, transparent 62%,
+       rgba(60,52,42,.16) 84%, rgba(232,222,205,.52) 100%)}
+
+ /* 6 · BLURRED bottom band — a frosted strip along the lowest edge of the photo
+    so it reads as depth softening into darkness (not a hard cutoff). The blur
+    feathers in via a mask, and the same band carries the final fade to the
+    constellation colour. Pure CSS, no motion (respects reduced-motion). */
+ /* now feathers into a LIGHT warm cream (was near-black) so the sunlit hero stays
+    bright at its foot and dissolves seamlessly into the ivory page below. */
+ .ch-fade{position:absolute;left:0;right:0;bottom:0;height:34%;z-index:5;pointer-events:none;
+   -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+   background:linear-gradient(180deg, transparent 0%, rgba(226,216,200,.18) 46%,
+     rgba(232,222,205,.62) 80%, rgba(238,229,213,.95) 100%);
+   -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 50%, #000 100%);
+   mask-image:linear-gradient(180deg, transparent 0%, #000 50%, #000 100%)}
+
+ /* 6b · LIVE DATABASE STAT — lower-right proof panel over the video. Anchored to the
+    open garden space on the right of the frame, vertically toward the lower third, so
+    it's clear of the headline column (left) and the couple/house (centre). z-index 7 so
+    it floats above the scrim/fade but below nothing it needs to. A soft radial backing
+    + drop-shadow keep it readable on any moving frame WITHOUT a loud badge box. The
+    number is brand forest-green→mint for on-video legibility; the label is a small
+    letter-spaced ivory line with the same pulsing "live" pip as the map count stat. */
+ .ch-stat{position:absolute;z-index:7;right:clamp(28px,4.4vw,72px);bottom:clamp(56px,11vh,128px);
+   display:flex;flex-direction:column;align-items:flex-end;text-align:right;pointer-events:none;
+   padding:14px 20px 16px;border-radius:16px;
+   background:radial-gradient(120% 130% at 78% 40%, rgba(8,14,24,.42), rgba(8,14,24,.10) 62%, transparent 80%)}
+ .ch-stat-num{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;
+   font-size:clamp(2.9rem,5.2vw,4.4rem);line-height:.94;letter-spacing:.004em;color:#7BEEB0;
+   text-shadow:0 1px 2px rgba(6,8,14,.85), 0 2px 14px rgba(6,8,14,.7), 0 0 26px rgba(26,106,72,.45)}
+ .ch-stat-cap{display:inline-flex;align-items:center;gap:9px;margin-top:7px;
+   font-family:"Inter";font-size:.685rem;font-weight:600;letter-spacing:.165em;text-transform:uppercase;
+   color:#F1EAD9;text-shadow:0 1px 2px rgba(6,8,14,.8), 0 0 10px rgba(6,8,14,.6)}
+ .ch-stat-dot{width:7px;height:7px;border-radius:50%;flex:none;background:#5BC78E;
+   box-shadow:0 0 0 3px rgba(91,199,142,.22), 0 0 10px rgba(91,199,142,.85);
+   animation:ch-stat-pulse 2.6s ease-in-out infinite}
+ @keyframes ch-stat-pulse{0%,100%{opacity:.55}50%{opacity:1}}
+ @media(prefers-reduced-motion:reduce){.ch-stat-dot{animation:none}}
+
+ /* top bar */
+ .ch-header{position:relative;z-index:10}
+ .ch-bar{max-width:1180px;margin:0 auto;padding:30px 44px;display:flex;align-items:center;gap:18px}
+ /* BRAND WORDMARK — owner: "make UNDERLISTED big" + "elegant again like CASCADE &
+    COAL". Kept BIG and unmistakable, but refined to a graceful logotype: a LIGHTER
+    Cormorant weight (500, not heavy 700) with GENEROUS airy tracking like the
+    reference's letter-spaced top-left mark, bright ivory, a tight stacked dark
+    text-shadow so it always holds on a sunlit patch, and a thin gold underline rule
+    so it reads as a deliberate, expensive logotype — not body text. */
+ /* BOLD CLASSIC FOREST GREEN (owner 2026-06-21: "give a classic BOLD green… make it
+    very visible"). A deep, confident forest green (#123F2C) at a HEAVIER weight (700)
+    so the logotype is unmistakable — reads as a confident brand mark, not faint text.
+    Deep green can sink into a dark video frame, so it carries a tight IVORY micro-halo
+    (4-way, hugs each letter) that lifts it off darker footage PLUS a soft dark drop for
+    bright sunlit frames — so the bold green POPS on ANY frame. Elegant letter-spacing
+    + the green->brick-red underline accent are kept. */
+ .ch-wordmark{position:relative;font-family:"Cormorant Garamond",serif;font-weight:700;
+   font-size:clamp(2.0rem,3.4vw,2.8rem);line-height:1;
+   letter-spacing:.34em;text-transform:uppercase;color:#123F2C;padding:.06em 0 .16em .34em;
+   text-shadow:
+     0 0 1px rgba(248,244,236,.95), .6px .6px 0 rgba(248,244,236,.80),
+     -.6px -.6px 0 rgba(248,244,236,.55), 0 1px 1px rgba(248,244,236,.55),
+     0 2px 10px rgba(248,244,236,.42), 0 3px 16px rgba(6,18,12,.30)}
+ .ch-wordmark::after{content:"";position:absolute;left:.34em;bottom:0;
+   width:1.5em;height:2px;border-radius:2px;
+   background:linear-gradient(90deg,#123F2C 58%,#C8443F);
+   box-shadow:0 0 3px rgba(248,244,236,.7),0 1px 3px rgba(6,8,14,.4)}
+ .ch-nav{margin-left:auto;display:flex;align-items:center;gap:34px}
+ .ch-nav a{font-family:"Inter";color:#D8D1C2;font-weight:500;font-size:.72rem;
+   letter-spacing:.18em;text-transform:uppercase;transition:color .25s}
+ .ch-nav a:hover{color:#3FB07A}
+ .ch-navtoggle{display:none}
+
+ /* LEFT-ANCHORED headline stage — the cover copy lives in a confident column on
+    the LEFT of the frame (owner: "you can use these sides too, not everything has
+    to be in the middle"). This fills the previously-dead left space and lets the
+    lit dusk house on the RIGHT show through. The stage is a max-width container so
+    the column is pinned left and the copy never drifts over the brightest window. */
+ .ch-stage{position:relative;z-index:6;flex:1;display:flex;align-items:center;
+   justify-content:flex-start}
+ .ch-copy{max-width:1180px;width:100%;margin:0 auto;padding:2vh 44px 7vh;
+   text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+ /* the headline measure is WIDE (well beyond the old 16ch) so the lead line breaks
+    naturally across the frame into a few strong lines instead of a thin centre strip,
+    but the whole copy column is held to ~the left half so the house breathes right. */
+ .ch-copy > *{max-width:min(720px,58vw)}
+ /* EYEBROW — the small-caps label above the headline. Refined to echo the
+    "CASCADE & COAL" label: airier tracking (.38em), a calmer medium weight, and the
+    refined gold so it reads as an elegant kicker, not a loud tag. */
+ .ch-eyebrow{display:inline-flex;align-items:center;gap:16px;
+   font-family:"Inter";font-size:.70rem;font-weight:600;letter-spacing:.38em;
+   text-transform:uppercase;color:#5BC78E;
+   text-shadow:0 1px 2px rgba(6,8,14,.72)}
+ .ch-eyebrow::before{content:"";width:0}
+ .ch-eyebrow::after{content:"";width:46px;height:1px;
+   background:linear-gradient(90deg, rgba(var(--ch-glow),.85), transparent)}
+ /* text-shadow does the heavy lifting now that the background is bright: a tight
+    dark halo + a soft wider one so ivory letters stay crisp over sunlit spots,
+    WITHOUT darkening the whole image. */
+ .ch-headline{font-family:"Cormorant Garamond",serif;font-weight:500;
+   font-size:clamp(2.7rem,6.4vw,5.6rem);line-height:1.02;letter-spacing:.005em;
+   margin:.34em 0 0;color:#FBF7EE;
+   text-shadow:0 1px 1px rgba(6,8,14,.78), 0 2px 6px rgba(6,8,14,.60), 0 0 30px rgba(6,8,14,.40)}
+ /* LONG/differentiated variant — three deliberately DIFFERENT typographic parts so
+    the eye moves (owner: "differentiate your text"), instead of one monotone block.
+    Measure is wide (no narrow ch-cap) so the lead spans the frame in ~2 lines. */
+ .ch-headline.long{display:block;margin:.18em 0 0;letter-spacing:0;max-width:none}
+ /* 1 · LEAD — the dominant phrase. Largest size, ivory, graceful leading. Owner:
+    "elegant again like CASCADE & COAL." Dropped from a heavy 600 to a refined 500
+    so the Cormorant reads like an expensive editorial serif, not a bold slab; a
+    hair MORE line-height (1.06) and a whisper of positive tracking (.004em) so the
+    long phrase breathes and feels calm. Legibility kept by the tight stacked dark
+    halo + the localized shade panel behind the left column. */
+ .ch-headline .ch-hl-lead{display:block;font-weight:500;
+   font-size:clamp(2.4rem,5.6vw,4.9rem);line-height:1.06;color:#FBF7EE;
+   letter-spacing:.004em;
+   /* tight, clean dark halo (not a soft glow) so each elegant letter holds against
+      any bright spot behind it — close 1–2px shadows do the work, one wider pass. */
+   text-shadow:0 1px 1px rgba(6,8,14,.80), 0 2px 6px rgba(6,8,14,.62), 0 0 28px rgba(6,8,14,.38)}
+ /* 2 · QUALIFIER — secondary scale, lighter, calmer ivory. Steps DOWN from the
+    lead so it reads as supporting detail, not a headline of its own. "all 50 states"
+    keeps the gold accent so the differentiator number still pops. */
+ /* QUALIFIER — "Nationwide, in cities across all 50 states." The ugly dark BLOB
+    backing (::before) is REMOVED 2026-06-21; the line now sits on the single elegant
+    left-side wash like the rest of the column. Brighter ivory + a firm tight stacked
+    halo keep it crisp; the green accent word ("across all 50 states.") is brightened
+    below so the differentiator still reads on the sunny frame. */
+ .ch-headline .ch-hl-qual{display:block;position:relative;
+   font-weight:500;font-style:normal;
+   font-size:clamp(1.34rem,2.65vw,2.2rem);line-height:1.3;color:#FCF8EF;
+   margin-top:.46em;letter-spacing:.006em;max-width:20ch;
+   text-shadow:0 1px 1px rgba(6,8,14,.88), 0 1px 5px rgba(6,8,14,.72), 0 0 18px rgba(6,8,14,.50)}
+ /* 3 · KICKER — the punchline gets its own emphasized gold-italic line (the luxe
+    signature accent). Distinct size + italic so it lands as the closing statement. */
+ /* KICKER — owner: "make it elegant AGAIN like CASCADE & COAL" (their gold ampersand).
+    Moved OFF the heavy garnet red back to a refined, elegant GOLD — the hero's signature
+    gold family (#E7C275→#C79A4B with a #F0CF82 highlight), brightened just enough to
+    read on the sunny image. A graceful italic in a lighter weight (600, not 650) so it
+    feels like a tasteful signature, not a shout. Kept legible by the lower-left shade
+    panel + its own blurred backing + a firm stacked drop-shadow so the gold stays crisp
+    on the bright path. This is the single load-bearing accent — calm, expensive gold. */
+ /* KICKER — the single load-bearing punchline now carries the logo's BRICK RED (the
+    most emphatic of the two brand accents), as a refined italic signature. A warm
+    brick-red gradient that stays rich and readable on the sunny image, kept legible
+    by the lower-left shade panel + its own blurred backing + a firm stacked shadow. */
+ /* KICKER — the load-bearing punchline. REBUILT 2026-06-21 (owner: "I can't read it at
+    all… make it readable, beautiful, elegant — this is a very important message"). The
+    dark BLOB backing (::before) is REMOVED. Brick-red over bright moving video is the
+    hard case, so the LINE is now warm IVORY in the elegant Cormorant italic (the most
+    readable colour on video), with ONE brighter brick-red accent word (.ch-kr) for the
+    brand pop. A tight 4-way dark micro-outline + soft drop keep the ivory crisp on any
+    frame, sitting on the single left wash. Calm, elegant, unmistakably readable. */
+ .ch-headline .ch-hl-kicker{display:block;position:relative;
+   font-style:italic;font-weight:500;max-width:20ch;
+   font-size:clamp(1.5rem,3.1vw,2.6rem);line-height:1.16;margin-top:.5em;
+   color:#FCF7EC;
+   text-shadow:0 1px 1px rgba(6,8,14,.92), .6px .6px 0 rgba(6,8,14,.55),
+     -.6px -.6px 0 rgba(6,8,14,.45), 0 2px 6px rgba(6,8,14,.78), 0 0 20px rgba(6,8,14,.50)}
+ /* the single brick-red accent inside the otherwise-ivory kicker — bright enough to
+    read on the sunny garden, with the same tight dark micro-outline. */
+ .ch-headline .ch-hl-kicker .ch-kr{font-style:italic;color:#FF9A8E;
+   text-shadow:0 1px 1px rgba(6,8,14,.95), .6px .6px 0 rgba(6,8,14,.7),
+     -.6px -.6px 0 rgba(6,8,14,.6), 0 2px 6px rgba(6,8,14,.85), 0 0 18px rgba(6,8,14,.55)}
+ /* "all 50 states" — the differentiator number now carries the refined GOLD accent
+    (matches the kicker), so the two gold phrases form one elegant focal thread that
+    leads the eye to OUR message. Sits on the lower-left shade + qualifier panel, with
+    a firm drop-shadow, so the gold reads crisply on the bright photo. A graceful
+    italic, lighter weight (600) so it stays tasteful, not loud. */
+ /* "all 50 states" — the differentiator now carries a refined FOREST-GREEN accent
+    (matches the logo + the green eyebrow/wordmark), so green leads the eye and the
+    brick-red kicker lands as the closing emphasis. A bright readable green so it
+    holds on the sunny photo, with a firm drop-shadow. */
+ /* "across all 50 states." — the differentiator, in a bright readable forest green so
+    it reads cleanly on the sunny frame now that the dark blob is gone. A solid colour
+    (not a faint gradient) + tight 4-way dark micro-outline so the green stays crisp. */
+ .ch-headline .ch-hl-qual .ch-accent{font-style:italic;font-weight:700;color:#7BEEB0;
+   text-shadow:0 1px 1px rgba(6,8,14,.95), .6px .6px 0 rgba(6,8,14,.75),
+     -.6px -.6px 0 rgba(6,8,14,.6), 0 2px 5px rgba(6,8,14,.85), 0 0 16px rgba(6,8,14,.55)}
+ /* legacy block accent kept for reversibility (was .ch-obvious on the cover) */
+ .ch-headline .ch-obvious{display:block;font-style:italic;font-weight:600;color:#F0CF82;
+   background:linear-gradient(92deg,#F5D88E,#D2A451,#F5D88E);
+   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+   filter:drop-shadow(0 1px 1px rgba(6,8,14,.85)) drop-shadow(0 2px 5px rgba(6,8,14,.62)) drop-shadow(0 0 16px rgba(6,8,14,.40))}
+ .ch-sub{font-family:"Inter";font-weight:450;font-size:clamp(1.04rem,2vw,1.2rem);
+   line-height:1.6;color:#F4EEE0;max-width:42ch;margin:1.3em 0 0;
+   /* smallest body line on a bright photo => the firmest tight halo of all */
+   text-shadow:0 1px 1px rgba(6,8,14,.80), 0 1px 4px rgba(6,8,14,.62), 0 0 14px rgba(6,8,14,.44)}
+ .ch-sub b{color:#FFFBF3;font-weight:650}
+ .ch-sub i{font-style:italic;color:#BFE6CF}
+ /* both hero buttons share ONE baseline (owner: "must be the same level"). The gold
+    CTA sits in a small column with the "New to buying a house?" eyebrow floating ABOVE
+    it; align-items:flex-end bottom-aligns the BUTTONS so they read as one clean row
+    even with the eyebrow above the gold one. */
+ .ch-actions{display:flex;align-items:flex-end;justify-content:flex-start;gap:18px;
+   margin-top:2.2em;flex-wrap:wrap}
+
+ /* DORMANT — frosted "What you get" value rail (removed from the hero 2026-06-20;
+    CSS kept but unused for reversibility). */
+ .ch-rail{position:relative;border-radius:18px;padding:22px 22px 20px;
+   background:linear-gradient(180deg, rgba(12,19,32,.62), rgba(8,13,22,.72));
+   -webkit-backdrop-filter:blur(12px) saturate(125%);backdrop-filter:blur(12px) saturate(125%);
+   border:1px solid rgba(246,241,231,.16);
+   box-shadow:0 30px 70px -28px rgba(0,0,0,.7), inset 0 1px 0 rgba(246,241,231,.10);
+   --r-green:#5FD89C;--r-red:#E8917F;--r-blue:#7FB4E6}
+ .ch-rail-head{display:flex;align-items:center;gap:9px;
+   font-family:"Inter";font-size:.62rem;font-weight:700;letter-spacing:.22em;
+   text-transform:uppercase;color:#5BC78E;margin-bottom:13px}
+ .ch-rail-head::after{content:"";flex:1;height:1px;
+   background:linear-gradient(90deg, rgba(var(--ch-glow),.6), transparent)}
+ .ch-rail-head .dot{width:6px;height:6px;border-radius:50%;background:#5FD89C;
+   box-shadow:0 0 9px rgba(95,216,156,.9)}
+ .ch-rail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 11px}
+ .ch-feat{display:flex;align-items:center;gap:10px;min-width:0}
+ .ch-feat .fi{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:grid;
+   place-items:center;background:rgba(246,241,231,.05);border:1px solid rgba(246,241,231,.12)}
+ .ch-feat .fi svg{width:17px;height:17px}
+ .ch-feat.g .fi{color:var(--r-green);border-color:rgba(95,216,156,.34);background:rgba(95,216,156,.08)}
+ .ch-feat.r .fi{color:var(--r-red);border-color:rgba(232,145,127,.34);background:rgba(232,145,127,.08)}
+ .ch-feat.b .fi{color:var(--r-blue);border-color:rgba(127,180,230,.34);background:rgba(127,180,230,.08)}
+ .ch-feat .ft{min-width:0}
+ .ch-feat .ft b{display:block;font-family:"Inter";font-weight:600;font-size:.78rem;
+   color:#F6F1E7;line-height:1.2;letter-spacing:.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .ch-feat .ft span{display:block;font-family:"Inter";font-size:.64rem;color:#A9A293;line-height:1.25;margin-top:1px}
+ .ch-rail-foot{margin-top:14px;padding-top:13px;border-top:1px solid rgba(246,241,231,.12);
+   display:flex;align-items:center;gap:8px;font-family:"Inter";font-size:.66rem;color:#B7B0A1}
+ .ch-rail-foot .pip{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;
+   font-weight:700;color:#5FD89C;letter-spacing:.02em}
+ .ch-btn{font-family:"Inter";font-weight:600;font-size:.78rem;letter-spacing:.16em;
+   text-transform:uppercase;padding:16px 30px;border-radius:2px;display:inline-flex;
+   align-items:center;gap:11px;transition:.3s var(--ch-ease);border:1px solid transparent}
+ .ch-btn .arr{transition:transform .3s var(--ch-ease)}
+ /* buttons can sit on a bright patch — give each a readable backing so the label
+    and border hold: the primary gets a faint dark glass fill + brighter gold text,
+    the ghost gets a firmer border + a subtle text-shadow. */
+ .ch-btn-primary{color:#5BC78E;border-color:rgba(var(--ch-glow),.85);
+   background:linear-gradient(180deg, rgba(var(--ch-field-tint),.30), rgba(var(--ch-field-tint),.20));
+   text-shadow:0 1px 2px rgba(6,8,14,.55)}
+ .ch-btn-primary:hover{border-color:#5BC78E;background:rgba(var(--ch-glow),.22);
+   box-shadow:0 0 34px -8px rgba(var(--ch-glow),.6);color:#fff}
+ .ch-btn-primary:hover .arr{transform:translateX(6px)}
+ .ch-btn-ghost{color:#F0EADB;border-color:rgba(246,241,231,.55);
+   background:rgba(var(--ch-field-tint),.18);text-shadow:0 1px 2px rgba(6,8,14,.55)}
+ .ch-btn-ghost:hover{color:#FFFBF3;border-color:rgba(246,241,231,.8);background:rgba(246,241,231,.10)}
+
+ /* #1 GOLD CTA — the first-time-buyer "Learn how it works" button. Gold is declared
+    ONLY here (--ch-gold local to this rule) so it can never leak elsewhere on the
+    page. ~1.5px gold border, a soft gold fill + glow over the dark-glass backing,
+    slightly larger padding, a bright-gold label with a dark text-shadow so it holds
+    over the bright sunny video. This out-ranks "See the deals" by styling alone. */
+ .ch-btn-gold{--ch-gold:#C79A4B;color:#F4D79A;
+   border:1.5px solid var(--ch-gold);padding:18px 34px;border-radius:2px;
+   background:
+     linear-gradient(180deg, rgba(199,154,75,.26), rgba(199,154,75,.14)),
+     linear-gradient(180deg, rgba(var(--ch-field-tint),.34), rgba(var(--ch-field-tint),.24));
+   box-shadow:0 0 30px -10px rgba(199,154,75,.7), inset 0 1px 0 rgba(244,215,154,.18);
+   text-shadow:0 1px 3px rgba(6,8,14,.7)}
+ .ch-btn-gold:hover{color:#FFEEC4;border-color:#E2BE76;
+   background:
+     linear-gradient(180deg, rgba(199,154,75,.40), rgba(199,154,75,.22)),
+     linear-gradient(180deg, rgba(var(--ch-field-tint),.34), rgba(var(--ch-field-tint),.24));
+   box-shadow:0 0 44px -8px rgba(199,154,75,.85), inset 0 1px 0 rgba(244,215,154,.28)}
+ .ch-btn-gold:hover .arr{transform:translateX(6px)}
+
+ /* the tiny letter-spaced eyebrow sits in a small flex column directly over the
+    gold button; it fades out when the story is open (JS toggles .is-open on it). */
+ .ch-cta-stack{display:inline-flex;flex-direction:column;align-items:center;gap:7px}
+ .ch-cta-eyebrow{font-family:"Inter";font-size:.62rem;font-weight:600;
+   letter-spacing:.22em;text-transform:uppercase;color:#E8D9B6;
+   text-shadow:0 1px 2px rgba(6,8,14,.6);transition:opacity .25s var(--ch-ease);
+   white-space:nowrap}
+ .ch-cta-eyebrow.is-open{opacity:0;pointer-events:none}
+
+ /* #2 SECONDARY — "See the deals" demoted: green text, thin dim green border,
+    no glow. Clearly clickable, visually ranked below the gold CTA. */
+ /* height-matched to the gold CTA so both buttons are the SAME height in the row:
+    same 18px vertical padding + 1.5px border box as .ch-btn-gold. */
+ .ch-btn-secondary{color:#5BC78E;border:1.5px solid rgba(91,199,142,.45);
+   padding:18px 30px;
+   background:rgba(var(--ch-field-tint),.18);text-shadow:0 1px 2px rgba(6,8,14,.55)}
+ .ch-btn-secondary:hover{color:#9FE6BE;border-color:rgba(91,199,142,.75);
+   background:rgba(var(--ch-field-tint),.26)}
+ .ch-btn-secondary:hover .arr{transform:translateX(6px)}
+
+ /* (the old .ch-markline footer caption was removed 2026-06-20 — its two phrases
+    ran together as mashed text and competed with the longer headline; the bottom
+    edge is now calmest empty, melting into the fade.) */
+
+ /* (the old .ch-scrollcue down-arrow + its keyframes were removed 2026-06-20 —
+    the blurred, fading bottom edge IS the "there's more below" cue now.) */
+
+ /* entrance motion */
+ .ch-rise{opacity:0;transform:translateY(28px);animation:ch-rise 1.2s var(--ch-ease) forwards}
+ .ch-d1{animation-delay:.20s}.ch-d2{animation-delay:.55s}.ch-d3{animation-delay:.95s}
+ .ch-d4{animation-delay:1.30s}.ch-d5{animation-delay:1.60s}.ch-d6{animation-delay:1.90s}
+ @keyframes ch-rise{to{opacity:1;transform:translateY(0)}}
+
+ @media(max-width:780px){
+   .ch-bar{padding:22px 22px}
+   .ch-wordmark{font-size:clamp(1.6rem,7vw,2.0rem);letter-spacing:.30em;padding-left:.30em}
+   .ch-wordmark::after{left:.30em}
+   /* MOBILE FRAMING — portrait crops the 16:9 clip hard to a centre vertical strip.
+      Lift the bias a little higher (50% 30%) so the house BODY + roofline read on a
+      phone instead of zooming down to the path/feet (owner: full house must read). */
+   .ch-vid,.ch-img{object-position:50% 30%;background-position:50% 30%}
+   .ch-nav{gap:0}
+   .ch-nav a{display:none}
+   .ch-navtoggle{display:inline-flex;align-items:center;justify-content:center;
+     width:42px;height:42px;border:1px solid rgba(246,241,231,.3);border-radius:8px;
+     color:#F6F1E7;background:rgba(var(--ch-field-tint),.4)}
+   .ch-navtoggle span{display:block;width:18px;height:1.5px;background:#F6F1E7;position:relative}
+   .ch-navtoggle span::before,.ch-navtoggle span::after{content:"";position:absolute;left:0;
+     width:18px;height:1.5px;background:#F6F1E7}
+   .ch-navtoggle span::before{top:-6px}.ch-navtoggle span::after{top:6px}
+   /* MOBILE: collapse to a LEFT-aligned single-axis stack (left reads cleanly on a
+      narrow screen too), tighter padding, copy spans the full width. */
+   .ch-copy{max-width:100%;text-align:left;align-items:flex-start;margin:0;padding:1vh 22px 13vh}
+   .ch-copy > *{max-width:100%}
+   .ch-eyebrow{justify-content:flex-start;font-size:.62rem;letter-spacing:.24em;gap:10px}
+   .ch-eyebrow::after{width:30px}
+   /* MOBILE: re-scale the three headline parts so they fit and keep their hierarchy */
+   .ch-headline.long{margin:.1em 0 0}
+   .ch-headline .ch-hl-lead{font-size:clamp(1.95rem,8.6vw,2.7rem);line-height:1.06}
+   .ch-headline .ch-hl-qual{font-size:clamp(1.05rem,4.6vw,1.4rem);line-height:1.25;max-width:30ch}
+   .ch-headline .ch-hl-kicker{font-size:clamp(1.3rem,5.6vw,1.7rem);line-height:1.14}
+   /* MOBILE legibility (2026-06-21): the dark blob ::before panels are gone, and a
+      narrow phone crops the bright doorway right under the wrapped kicker/qualifier.
+      So on mobile these lines lean on a FIRMER stacked dark halo (the left wash alone
+      may not reach a wrapped second line) — keeps the ivory kicker + green accent
+      crisp without bringing back any black patches. */
+   .ch-headline .ch-hl-kicker{text-shadow:0 1px 1px rgba(6,8,14,.96), .7px .7px 0 rgba(6,8,14,.7),
+     -.7px -.7px 0 rgba(6,8,14,.6), 0 2px 7px rgba(6,8,14,.9), 0 0 22px rgba(6,8,14,.7)}
+   .ch-headline .ch-hl-kicker .ch-kr{text-shadow:0 1px 1px rgba(6,8,14,.98), .7px .7px 0 rgba(6,8,14,.82),
+     -.7px -.7px 0 rgba(6,8,14,.72), 0 2px 7px rgba(6,8,14,.95), 0 0 20px rgba(6,8,14,.78)}
+   .ch-headline .ch-hl-qual .ch-accent{text-shadow:0 1px 1px rgba(6,8,14,.98), .7px .7px 0 rgba(6,8,14,.85),
+     -.7px -.7px 0 rgba(6,8,14,.72), 0 2px 6px rgba(6,8,14,.92), 0 0 18px rgba(6,8,14,.72)}
+   .ch-sub{max-width:38ch}
+   .ch-actions{gap:12px;flex-direction:column;align-items:stretch;justify-content:flex-start}
+   .ch-btn{width:100%;max-width:340px;justify-content:center;padding:17px 24px}
+   /* on mobile the gold CTA + its eyebrow stack full-width like the other button */
+   .ch-cta-stack{width:100%;max-width:340px;align-items:stretch;gap:8px}
+   .ch-cta-eyebrow{text-align:center}
+   .ch-btn-gold{padding:18px 24px}
+   /* match the secondary to the gold so the stacked mobile buttons are identical */
+   .ch-btn-secondary{padding:18px 24px}
+   /* mobile scrim: KEEP IT LIGHT too. A slightly stronger left feather (the text
+      column fills more of a narrow screen) but still a warm-cream bottom, never
+      black, so the sunny photo melts into the ivory page below. */
+   .ch-scrim{background:
+     linear-gradient(90deg, rgba(var(--ch-field-tint),.52) 0%, rgba(var(--ch-field-tint),.34) 40%, rgba(var(--ch-field-tint),.12) 64%, transparent 82%),
+     linear-gradient(180deg, rgba(var(--ch-field-tint),.18) 0%, transparent 24%,
+       transparent 58%, rgba(232,222,205,.55) 100%)}
+   .ch-fade{height:40%}
+   /* MOBILE: hide the lower-right live stat. A portrait phone crops the clip hard to
+      a centre strip (couple/house fill it) and the buttons stack tall — a floating
+      stat would collide with people or controls. The page already shows a prominent
+      live count lower down, so dropping it here keeps the cover clean. */
+   .ch-stat{display:none}
+ }
+
+ @media(prefers-reduced-motion: reduce){
+   /* No autoplay motion for users who opt out: HIDE the video entirely and let
+      the still poster surface (.ch-img → hero_couple_poster.jpg) show through.
+      Kill the Ken-Burns + smoke drift too so the hero is a calm still of the
+      couple. */
+   .ch-vid{display:none !important}
+   .ch-smoke{opacity:.10}
+   .ch-smoke span{animation:none !important}
+   .ch-img{animation:none !important;transform:scale(1.06)}
+   .ch-rise{animation:none !important;opacity:1;transform:none}
+ }
+
+ /* ===== "HOW IT WORKS" — UNFOLD-THE-STORY collapsible ======================
+    The five story sections live inside #howitworks.hiw. We animate HEIGHT with
+    the modern grid-rows trick (0fr → 1fr) so it slides smoothly with NO fixed
+    max-height guess and NO clipped content. The wrapper carries NO background of
+    its own — so when COLLAPSED, the cover's ivory foot (.ch-fade) flows straight
+    into the free-tools section below with no hard seam.
+
+    SEO/no-JS: the markup ships with `.hiw--open`, so crawlers and JS-off users
+    get the fully-expanded story. The inline JS removes `.hiw--open` on load
+    (collapsing it) only when JS is present — the calm default flow.            */
+ .hiw{display:grid;grid-template-rows:0fr;
+   transition:grid-template-rows .55s cubic-bezier(.22,.61,.36,1)}
+ .hiw--open{grid-template-rows:1fr}
+ /* the inner wrapper is the actual scroll/overflow box the grid row sizes */
+ .hiw-inner{overflow:hidden;min-height:0}
+ /* While COLLAPSED, hard-hide the inner so it can never catch focus, leave a
+    stray pixel row, or paint a seam under the cover. Open state restores it. */
+ .hiw:not(.hiw--open) .hiw-inner{visibility:hidden}
+ .hiw--open .hiw-inner{visibility:visible}
+
+ /* the "▲ Hide how it works" footer control — calm, on ivory, gold-on-hover */
+ .hiw-hidebar{background:var(--ivory);text-align:center;padding:8px 20px 46px}
+ .hiw-hide{font-family:"Inter",sans-serif;cursor:pointer;
+   display:inline-flex;align-items:center;gap:9px;
+   font-size:.74rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+   color:var(--ink-soft);background:var(--surface);
+   border:1px solid var(--hair);border-radius:999px;padding:11px 22px;
+   transition:color .2s,border-color .2s,background .2s,box-shadow .2s}
+ .hiw-hide:hover{color:var(--gold);border-color:var(--gold);
+   box-shadow:0 2px 14px rgba(26,106,72,.16)}
+ .hiw-hide .chev{font-size:.62rem;line-height:1;color:var(--gold);
+   transform:translateY(-1px)}
+ .hiw-hide:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+ @media(prefers-reduced-motion: reduce){
+   /* opt-out users get an INSTANT toggle — no slide. */
+   .hiw{transition:none}
+ }
+</style>
+<style>
+ /* ===== THE "SEE WHAT YOU GET" MAP — matched tiles on the ivory page ===== */
+ .hiw-map{max-width:1180px;margin:0 auto;padding:var(--sp-1) 22px var(--sp-1);
+   display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+ .hiw-map .row-full{grid-column:1 / -1}
+
+ /* a matched ivory tile — shares the UNIFIED card system (radius/shadow/border)
+    so every tile + the free-tools cards read as ONE designed surface. Inner
+    content is vertically centred so neither tile floats when the pair stretches
+    to equal height. */
+ .hiw-map .maptile{position:relative;background:var(--surface);
+   border:1px solid var(--hair);border-radius:var(--r-card);
+   padding:34px 32px;display:flex;flex-direction:column;justify-content:center;
+   box-shadow:var(--card-shadow);
+   transition:transform .18s var(--ease-card),box-shadow .18s var(--ease-card),border-color .18s}
+ .hiw-map .maptile:hover{transform:var(--lift);box-shadow:var(--card-shadow-hover);
+   border-color:rgba(26,106,72,.5)}
+ @media(prefers-reduced-motion:reduce){.hiw-map .maptile:hover{transform:none}}
+ .hiw-map .maptile-head{margin-bottom:18px}
+ .hiw-map .maptile .kicker{margin-bottom:12px}
+ .hiw-map .maptile h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;
+   font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.08;letter-spacing:.005em;
+   margin:0;color:var(--ink)}
+ .hiw-map .maptile h2 em{color:var(--gold);font-style:italic;font-weight:600}
+ .hiw-map .maptile h2 .red{color:var(--deep-red);font-weight:600}
+ .hiw-map .maptile .lead{font-family:"Inter",sans-serif;color:var(--ink-soft);
+   font-size:.99rem;line-height:1.55;margin:12px 0 0}
+ .hiw-map .maptile .lead b{color:var(--ink);font-weight:600}
+ /* brand meaning-colours so the eye scans fast (green=deal, red=risk, blue=money) */
+ .hiw-map .mk-green{color:var(--good);font-weight:600}
+ .hiw-map .mk-red{color:var(--weak);font-weight:600}
+ .hiw-map .mk-blue{color:#235E94;font-weight:600}
+
+ /* ── the DARK constellation card (own framed tile → no dark/light seam) ── */
+ /* the dark constellation tile keeps its dark surface but shares the SAME radius
+    (var(--r-card), via .maptile) + the same shadow geometry, tuned darker so it
+    belongs to the set rather than standing apart. */
+ .hiw-map .maptile--dark{padding:0;overflow:hidden;border:1px solid rgba(46,140,98,.34);
+   background:var(--ink-deep);
+   box-shadow:0 24px 54px -26px rgba(0,0,0,.62), 0 2px 10px -4px rgba(0,0,0,.30), 0 0 0 1px rgba(46,140,98,.10)}
+ .hiw-map .maptile--dark:hover{border-color:rgba(46,140,98,.5);
+   box-shadow:0 34px 66px -26px rgba(0,0,0,.66), 0 4px 14px -5px rgba(0,0,0,.34), 0 0 0 1px rgba(46,140,98,.16)}
+ /* inside the map, the galaxy stops being a full-bleed section: no negative pull,
+    no cover photo, no top-edge blend — it's a self-contained tile. */
+ .hiw-map .maptile--dark .galaxy{margin-top:0;padding:30px 22px 34px;overflow:hidden;
+   background-image:
+     radial-gradient(700px 420px at 50% 6%, rgba(46,140,98,.18), transparent 60%),
+     radial-gradient(560px 420px at 12% 96%, rgba(63,184,160,.12), transparent 62%),
+     radial-gradient(560px 420px at 92% 70%, rgba(46,140,98,.08), transparent 60%),
+     linear-gradient(180deg, rgba(28,23,17,.92) 0%, rgba(19,16,11,.95) 60%, rgba(15,12,8,.97) 100%)}
+ .hiw-map .maptile--dark .galaxy::after{display:none}      /* kill the cover-blend wash */
+ .hiw-map .maptile--dark .galaxy-inner{max-width:none}
+ .hiw-map .maptile--dark .g-head{margin-bottom:6px}
+ .hiw-map .maptile--dark .g-head h2{font-size:clamp(1.6rem,2.6vw,2.2rem)}
+ .hiw-map .maptile--dark .g-head p{font-size:.95rem;margin-top:10px}
+ /* scale the ring to fit the narrower column (resize JS keeps node math correct) */
+ .hiw-map .maptile--dark .stage{width:min(440px,82%);height:min(440px,82vw);margin:24px auto 6px}
+
+ /* ── RIGHT tile: "Here's how we find them" (keeps ZIP box + live count) ──
+    distribute the content over the full tile height: the headline/explainer sit
+    at the top, the live count + ZIP box settle toward the bottom. So this tile
+    fills its (stretched) height gracefully instead of floating a band of dead
+    space below the button — and its head aligns with the dark tile's head. */
+ /* the find-tile must let its inner .find stretch the full height (not centre it)
+    so the foot can sit at the bottom. */
+ .hiw-map .find-tile{justify-content:stretch}
+ .hiw-map .find{display:flex;flex-direction:column;flex:1 1 auto}
+ .hiw-map .find .find-foot{margin-top:auto;padding-top:8px}
+ .hiw-map .find .how{font-family:"Inter",sans-serif;color:var(--ink-soft);
+   font-size:.99rem;line-height:1.55;margin:12px 0 0}
+ .hiw-map .find .how b{color:var(--ink);font-weight:600}
+ .hiw-map .find .how .src{color:var(--gold-2);font-weight:600}
+ /* the live database count is PROOF the product is real — so it's a confident
+    hero-stat now: big elegant forest-GREEN Cormorant numerals, a soft green halo,
+    a "live" pip, and a clear label. Sits inside the find tile (not moved out). */
+ .hiw-map .find .countstat{margin:24px 0 4px;align-items:flex-start;padding:4px 0 0}
+ .hiw-map .find .countstat::before{left:26%;top:42%;width:340px;height:150px;
+   background:radial-gradient(circle, rgba(26,106,72,.20), transparent 66%)}
+ .hiw-map .find .countstat .num{font-size:clamp(3.5rem,8vw,5.2rem);font-weight:600;
+   color:var(--gold-bright);letter-spacing:.004em;
+   text-shadow:0 1px 0 rgba(255,255,255,.5)}
+ .hiw-map .find .countstat .cap{display:inline-flex;align-items:center;gap:9px;
+   color:var(--gold-2);font-size:.74rem;letter-spacing:.18em;margin-top:6px}
+ .hiw-map .find .countstat .cap::before{content:"";width:7px;height:7px;border-radius:50%;
+   background:var(--good);box-shadow:0 0 0 3px rgba(26,143,90,.18),0 0 9px rgba(26,143,90,.7);
+   flex:none;animation:cs-pulse 2.6s ease-in-out infinite}
+ @keyframes cs-pulse{0%,100%{opacity:.55}50%{opacity:1}}
+ @media(prefers-reduced-motion:reduce){.hiw-map .find .countstat .cap::before{animation:none}}
+ .hiw-map .find .ziphunt{margin:22px 0 0;max-width:none}
+ .hiw-map .find .zipform{justify-content:flex-start}
+ .hiw-map .find .best-disclaim{margin:18px 0 0!important;text-align:left}
+
+ /* ── compact "four things" list inside its tile (one scannable line each) ── */
+ .hiw-map .why .why-list{max-width:none}
+ .hiw-map .why .why-item{grid-template-columns:auto 1fr auto;gap:6px 16px;
+   padding:14px 0;align-items:center}
+ .hiw-map .why .why-item .ico{display:none}
+ .hiw-map .why .why-item .no{font-size:1.5rem;padding-top:0}
+ .hiw-map .why .why-item .txt h3{font-size:1.18rem;margin:0 0 2px}
+ .hiw-map .why .why-item .txt p{font-size:.9rem;line-height:1.45}
+ .hiw-map .why .why-item .seal{font-size:.66rem}
+ @media(max-width:520px){.hiw-map .why .why-item .seal{display:none}}
+
+ /* ── compact "one home, three seconds" glance card inside its tile ── */
+ .hiw-map .glance .glance-card{max-width:none;margin:0}
+ .hiw-map .glance .stat-grid{grid-template-columns:1fr 1fr;gap:18px}
+
+ /* ── full-width teaser row: kill its own section wrapper/bg/rules ── */
+ .hiw-map .teaser-row .teaser-wrap{background:none}
+ .hiw-map .teaser-row .teaser-wrap>.rule,
+ .hiw-map .teaser-row .teaser-wrap+.rule{display:none}
+ .hiw-map .teaser-row .sec{padding:6px 0 10px}
+
+ /* Inside the map, the inner sections must NOT re-draw their own full-bleed
+    backgrounds, extra section padding, or hairline rules — the tile IS the frame. */
+ .hiw-map .sec{padding:0}
+ .hiw-map .wrap{padding:0;max-width:none}
+ .hiw-map .rule{display:none}
+ .hiw-map .best-wrap{background:none}
+ .hiw-map .best-wrap>.sec{padding-top:0}
+ .hiw-map .glance-wrap{background:none}
+ /* re-hide the section headlines that the tiles now render themselves */
+ .hiw-map .maptile .sec-head{text-align:left;max-width:none;margin:0 0 22px}
+
+ /* ===== RESPONSIVE — phones stack to ONE tight column ===== */
+ @media(max-width:860px){
+   .hiw-map{grid-template-columns:1fr;gap:16px;padding:30px 16px 6px}
+   .hiw-map .maptile{padding:26px 22px}
+   .hiw-map .maptile--dark .galaxy{padding:24px 14px 28px}
+   .hiw-map .glance .stat-grid{grid-template-columns:1fr 1fr;gap:16px}
+ }
+</style></head><body><section class='ch-hero'><div class='ch-img'></div><video class='ch-vid' autoplay muted loop playsinline preload='auto' poster='assets/hero_couple_poster.jpg'><source src='assets/hero_couple.mp4' type='video/mp4'></video><div class='ch-grade'></div><div class='ch-smoke'><span class='s1'></span><span class='s2'></span><span class='s3'></span><span class='s4'></span></div><div class='ch-grain'></div><div class='ch-scrim'></div><div class='ch-fade'></div><header class='ch-header'><div class='ch-bar'><a class='ch-wordmark ch-rise ch-d1' href='index.html'>Underlisted</a><nav class='ch-nav ch-rise ch-d1'><a href='report-underpriced.html'>Browse</a><a href='index.html#howitworks' data-hiw-toggle aria-controls='howitworks' aria-expanded='true'>How it works</a><a href='index.html#early-access'>Pricing</a><a href='https://underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app'>Sign in</a></nav><button class='ch-navtoggle ch-rise ch-d1' aria-label='Menu'><span></span></button></div></header><div class='ch-stage'><div class='ch-copy'><div class='ch-eyebrow ch-rise ch-d2'>Underpriced U.S. Homes</div><h1 class='ch-headline long ch-rise ch-d3'><span class='ch-hl-lead'>Foreclosures &amp; under-priced homes</span><span class='ch-hl-qual'>Nationwide, in cities <span class='ch-accent'>across all 50 states.</span></span><span class='ch-hl-kicker'>The deals other sites make you <span class='ch-kr'>dig for.</span></span></h1><p class='ch-sub ch-rise ch-d4'>Every home scored <b>0&ndash;100 in plain English</b> &mdash; green means a real deal, with fire &amp; flood risk and the true monthly cost made <i>obvious</i>.</p><div class='ch-actions ch-rise ch-d5'><a class='ch-btn ch-btn-secondary' href='report-underpriced.html'>See the deals <span class='arr'>&rarr;</span></a><span class='ch-cta-stack'><span class='ch-cta-eyebrow' data-hiw-eyebrow>New to buying a house?</span><a class='ch-btn ch-btn-gold' href='index.html#howitworks' data-hiw-toggle data-hiw-hero aria-controls='howitworks' aria-expanded='true'><span class='hiw-lbl'>Learn how it works</span> <span class='arr'>&rarr;</span></a></span></div></div></div><div class='ch-stat ch-rise ch-d5' aria-label='Homes in our database'><span class='ch-stat-num'>6,900+</span><span class='ch-stat-cap'><span class='ch-stat-dot'></span>homes scored &amp; tracked nationwide</span></div></section><div id='howitworks' class='hiw hiw--open' role='region' aria-label='How Underlisted works'><div class='hiw-inner'><div class='hiw-map'><div class='maptile maptile--dark'>
+<section class="galaxy" aria-labelledby="galaxy-title">
+  <div class="galaxy-inner">
+    <div class="g-head reveal">
+      <span class="g-tag"><span class="dot"></span>Everything you get</span>
+      <h2 id="galaxy-title">One app. Every answer a <em>home buyer</em> needs.</h2>
+      <p>No more clicking around or doing the math in spreadsheets. Tap any point in the
+         constellation to see what it does for you.</p>
+      <p class="g-hint">The ring turns on its own — tap a node to pause and explore.</p>
+    </div>
+
+    <!-- ORBIT (desktop/tablet) -->
+    <div class="stage" id="g-stage" aria-hidden="false">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="orbit-field" id="g-field"><!-- nodes injected by JS --></div>
+      <button class="hub" id="g-hub" aria-label="Underlisted Deal Score — collapse any open feature">
+        <span class="glow"></span>
+        <span class="disc">
+          <svg class="ring-svg" viewBox="0 0 130 130" width="130" height="130" aria-hidden="true">
+            <path d="M20 95 A52 52 0 1 1 110 95" fill="none" stroke="rgba(26,143,90,.16)" stroke-width="9" stroke-linecap="round"/>
+            <path d="M20 95 A52 52 0 0 1 105 50" fill="none" stroke="#1FA968" stroke-width="9" stroke-linecap="round"/>
+          </svg>
+          <span class="num">84</span>
+          <span class="lbl">Deal Score</span>
+        </span>
+      </button>
+      <div class="gdetail" id="g-detail" role="dialog" aria-modal="false" aria-live="polite"></div>
+    </div>
+
+    <!-- MOBILE FALLBACK: stacked cards (same features) -->
+    <div class="glist" id="g-list" aria-label="Underlisted features"></div>
+  </div>
+</section>
+<script>
+(function(){
+  var ICONS = {
+    score:'<path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z"/><path d="M12 12l4-3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+    fire:'<path d="M12 3c3 3 4.5 5.5 4.5 8.5a4.5 4.5 0 0 1-9 0c0-1.4.6-2.7 1.5-3.6.2 1.3 1 2.1 2 2.1 0-2 .3-4.4 1-7z"/><path d="M3 20.5c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0" opacity=".7"/>',
+    cost:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/>',
+    cash:'<path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    afford:'<path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+    fore:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/><circle cx="16.5" cy="7.5" r="2.4"/><path d="M16.5 6.4v2.2M15.4 7.5h2.2"/>',
+    calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v3"/>'
+  };
+  // `link` = the dedicated "See how it works" deep-dive page for each feature
+  // (Quill's honest engineering explainers, one indexable URL per buyer search).
+  // EXCEPTION: the Foreclosures node ALSO has a deep-dive, but we route it to
+  // that deep-dive (which itself links onward to learn.html#what-is-reo).
+  // `mc` = MEANING colour of the node's icon (owner wants instant scan, not all-gold):
+  //   green = the deal / good / found · red = a warning · blue = a money tool.
+  var FEATURES = [
+    {id:'score', icon:'score', tone:'good', mc:'green', title:'Plain-English Deal Score',
+     tag:'0\u2013100 \u00b7 green = good', link:'how-deal-score-works.html',
+     what:'Every U.S. home gets one honest number from 0 to 100. Green means a genuinely under-priced deal \u2014 no jargon, no spreadsheets, just "is this a good buy, yes or no."'},
+    {id:'fire', icon:'fire', tone:'weak', mc:'red', title:'Fire & flood insurance risk',
+     tag:'FEMA risk \u00b7 warnings only', link:'how-insurance-risk-works.html', related:['cost','afford'],
+     what:'We check FEMA fire and flood data for the address, so a pretty home in a high-risk zone never blindsides you with a sky-high insurance bill after you move in.'},
+    {id:'cost', icon:'cost', tone:'okay', mc:'blue', title:'The true monthly cost',
+     tag:'all-in, honest ranges', link:'how-true-monthly-cost-works.html', related:['afford','fire'],
+     what:'Mortgage, taxes, insurance, PMI, HOA and upkeep \u2014 gathered into one honest all-in number you can actually plan around, shown as realistic ranges, not a fantasy.'},
+    {id:'cash', icon:'cash', tone:'okay', mc:'blue', title:'The real cash to the keys',
+     tag:'down + closing + reserves', link:'how-cash-to-keys-works.html', related:['afford'],
+     what:'Down payment, closing costs and a sensible reserve add up to the real cash you need in the bank before you get the keys \u2014 no surprises at the closing table.'},
+    {id:'afford', icon:'afford', tone:'good', mc:'blue', title:'"Can I afford it?"',
+     tag:'green / amber / red verdict', link:'how-afford-check-works.html', related:['cost','cash'],
+     what:'Enter your income, savings and debts once. Each home turns green, amber or red with "$X left every month," so you instantly see what you can comfortably carry.'},
+    {id:'fore', icon:'fore', tone:'good', mc:'green', title:'Foreclosures, nationwide',
+     tag:'HUD & USDA homes', link:'how-foreclosures-work.html',
+     what:'Bank-owned and government (HUD / USDA) homes are folded into the same scored feed across the whole USA \u2014 the deepest discounts, scored the same plain way as everything else.'},
+    {id:'calc', icon:'calc', tone:'good', mc:'blue', title:'Free investor calculators',
+     tag:'rental & fix-and-flip \u00b7 free', link:'how-free-calculators-work.html',
+     what:'Free rental cash-flow and fix-and-flip / ARV calculators \u2014 cap rate, cash-on-cash, the 1% and 70% rules \u2014 so beginners can run the numbers without signing up.'}
+  ];
+
+  var field  = document.getElementById('g-field');
+  var stage  = document.getElementById('g-stage');
+  var detail = document.getElementById('g-detail');
+  var hub    = document.getElementById('g-hub');
+  var list   = document.getElementById('g-list');
+  if(!field || !stage) return;
+  var R = 0.62;
+  var nodeEls = {};
+
+  FEATURES.forEach(function(f){
+    var node = document.createElement('div');
+    node.className = 'node mc-' + (f.mc||'gold');
+    node.dataset.id = f.id;
+    node.innerHTML =
+      '<div class="spin-fix"><button aria-label="'+f.title.replace(/"/g,'&quot;')+'">'+
+        '<span class="bubble"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+        'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICONS[f.icon]+'</svg></span>'+
+        '<span class="cap">'+f.title.replace(' insurance risk','').replace(/"/g,'')+'</span>'+
+      '</button></div>';
+    field.appendChild(node);
+    nodeEls[f.id] = node;
+    node.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); openCard(f.id); });
+  });
+
+  function place(){
+    var half = stage.clientWidth/2;
+    FEATURES.forEach(function(f,i){
+      var ang = (i / FEATURES.length) * Math.PI*2 - Math.PI/2;
+      var x = Math.cos(ang) * R * half;
+      var y = Math.sin(ang) * R * half;
+      nodeEls[f.id].style.transform = 'translate('+x+'px,'+y+'px)';
+    });
+  }
+  window.addEventListener('resize', place); place();
+
+  var activeId = null;
+  function openCard(id){
+    var f = FEATURES.find(function(x){return x.id===id;});
+    activeId = id;
+    stage.classList.add('paused','has-active');
+    Object.keys(nodeEls).forEach(function(k){ nodeEls[k].classList.remove('active','related'); });
+    nodeEls[id].classList.add('active');
+    (f.related||[]).forEach(function(r){ if(nodeEls[r]) nodeEls[r].classList.add('related'); });
+    detail.innerHTML =
+      '<div class="card mc-'+(f.mc||'gold')+'">'+
+        '<button class="x" aria-label="Close">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'+
+        '</button>'+
+        '<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICONS[f.icon]+'</svg></div>'+
+        '<h3>'+f.title+'</h3>'+
+        '<p class="what">'+f.what+'</p>'+
+        '<span class="chip '+f.tone+'">'+f.tag+'</span><br>'+
+        '<a class="seemore" href="'+f.link+'">See how it works <span aria-hidden="true">\u2192</span></a>'+
+      '</div>';
+    detail.classList.add('show');
+    detail.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); closeCard(); });
+  }
+  function closeCard(){
+    activeId = null;
+    detail.classList.remove('show');
+    stage.classList.remove('paused','has-active');
+    Object.keys(nodeEls).forEach(function(k){ nodeEls[k].classList.remove('active','related'); });
+  }
+  hub.addEventListener('click', function(){ if(activeId) closeCard(); });
+  stage.addEventListener('click', closeCard);
+  detail.addEventListener('click', function(e){ e.stopPropagation(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeCard(); });
+
+  // mobile fallback — stacked cards, each with the same "See how it works" link
+  FEATURES.forEach(function(f){
+    var c = document.createElement('div');
+    c.className = 'fcard mc-' + (f.mc||'gold');
+    c.innerHTML =
+      '<div class="frow">'+
+        '<span class="fic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICONS[f.icon]+'</svg></span>'+
+        '<span><h3>'+f.title+'</h3><p class="what">'+f.what+'</p>'+
+        '<span class="chip '+f.tone+'">'+f.tag+'</span></span>'+
+      '</div>'+
+      '<a class="seemore" href="'+f.link+'">See how it works <span aria-hidden="true">\u2192</span></a>';
+    list.appendChild(c);
+  });
+})();
+</script>
+</div><div class='maptile find-tile'><div class='find reveal'><div class='maptile-head'><div class='kicker'>Why our deals are the best</div><h2>Here's how we <em>find</em> them.</h2></div><p class='how'>We pull <span class='src'>government foreclosure &amp; bank-owned feeds (HUD &amp; USDA)</span> plus <b>under-priced listings nationwide</b>, then score every one <b>0–100 in plain English</b> — with <span class='mk-red'>fire &amp; flood risk</span> and the <span class='mk-blue'>true monthly cost</span> built in.</p><div class='find-foot'><div class='countstat'><div class='num tnum'>6,900+</div><div class='cap'>homes scored &amp; tracked nationwide</div></div><div class='ziphunt'><p class='prompt'>Type your ZIP — see the under-priced homes near you.</p><form class='zipform' action='https://underlisted-gidalbx5x5vlaeuvqncwpp.streamlit.app/Browse_Deals' method='get' target='_blank' rel='noopener'><span class='zipwrap'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg><input type='text' name='area' inputmode='text' autocomplete='postal-code' placeholder='ZIP or city — e.g. 30303 or Atlanta' aria-label='Your ZIP code or city' /></span><button type='submit'>See deals near you <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M4.5 12h15"/><path d="M13 5.5 19.5 12 13 18.5"/></svg></button></form></div><p class='best-disclaim' style='font-size:.72rem;line-height:1.5;color:#938A7E'>Deal Scores and cost estimates are automated screening tools — not appraisals or financial advice. Verify with a licensed lender, agent and inspector before buying.</p></div></div></div><div class='maptile why reveal'><section class='sec' id='why'><div class='wrap'><div class='sec-head'><div class='kicker'>Why Underlisted</div><h2>Four things every site makes you <em>figure out alone.</em></h2></div><div class='why-list'><div class='why-item'><div class='no'>I.</div><div class='txt'><h3>A plain-English <span class='mk-green'>Deal Score</span></h3><p>Every home, one 0–100 number. Green = a good deal.</p></div><div class='seal'>0–100</div></div><div class='why-item'><div class='no'>II.</div><div class='txt'><h3><span class='mk-red'>Fire &amp; flood</span> insurance warning</h3><p>FEMA risk flagged before you fall in love.</p></div><div class='seal'>FEMA</div></div><div class='why-item'><div class='no'>III.</div><div class='txt'><h3>The <span class='mk-blue'>true monthly cost</span></h3><p>Mortgage + tax + insurance + upkeep + HOA, all-in.</p></div><div class='seal'>All-in</div></div><div class='why-item'><div class='no'>IV.</div><div class='txt'><h3>The <span class='mk-blue'>real cash</span> you'd need</h3><p>Down payment + closing — the money to get the keys.</p></div><div class='seal'>To keys</div></div></div></div></section></div><div class='maptile glance reveal'><section class='sec' id='glance'><div class='wrap'><div class='sec-head'><div class='kicker'>What you see</div><h2>One home, read in <em>three seconds.</em></h2></div><div class='glance-card'><div class='glance-top'><span class='addr'>Maple Ridge Bungalow</span><span class='meta'>Houston, TX · 3 bed · 2 bath</span><span class='chip'><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M20 6.5 9.2 17.3 4 12.1"/></svg>Strong deal</span></div><div class='stat-grid'><div class='stat'><div class='l'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3.4 20.5 7.6H3.5z"/><path d="M3.5 10.4h17"/><path d="M6.6 10.4V17M10.2 10.4V17M13.8 10.4V17M17.4 10.4V17"/><path d="M3.2 20.4h17.6"/></svg>True cost / month</div><div class='v good tnum'>$2,540</div><div class='f'>All-in, no surprises</div></div><div class='stat'><div class='l'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx="12" cy="12" r="8.4"/><path d="M12 6.6v10.8"/><path d="M14.7 9.1a2.7 2.5 0 0 0-2.7-1.6 2.6 2.4 0 0 0 0 4.8 2.6 2.4 0 0 1 0 4.8 2.7 2.5 0 0 1-2.7-1.6"/></svg>Real cash needed</div><div class='v tnum'>$48,060</div><div class='f'>To actually buy</div></div><div class='stat'><div class='l'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.5 14.4c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0"/><path d="M3.5 9.4c1.8-2 3.6-2 5.4 0s3.6 2 5.4 0 3.6-2 5.4 0"/></svg>Flood risk</div><div class='v good'>Low</div><div class='f'>Insurance friendly</div></div><div class='stat'><div class='l'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M12.4 3.3c-.3 2.6-1.5 3.9-2.9 5.2-1.6 1.5-3 3.3-3 5.9a5.5 5.5 0 0 0 11 0c0-2-.8-3.4-1.8-4.6.1 1.6-.6 2.4-1.6 2.6.8-2.6-.2-5.4-1.7-6.4 0 1.7-.6 2.5-1.5 3.2.8-2.2.6-4.3 1.5-5.9z"/></svg>Fire risk</div><div class='v okay'>Moderate</div><div class='f'>Watch insurance</div></div></div></div></div></section></div><div class='maptile teaser-row row-full reveal'><div class='teaser-wrap'><section class='sec' id='peek'><div class='wrap'><div class='sec-head reveal'><div class='kicker'>What you'll find when you search</div><h2>The free part is the address. The <em>magic</em> is behind the glass.</h2><p>The parts that actually answer “is this a good deal?” unlock the moment you subscribe.</p></div><div class='teaser-grid'><div class='tcard reveal'><span class='sample-tag'>Sample home</span><div class='open'><div class='addr'>1428 Magnolia Ave</div><div class='meta'>Sacramento, CA · 3 bed · 2 bath · 41 days listed</div><div class='teaserline'><svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg>Listed at $389,000 — but is it a deal?</div></div><div class='tlocked'><div class='blurfield' aria-hidden='true'><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M4 13.5a8 8 0 0 1 16 0"/><path d="M12 13.5 17 9.2"/><circle cx="12" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>Deal Score</span><span class='lv good tnum'>84 · GREAT</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M20.2 13.1 13.1 20.2a1.9 1.9 0 0 1-2.7 0l-6.8-6.8a1.9 1.9 0 0 1-.6-1.3V4.6a1.9 1.9 0 0 1 1.9-1.9h7.5a1.9 1.9 0 0 1 1.3.6l6.8 6.8a1.9 1.9 0 0 1 0 2.7z"/><circle cx="8" cy="8" r="1.15" fill="currentColor" stroke="none"/></svg>Below its value</span><span class='lv good tnum'>$34,000</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3.4 20.5 7.6H3.5z"/><path d="M3.5 10.4h17"/><path d="M6.6 10.4V17M10.2 10.4V17M13.8 10.4V17M17.4 10.4V17"/><path d="M3.2 20.4h17.6"/></svg>True cost / month</span><span class='lv tnum'>$2,760/mo</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx="12" cy="12" r="8.4"/><path d="M12 6.6v10.8"/><path d="M14.7 9.1a2.7 2.5 0 0 0-2.7-1.6 2.6 2.4 0 0 0 0 4.8 2.6 2.4 0 0 1 0 4.8 2.7 2.5 0 0 1-2.7-1.6"/></svg>Can you afford it?</span><span class='lv good'>Yes — $610 left/mo</span></div></div><div class='glass'><span class='lockwrap'><svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x="4.8" y="10.6" width="14.4" height="9.8" rx="2.6"/><path d="M8 10.6V7.8a4 4 0 0 1 8 0v2.8"/><path d="M12 14.4v2.6"/><circle cx="12" cy="14.4" r="1.15" fill="currentColor" stroke="none"/></svg></span><span class='gline'>Subscribe to see every home's Deal Score, true cost &amp; risk.</span><a class='unlock' href='index.html#early-access'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x="4.8" y="10.6" width="14.4" height="9.8" rx="2.6"/><path d="M8 10.6V7.8a4 4 0 0 1 8 0v2.8"/><path d="M12 14.4v2.6"/><circle cx="12" cy="14.4" r="1.15" fill="currentColor" stroke="none"/></svg>Unlock — founding $19.99/mo</a><span class='gfine'>Cancel anytime · founding price locked for a year</span></div></div></div><div class='tcard reveal'><span class='sample-tag'>Sample home</span><div class='open'><div class='addr'>76 Birchwood Ln</div><div class='meta'>Cleveland, OH · 4 bed · 2 bath · 18 days listed</div><div class='teaserline'><svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg>Listed at $214,500 — but is it a deal?</div></div><div class='tlocked'><div class='blurfield' aria-hidden='true'><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M4 13.5a8 8 0 0 1 16 0"/><path d="M12 13.5 17 9.2"/><circle cx="12" cy="13.5" r="1.2" fill="currentColor" stroke="none"/></svg>Deal Score</span><span class='lv good tnum'>71 · STRONG</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M20.2 13.1 13.1 20.2a1.9 1.9 0 0 1-2.7 0l-6.8-6.8a1.9 1.9 0 0 1-.6-1.3V4.6a1.9 1.9 0 0 1 1.9-1.9h7.5a1.9 1.9 0 0 1 1.3.6l6.8 6.8a1.9 1.9 0 0 1 0 2.7z"/><circle cx="8" cy="8" r="1.15" fill="currentColor" stroke="none"/></svg>Below its value</span><span class='lv good tnum'>$19,800</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3.4 20.5 7.6H3.5z"/><path d="M3.5 10.4h17"/><path d="M6.6 10.4V17M10.2 10.4V17M13.8 10.4V17M17.4 10.4V17"/><path d="M3.2 20.4h17.6"/></svg>True cost / month</span><span class='lv tnum'>$1,640/mo</span></div><div class='lrow'><span class='lk'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx="12" cy="12" r="8.4"/><path d="M12 6.6v10.8"/><path d="M14.7 9.1a2.7 2.5 0 0 0-2.7-1.6 2.6 2.4 0 0 0 0 4.8 2.6 2.4 0 0 1 0 4.8 2.7 2.5 0 0 1-2.7-1.6"/></svg>Can you afford it?</span><span class='lv good'>Yes — $430 left/mo</span></div></div><div class='glass'><span class='lockwrap'><svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x="4.8" y="10.6" width="14.4" height="9.8" rx="2.6"/><path d="M8 10.6V7.8a4 4 0 0 1 8 0v2.8"/><path d="M12 14.4v2.6"/><circle cx="12" cy="14.4" r="1.15" fill="currentColor" stroke="none"/></svg></span><span class='gline'>Subscribe to see every home's Deal Score, true cost &amp; risk.</span><a class='unlock' href='index.html#early-access'><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x="4.8" y="10.6" width="14.4" height="9.8" rx="2.6"/><path d="M8 10.6V7.8a4 4 0 0 1 8 0v2.8"/><path d="M12 14.4v2.6"/><circle cx="12" cy="14.4" r="1.15" fill="currentColor" stroke="none"/></svg>Unlock — founding $19.99/mo</a><span class='gfine'>Cancel anytime · founding price locked for a year</span></div></div></div></div><p class='teaser-foot'>Every example is a <b>sample</b> with made-up numbers. Inside Underlisted, every real U.S. home gets the same plain-English read — <a href='index.html#early-access'>get founding access →</a></p></div></section></div></div></div><div class='hiw-hidebar'><button type='button' class='hiw-hide' data-hiw-hide aria-controls='howitworks'><span class='chev'>&#9650;</span> Hide how it works</button></div></div></div><script>(function(){var e=document.getElementById('howitworks');if(e){e.classList.remove('hiw--open');document.querySelectorAll('[data-hiw-toggle]').forEach(function(t){t.setAttribute('aria-expanded','false');});}})();</script><section class='sec' id='why-grid'><div class='wrap'><div class='sec-head reveal'><div class='kicker'>Everything you get</div><h2>One simple app, the whole <em>home-buying picture.</em></h2><p>The numbers that decide a home — each in plain English, each at a glance.</p></div><div class='fgrid'><a class='fcard reveal' href='home-affordability-calculator.html'><div class='fico'><img src='assets/icons/afford.png' alt='Can I afford it?' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Can I afford it?</h4><p>Your income, cash &amp; debts → green, amber or red.</p></div></a><div class='fcard reveal'><div class='fico'><img src='assets/icons/risk.png' alt='Fire and flood risk' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Fire &amp; flood risk</h4><p>Insurance surprises, flagged early.</p></div></div><a class='fcard reveal' href='rent-vs-buy-calculator.html'><div class='fico'><img src='assets/icons/cost.png' alt='True monthly cost' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>True monthly cost</h4><p>Every cost added up, not just the loan.</p></div></a><a class='fcard reveal' href='cash-to-close-calculator.html'><div class='fico'><img src='assets/icons/cash.png' alt='Cash to the keys' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Cash to the keys</h4><p>The real money you need up front.</p></div></a><div class='fcard reveal'><div class='fico'><img src='assets/icons/score.png' alt='Plain-English Deal Score' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Plain-English Deal Score</h4><p>One 0–100 number. Green = a good deal.</p></div></div><a class='fcard reveal' href='rent-vs-buy-calculator.html'><div class='fico'><img src='assets/icons/calc.png' alt='Free investor calculators' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Free investor calculators</h4><p>Rental &amp; flip math, no signup.</p></div></a><a class='fcard reveal' href='learn.html'><div class='fico'><img src='assets/icons/credit.png' alt='Credit score check' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Credit score check</h4><p>What your score means for your rate &amp; payment.</p></div></a><div class='fcard reveal'><div class='fico'><img src='assets/icons/foreclosure.png' alt='Foreclosures, nationwide' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Foreclosures, nationwide</h4><p>Bank-owned deals across the USA.</p></div></div><div class='fcard reveal'><div class='fico'><img src='assets/icons/agent.png' alt='Talk to a local agent' width='62' height='62' loading='lazy' decoding='async'></div><div class='fbody'><h4>Talk to a local agent</h4><p>When you’re ready, reach the listing agent.</p></div></div></div></div></section><section class='sec' id='tools'><div class='wrap'><div class='sec-head reveal'><div class='kicker'>Free to try</div><h2>Run the numbers <em>before</em> you fall in love.</h2><p>Four plain-English calculators. No signup, no math homework. <span class='freebadge big'><span class='fdot'></span>FREE</span></p></div><div class='tools-grid'><a class='tool reveal' href='home-affordability-calculator.html'><div class='ico illus'><img src='assets/icons/afford.png' alt='Can I afford it' width='62' height='62' loading='lazy' decoding='async'></div><h4>Can I afford it?</h4><p>Income, cash and debts → green, amber or red.</p><span class='freebadge'><span class='fdot'></span>FREE</span></a><a class='tool reveal' href='cash-to-close-calculator.html'><div class='ico illus'><img src='assets/icons/cash.png' alt='Cash to the keys' width='62' height='62' loading='lazy' decoding='async'></div><h4>Cash to the keys</h4><p>Down payment + closing, the real number.</p><span class='freebadge'><span class='fdot'></span>FREE</span></a><a class='tool reveal' href='rent-vs-buy-calculator.html'><div class='ico illus'><img src='assets/icons/cost.png' alt='Rent vs buy' width='62' height='62' loading='lazy' decoding='async'></div><h4>Rent vs buy</h4><p>Which one really wins for you, and when.</p><span class='freebadge'><span class='fdot'></span>FREE</span></a><a class='tool reveal' href='mortgage-payoff-calculator.html'><div class='ico illus'><img src='assets/icons/calc.png' alt='Payoff time' width='62' height='62' loading='lazy' decoding='async'></div><h4>Payoff time</h4><p>How fast a little extra clears the loan.</p><span class='freebadge'><span class='fdot'></span>FREE</span></a></div><div class='pagelinks reveal' style='margin-top:44px'><div class='kicker' style='margin-bottom:14px'>Deals by city</div><div class='toc' style='margin-top:0'><a href='deals-in-anniston.html'>ANNISTON · 2 homes</a><a href='deals-in-birmingham.html'>BIRMINGHAM · 5 homes</a><a href='deals-in-decatur.html'>DECATUR · 1 home</a><a href='deals-in-dothan.html'>DOTHAN · 1 home</a><a href='deals-in-hope-hull.html'>HOPE HULL · 1 home</a><a href='deals-in-huntsville.html'>HUNTSVILLE · 1 home</a><a href='deals-in-irvington.html'>IRVINGTON · 1 home</a><a href='deals-in-jemison.html'>JEMISON · 1 home</a><a href='deals-in-lowdesboro.html'>LOWDESBORO · 1 home</a><a href='deals-in-mobile.html'>MOBILE · 1 home</a><a href='deals-in-montgomery.html'>MONTGOMERY · 7 homes</a><a href='deals-in-owens-cross-roads.html'>OWENS CROSS ROADS · 1 home</a><a href='deals-in-phenix-city.html'>PHENIX CITY · 1 home</a><a href='deals-in-sacramento.html'>Sacramento · 8 homes</a><a href='deals-in-tuscaloosa.html'>TUSCALOOSA · 2 homes</a><a href='deals-in-verbena.html'>VERBENA · 1 home</a><a href='deals-in-vernon.html'>VERNON · 1 home</a><a href='deals-in-west-blocton.html'>WEST BLOCTON · 1 home</a><a href='deals-in-wilmer.html'>WILMER · 1 home</a></div></div></div></section><section class='sec' id='early-access'><div class='wrap'><div class='wl reveal'><div class='key'>Founding access</div><h2>Be first when we open the doors.</h2><p>Founding members lock in <span class='price'>$19.99/mo</span> for a full year — rising to $49.99/mo soon. No spam, just your invite.</p><form name='waitlist' method='POST' data-netlify='true' netlify-honeypot='bot-field' action='/thanks.html'><input type='hidden' name='form-name' value='waitlist' /><p style='display:none'><label>Leave blank: <input name='bot-field' /></label></p><input type='email' name='email' placeholder='you@email.com' required aria-label='Your email address' /><button type='submit'>Join the waitlist →</button></form><p class='fine'>We email you when your city opens. Unsubscribe anytime.</p></div></div></section>
+<script>
+(function(){
+  var panel = document.getElementById('howitworks');
+  if(!panel) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var toggles = Array.prototype.slice.call(document.querySelectorAll('[data-hiw-toggle]'));
+  var hides   = Array.prototype.slice.call(document.querySelectorAll('[data-hiw-hide]'));
+
+  function isOpen(){ return panel.classList.contains('hiw--open'); }
+
+  // keep every toggle's aria-expanded in sync. The hero gold button's label is now
+  // CONSTANT ("Learn how it works →") — it no longer flips to "Hide" when open
+  // (owner 2026-06-21: "Why call it 'Hide'?"). The bottom "▲ Hide how it works"
+  // control inside the unfolded story is still the way to collapse it.
+  function syncState(){
+    var open = isOpen();
+    toggles.forEach(function(t){ t.setAttribute('aria-expanded', open ? 'true':'false'); });
+    // the "New to buying a house?" eyebrow only shows while the story is closed
+    var eyebrow = document.querySelector('[data-hiw-eyebrow]');
+    if(eyebrow){ eyebrow.classList.toggle('is-open', open); }
+  }
+
+  function smoothTo(el){
+    if(!el) return;
+    el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+  }
+
+  // The story sections use the site's scroll-triggered fade-in (.reveal -> .reveal.in
+  // added by the IntersectionObserver). When the block unfolds, the sections now on
+  // screen would read faint until the user scrolls. So the instant we open, we mark
+  // any .reveal inside #howitworks that's already in (or near) the viewport as visible
+  // by adding the SAME ".in" class the observer uses. Elements further down keep their
+  // un-revealed state and still animate normally on scroll.
+  function revealVisibleInside(){
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var margin = vh * 0.25; // also pre-reveal a little below the fold so nothing pops faint
+    var els = panel.querySelectorAll('.reveal:not(.in)');
+    Array.prototype.forEach.call(els, function(e){
+      var r = e.getBoundingClientRect();
+      if(r.top < vh + margin && r.bottom > -margin){ e.classList.add('in'); }
+    });
+  }
+
+  function open(){
+    panel.classList.add('hiw--open');
+    syncState();
+    // crisp-up the now-visible story sections immediately (no faint flash),
+    // then scroll to the top of the unfolded story after the row begins to expand.
+    requestAnimationFrame(function(){
+      revealVisibleInside();
+      smoothTo(panel);
+      // after the smooth scroll settles, catch anything newly brought into view
+      requestAnimationFrame(revealVisibleInside);
+    });
+  }
+  function close(scrollUp){
+    panel.classList.remove('hiw--open');
+    syncState();
+    if(scrollUp){
+      // collapse, then ease back up to the cinematic cover
+      var cover = document.querySelector('.ch-hero') || document.body;
+      requestAnimationFrame(function(){
+        window.scrollTo({top:0, behavior: reduce ? 'auto':'smooth'});
+        if(cover && cover.scrollIntoView){ /* top is the cover */ }
+      });
+    }
+  }
+
+  toggles.forEach(function(t){
+    t.addEventListener('click', function(ev){
+      ev.preventDefault();
+      if(isOpen()){ close(true); } else { open(); }
+    });
+  });
+  hides.forEach(function(h){
+    h.addEventListener('click', function(ev){
+      ev.preventDefault();
+      close(true);
+    });
+  });
+
+  syncState();
+})();
+</script><div class='rule gold'></div><footer><div class='wrap'><div class='foot-grid'><a class='logo' href='index.html'><span class='mark'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d="M3.6 11.3 12 4.2l8.4 7.1"/><path d="M5.4 9.9V20h13.2V9.9"/><path d="M10.2 20v-5.1h3.6V20"/></svg></span><b>Underlisted</b></a><nav class='foot-links'><a href='index.html'>Deals</a><a href='free-tools.html'>Free tools</a><a href='report-underpriced.html'>Most underpriced</a><a href='learn.html'>Learn the basics</a><a href='index.html#early-access'>Get access</a></nav></div><p class='disclaim'>Estimates only — a screening tool, not financial or investment advice. Always confirm with a lender and an inspection. Fair Housing: our scoring never uses demographic or neighborhood-quality signals.</p></div></footer>
+<script>
+ (function(){
+   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+   window.addEventListener("load", function(){
+     var arc = document.getElementById("arcF");
+     if(arc){ var pct = parseFloat(arc.getAttribute("data-pct")||"0.84");
+       if(reduce){arc.style.transition="none";}
+       requestAnimationFrame(function(){ arc.style.strokeDashoffset = (251.2*(1-pct)).toFixed(1); }); }
+   });
+   if(reduce){ document.querySelectorAll(".reveal").forEach(function(e){e.classList.add("in")}); return; }
+   var io = new IntersectionObserver(function(es){
+     es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+   },{threshold:.14});
+   document.querySelectorAll(".reveal:not(.in)").forEach(function(e){io.observe(e)});
+ })();
+</script></body></html>
